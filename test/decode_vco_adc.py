@@ -1,4 +1,4 @@
-"""Off-chip DSP for tt_um_arcadia1_vco_adc captures (pseudo-differential).
+"""Off-chip DSP for tt_um_arcadia1_vco_adc captures (pseudo-differential, second-order loop).
 
 Input: one 16-bit sample per clock, low byte = uio[7:0] (N half), high byte =
 uo_out[7:0] (P half). P: uo_out[6:0] are the 7 sampled ring phases, uo_out[7] the monitor.
@@ -9,8 +9,9 @@ little-endian 32-bit word, first sample in the upper half.
 
     python3 decode_vco_adc.py vco_adc.bin [--fs 10e6] [--bw 50e3] [--raw16]
 
-Per half: y[n] = popcount(phase[n] xor phase[n-1]) (= 14*f_vco/fs, first-order shaped).
-ADC output: y = yP - yN, then low-pass/decimate. Prints both VCO frequencies and the
+Per half: y[n] = popcount(phase[n] xor phase[n-1]), the same count the on-chip DAC fed back
+(second-order shaped). The loop integrator inverts, so a higher VINP lowers yP.
+ADC output: y = yN - yP, then low-pass/decimate. Prints both VCO frequencies and the
 SNDR of P alone and of the difference.
 """
 import argparse
@@ -55,8 +56,8 @@ def main():
     for name, y in (('P', yp), ('N', yn)):
         print(f'{name}: code range [{y.min():.0f}, {y.max():.0f}]  f_vco = {y.mean()*a.fs/14/1e6:.4f} MHz')
         if y.max() >= 7:
-            print(f'WARNING: {name} code reached 7, the VCO ran faster than fs/2; raise fs or lower VIN')
-    for name, y in (('P only', yp), ('P - N', yp - yn)):
+            print(f'WARNING: {name} code reached 7: the input is beyond full scale (about +-0.3 V per side)')
+    for name, y in (('P only', yp), ('N - P', yn - yp)):
         fin, v = sndr(y, a.fs, a.bw)
         print(f'{name}: tone {fin:.1f} Hz, SNDR in {a.bw/1e3:.0f} kHz = {v:.1f} dB')
 

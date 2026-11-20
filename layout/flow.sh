@@ -19,4 +19,6 @@ $RUN "cd /w/$1/mag && $M ../half.tcl > ../half.log 2>&1 && $M ../top.tcl > ../to
 grep -E "RBOX|rror" $R/half.log $R/top.log | head -20
 $RUN "cd /w/$1/mag && $M /w/tt-support-tools/precheck/magic_drc.tcl ../gds/tt_um_arcadia1_vco_adc.gds tt_um_arcadia1_vco_adc /w/pdk/sky130A ../magic_drc.txt ../magic_drc.mag > ../drc.log 2>&1; grep COUNT ../magic_drc.txt"
 cp $R/lvs_ref.v $R/ext/
-$RUN "cd /w/$1/ext && MODE=lvs $M /w/proj/layout/extract.tcl > extract.log 2>&1; netgen-lvs -batch source /w/proj/layout/lvs.tcl > lvs.log 2>&1; grep -E 'Netlists match|do not match|roperty errors' lvs_report.txt | sort | uniq -c"
+RUNX="podman run --rm -v $HOME/tt-vco-adc:/w:z -e PDK_ROOT=/w/pdk -e PDK=sky130A --entrypoint bash localhost/tt-precheck:sky26b -lc"
+$RUNX "cd /w/$1/ext && MODE=lvs $M /w/proj/layout/extract.tcl > extract.log 2>&1"
+$RUN "cd /w/$1/ext && netgen-lvs -batch source /w/proj/layout/lvs.tcl > lvs.log 2>&1; grep -E 'Netlists match|do not match|roperty errors' lvs_report.txt | sort | uniq -c"
