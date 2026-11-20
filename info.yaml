@@ -1,9 +1,9 @@
 # Tiny Tapeout project information
 project:
-  title:        "VCO Delta-Sigma ADC"      # Project title
+  title:        "2nd-order VCO Delta-Sigma ADC"      # Project title
   author:       "Arcadia-1"      # Your name
   discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "Pseudo-differential ring-VCO delta-sigma ADC: two 7-stage current-starved rings sampled by 14 flip-flops"      # One line description of what your project does
+  description:  "Pseudo-differential second-order closed-loop VCO delta-sigma ADC: OTA integrator, ring-VCO quantizer, 7-element resistor DAC per half"      # One line description of what your project does
   language:     "Analog" # other examples include Verilog, Amaranth, VHDL, etc
   clock_hz:     10000000       # Clock frequency in Hz (or 0 if not applicable)
 
@@ -55,8 +55,8 @@ pinout:
   uio[7]: "PHN6 (N half, sampled ring stage 6 output)"
 
   # Analog pins - make sure to also set "analog_pins" above, else the pins won't be connected
-  ua[0]: "VINP (positive analog input, around 1.0 V)"
-  ua[1]: "VINN (negative analog input, around 1.0 V)"
+  ua[0]: "VINP (positive analog input, around 0.9 V)"
+  ua[1]: "VINN (negative analog input, around 0.9 V)"
   ua[2]: ""
   ua[3]: ""
   ua[4]: ""
