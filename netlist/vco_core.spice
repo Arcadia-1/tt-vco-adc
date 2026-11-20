@@ -1,0 +1,24 @@
+* VCO core of tt_um_vco_adc: V-to-I + bias mirror + 7-stage current-starved ring
+* Ports: vin = ua[0], vs = degeneration node (ua[1]), ph0..ph6 ring phases
+.subckt csinv in out vbp vbn vdd gnd
+XMph x   vbp vdd vdd sky130_fd_pr__pfet_01v8 W={WS} L={LS}
+XMpi out in  x   vdd sky130_fd_pr__pfet_01v8 W=1.0 L=0.15
+XMni out in  y   gnd sky130_fd_pr__nfet_01v8 W=0.5 L=0.15
+XMnf y   vbn gnd gnd sky130_fd_pr__nfet_01v8 W={WS/2} L={LS}
+XMc  gnd out gnd gnd sky130_fd_pr__nfet_01v8 W={WC} L={LC}
+.ends
+
+.subckt vco_core vin vs ph0 ph1 ph2 ph3 ph4 ph5 ph6 vdd gnd
+XM1  vbp vin vs  gnd sky130_fd_pr__nfet_01v8 W={W1} L={L1}
+XR1  vs  gnd gnd sky130_fd_pr__res_xhigh_po_0p35 L={LR}
+XMpd vbp vbp vdd vdd sky130_fd_pr__pfet_01v8 W={WS} L={LS}
+XMp2 vbn vbp vdd vdd sky130_fd_pr__pfet_01v8 W={WS} L={LS}
+XMnd vbn vbn gnd gnd sky130_fd_pr__nfet_01v8 W={WS/2} L={LS}
+X0 ph6 ph0 vbp vbn vdd gnd csinv
+X1 ph0 ph1 vbp vbn vdd gnd csinv
+X2 ph1 ph2 vbp vbn vdd gnd csinv
+X3 ph2 ph3 vbp vbn vdd gnd csinv
+X4 ph3 ph4 vbp vbn vdd gnd csinv
+X5 ph4 ph5 vbp vbn vdd gnd csinv
+X6 ph5 ph6 vbp vbn vdd gnd csinv
+.ends

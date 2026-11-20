@@ -1,6 +1,23 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg)
 
-# Tiny Tapeout Analog Project Template
+# Pseudo-differential VCO Delta-Sigma ADC (Tiny Tapeout SKY26e, sky130A, 1x2 analog tile)
+
+Two mirror-image ring-VCO delta-sigma ADC halves. VINP (`ua[0]`) and VINN (`ua[1]`) each set the current of a 7-stage current-starved ring oscillator; 7 flip-flops per half sample the ring phases at `clk` (P half on `uo_out`, N half on `uio`, one unsampled monitor each). Off-chip, each half's code is the popcount of successive phase-word XORs and the ADC output is P minus N, which cancels the even-order distortion of the single-ended VCOs.
+
+| Path | Content |
+|---|---|
+| `docs/info.md` | datasheet: how it works, how to test |
+| `VERIFICATION.md` | sign-off record: precheck, DRC, LVS, pre- and post-layout simulation |
+| `gds/`, `lef/`, `mag/` | final layout (generated) |
+| `layout/gen_layout.py`, `layout/flow.sh` | layout generator and build/DRC/LVS flow (Magic, netgen) |
+| `layout/plan_ff.py`, `layout/ff_plan.json` | placement search for the flip-flop block (no spacing conflicts, each output straight to its pin) |
+| `netlist/vco_core.spice` | parametrized VCO netlist used for sizing |
+| `verify/` | LVS reference netlists, extracted RC netlist, precheck / LVS reports |
+| `sim/` | corner sweep (`fsweep.py`) and full-tile transient with DSP (`adc_tran.py`) |
+| `model/` | behavioral models (single-ended and pseudo-differential with mismatch) |
+| `test/` | RP2350 capture script and decoder for the real chip |
+
+## Tiny Tapeout Analog Project Template (original notes)
 
 - [Read the documentation for project](docs/info.md)
 

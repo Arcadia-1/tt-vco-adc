@@ -1,0 +1,34 @@
+* VCO core of tt_um_vco_adc: V-to-I + bias mirror + 7-stage current-starved ring
+* Ports: vin, vs = M1 source (to the bias resistor in rarray), ph0..ph6 ring phases
+.subckt csinv in out vbp vbn vdd gnd
+XMph x   vbp vdd vdd sky130_fd_pr__pfet_01v8 W=1 L=1
+XMpi out in  x   vdd sky130_fd_pr__pfet_01v8 W=1.0 L=0.15
+XMni out in  y   gnd sky130_fd_pr__nfet_01v8 W=0.5 L=0.15
+XMnf y   vbn gnd gnd sky130_fd_pr__nfet_01v8 W=0.5 L=1
+XMc  gnd out gnd gnd sky130_fd_pr__nfet_01v8 W=1.4 L=2.86
+.ends
+
+.subckt vco_core vin vs ph0 ph1 ph2 ph3 ph4 ph5 ph6 vdd gnd
+XM1  vbp vin vs  gnd sky130_fd_pr__nfet_01v8 W=4 L=1
+XMpd vbp vbp vdd vdd sky130_fd_pr__pfet_01v8 W=1 L=1
+XMp2 vbn vbp vdd vdd sky130_fd_pr__pfet_01v8 W=1 L=1
+XMnd vbn vbn gnd gnd sky130_fd_pr__nfet_01v8 W=0.5 L=1
+X0 ph6 ph0 vbp vbn vdd gnd csinv
+X1 ph0 ph1 vbp vbn vdd gnd csinv
+X2 ph1 ph2 vbp vbn vdd gnd csinv
+X3 ph2 ph3 vbp vbn vdd gnd csinv
+X4 ph3 ph4 vbp vbn vdd gnd csinv
+X5 ph4 ph5 vbp vbn vdd gnd csinv
+X6 ph5 ph6 vbp vbn vdd gnd csinv
+.ends
+
+* Bias resistors of both halves: one xhigh-poly array, strips D N1 P1 P2 N2 D
+* (common centroid). Each half: two strips in series from vs to gnd.
+.subckt rarray vsp vsn gnd
+XRP2 vsp mp gnd sky130_fd_pr__res_xhigh_po_0p35 L=30
+XRP1 mp gnd gnd sky130_fd_pr__res_xhigh_po_0p35 L=30
+XRN1 vsn mn gnd sky130_fd_pr__res_xhigh_po_0p35 L=30
+XRN2 mn gnd gnd sky130_fd_pr__res_xhigh_po_0p35 L=30
+XRD0 gnd gnd gnd sky130_fd_pr__res_xhigh_po_0p35 L=30
+XRD5 gnd gnd gnd sky130_fd_pr__res_xhigh_po_0p35 L=30
+.ends
