@@ -11,9 +11,45 @@ usage: python3 adc_tran.py <pdk_root> <outdir> [mode=sch|pex] [corner=tt] [temp=
 import os, re, subprocess, sys
 import numpy as np
 
+
+DIG_MODELS = """
+.model a2d adc_bridge(in_low=0.9 in_high=0.9)
+.model d2a dac_bridge(out_low=0 out_high=1.8 t_rise=0.3n t_fall=0.3n)
+.model dff d_dff(clk_delay=0.3n set_delay=0.3n reset_delay=0.3n)
+.model dxor d_xor(rise_delay=0.1n fall_delay=0.1n)
+.model dbuf d_buffer(rise_delay=0.1n fall_delay=0.1n)
+.model dinv d_inverter(rise_delay=0.05n fall_delay=0.05n)
+"""
+CELL_BODY = {   # standard cell -> (input pins, behaviour lines using digital nets d_<pin>, output pins)
+    "dfxtp": (["D", "CLK"], ["Aff d_D d_CLK null null d_Q nq dff"], ["Q"]),
+    "xor2_1": (["A", "B"], ["Ax [d_A d_B] d_X dxor"], ["X"]),
+    "buf_4": (["A"], ["Ab d_A d_X dbuf"], ["X"]),
+    "inv_1": (["A"], ["Ai d_A d_Y dinv"], ["Y"]),
+}
+
+
+def behav_cells(txt):
+    """replace the transistor bodies of the extracted standard cells (flip-flops, XOR, buffer,
+    inverter) by XSPICE digital models with the same port lists; wiring parasitics stay."""
+    def repl(m):
+        head, name = m.group(1), m.group(2)
+        key = next((k for k in CELL_BODY if k in name), None)
+        if key is None or not name.startswith("sky130_fd_sc_hd__"):
+            return m.group(0)
+        ins, body, outs = CELL_BODY[key]
+        lines = [head]
+        for p in ins:
+            lines += [f"Cin_{p} {p} VGND 2f", f"Aa_{p} [{p}] [d_{p}] a2d"]
+        lines += body
+        lines += [f"Ad_{p} [d_{p}] [{p}] d2a" for p in outs]
+        return "\n".join(lines) + "\n.ends"
+    txt = re.sub(r"^(\.subckt (\S+)[^\n]*(?:\n\+[^\n]*)*)\n.*?^\.ends", repl, txt, flags=re.S | re.M)
+    return DIG_MODELS + txt
+
+
 pdk, out = sys.argv[1], sys.argv[2]
 opt = dict(mode='sch', corner='tt', temp='27', fs='10e6', n='1024', vcm='1.0', amp='0.15',
-           bins='3', pex='', tag='', redecode='0', vcmp='0.9', skip='60', params='', idealc='1', xopt='', tmax='2n')
+           bins='3', pex='', tag='', redecode='0', vcmp='0.9', skip='60', params='', idealc='1', xopt='', tmax='2n', dig='0', idealota='0', lr='')
 for a in sys.argv[3:]:
     k, v = a.split('=', 1); opt[k] = v
 fs, n = float(opt['fs']), int(opt['n'])
@@ -35,12 +71,52 @@ if opt['idealc'] == '1':      # MIM model (series R network) doubles the run tim
     for c in ('XC1', 'XC2'):
         txt = txt.replace(f"{c} vg vctrl sky130_fd_pr__cap_mim_m3_1 W={{WCAP}} L={{LCAP}}",
                           f"{c[1:]} vg vctrl {{2e-15*WCAP*LCAP + 0.38e-15*(WCAP+LCAP)}}")
-    core = os.path.join(out, 'so_core_idealc.spice')
+    if opt['idealota'] == '1':     # diagnostic: OTA as a stiff gain-2000 amplifier
+        import re as _re
+        txt = _re.sub(r"\.subckt ota5t.*?\.ends", ".subckt ota5t inp inn out vbn vdd gnd\n"
+                      "Bo out gnd V=max(0.05, min(1.75, 1.0 + 2000*(V(inp)-V(inn))))\n.ends", txt, flags=_re.S)
+    core = os.path.join(out, f"so_core_{opt['tag'] or 'x'}.spice")
     open(core, 'w').write(txt)
-if opt['mode'] == 'sch':
+vcof = os.path.join(here, '../verify/vco_core_lvs.spice')
+if opt['lr']:                     # sizing: V-to-I resistor strip length (both strips of each half)
+    t_ = open(vcof).read()
+    for r_ in ('XRP2 vsp mp', 'XRP1 mp gnd', 'XRN1 vsn mn', 'XRN2 mn gnd'):
+        t_ = re.sub(rf"({r_} gnd \S+) L=30", rf"\1 L={opt['lr']}", t_)
+    vcof = os.path.join(out, f"vco_core_{opt['tag'] or 'x'}.spice")
+    open(vcof, 'w').write(t_)
+if opt['mode'] == 'sch' and opt['dig'] == '1':
+    # fast sizing testbench: registers, XORs and the reset inverter as XSPICE digital models
+    # (about 1000 of the 1150 transistors); VCO, OTA, DAC, bias stay at transistor level.
+    # 3 fF per ring phase stands in for the flip-flop input and wiring.
+    ph = [f"p{i}" for i in range(7)] + [f"m{i}" for i in range(7)]
+    dq = [f"q{i}" for i in range(7)] + [f"n{i + 1}" for i in range(7)]
+    dut = f"""
+.include {vcof}
+.include {core}
+.param {' '.join(f'{k}={v}' for k, v in P.items())}
+XvcoP vcp vsp p0 p1 p2 p3 p4 p5 p6 vdd 0 vco_core
+XvcoN vcn vsn m0 m1 m2 m3 m4 m5 m6 vdd 0 vco_core
+Xr vsp vsn 0 rarray
+XlP ua0 vcp bp0 bp1 bp2 bp3 bp4 bp5 bp6 vref vbn rst vdd 0 so_loop
+XlN ua1 vcn bn0 bn1 bn2 bn3 bn4 bn5 bn6 vref vbn rst vdd 0 so_loop
+Xbias vref vbn vdd 0 so_bias
+Brst rst 0 V=1.8-V(rst_n)
+.model a2d adc_bridge(in_low=0.9 in_high=0.9)
+.model d2a dac_bridge(out_low=0 out_high=1.8 t_rise=0.3n t_fall=0.3n)
+.model dff d_dff(clk_delay=0.3n set_delay=0.3n reset_delay=0.3n)
+.model dxor d_xor(rise_delay=0.1n fall_delay=0.1n)
+Aclk [clk] [dclk] a2d
+Aph [{' '.join(ph)}] [{' '.join('d' + p for p in ph)}] a2d
+""" + "\n".join(f"Cph{p} {p} 0 3f" for p in ph) + "\n" + "\n".join(
+        f"Ad1{i} d{ph[i]} dclk null null d{dq[i]} nul1{i} dff\nAd2{i} d{dq[i]} dclk null null dd{dq[i]} nul2{i} dff\n"
+        f"Ax{i} [d{dq[i]} dd{dq[i]}] dx{i} dxor"
+        for i in range(14)) + "\n" + f"""
+Aout [{' '.join('d' + q for q in dq)} dp0 dm0 {' '.join(f'dx{i}' for i in range(14))}] [{' '.join(dq)} q7 n0 {' '.join(f'bp{i}' for i in range(7))} {' '.join(f'bn{i}' for i in range(7))}] d2a
+"""
+elif opt['mode'] == 'sch':
     sc = "sky130_fd_sc_hd__"
     dut = f"""
-.include {here}/../verify/vco_core_lvs.spice
+.include {vcof}
 .include {pdk}/sky130A/libs.ref/sky130_fd_sc_hd/spice/sky130_fd_sc_hd.spice
 .include {core}
 .param {' '.join(f'{k}={v}' for k, v in P.items())}
@@ -61,6 +137,11 @@ XmonN m0 0 0 vdd vdd n0 {sc}buf_4
 else:
     # extracted top cell; pin order taken from its .subckt line
     txt = open(opt['pex']).read()
+    if opt['dig'] == '1':
+        txt = behav_cells(txt)
+        pexf = os.path.join(out, f"pex_dig_{opt['tag'] or 'x'}.spice")
+        open(pexf, 'w').write(txt)
+        opt['pex'] = pexf
     m = re.search(r"^\.subckt tt_um_arcadia1_vco_adc (.*?)\n(?!\+)", txt, re.S | re.M)
     pins = m.group(1).replace('\n+', ' ').split()
     conn = {'VGND': '0', 'VDPWR': 'vdd', 'clk': 'clk', 'rst_n': 'rst_n', 'ua[0]': 'ua0', 'ua[1]': 'ua1'}
@@ -126,11 +207,22 @@ def fmon(col):
 
 # P: uo_out[6:0] = phases, uo_out[7] = monitor; N (mirror image): uio_out[7:1] = phases, uio_out[0] = monitor
 yp, yn = code(list(range(7))), code(list(range(9, 16)))
-y = yp - yn
-sys.path.insert(0, here)
-from sndr_fit import sndr_fit
-res = {bw: sndr_fit(y, fs, fin, bw) for bw in (20e3, 50e3, 100e3)}
-rp = sndr_fit(yp, fs, fin, 50e3)
+
+
+def score(y, bw):
+    """coherent tone at bin `bins`, Hann window, 5-bin signal and harmonic groups."""
+    m = len(y); s_ = np.abs(np.fft.rfft((y - y.mean()) * np.hanning(m))) ** 2
+    k, kb = int(opt['bins']), int(bw / fs * m)
+    grp = lambda c: s_[c - 2:c + 3].sum()
+    sig, band = grp(k), s_[1:kb + 1].sum() - grp(k)
+    harm = sum(grp(h * k) for h in (2, 3) if h * k + 2 <= kb)
+    return dict(sndr=10 * np.log10(sig / band), snr=10 * np.log10(sig / (band - harm)),
+                hd2=10 * np.log10(grp(2 * k) / sig), hd3=10 * np.log10(grp(3 * k) / sig), amp=np.sqrt(sig))
+
+
+y = yn - yp                       # the integrator inverts: VINP up -> yP down
+res = {bw: score(y, bw) for bw in (20e3, 50e3, 100e3)}
+rp = score(-yp, 50e3)
 np.save(os.path.join(out, tag + '_yp.npy'), yp)
 np.save(os.path.join(out, tag + '_yn.npy'), yn)
 print(f"RESULT {tag} samples={len(y)} yP=[{yp.min():.0f},{yp.max():.0f}] yN=[{yn.min():.0f},{yn.max():.0f}] "

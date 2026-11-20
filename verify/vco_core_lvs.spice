@@ -25,10 +25,10 @@ X6 ph5 ph6 vbp vbn vdd gnd csinv
 * Bias resistors of both halves: one xhigh-poly array, strips D N1 P1 P2 N2 D
 * (common centroid). Each half: two strips in series from vs to gnd.
 .subckt rarray vsp vsn gnd
-XRP2 vsp mp gnd sky130_fd_pr__res_xhigh_po_0p35 L=30
-XRP1 mp gnd gnd sky130_fd_pr__res_xhigh_po_0p35 L=30
-XRN1 vsn mn gnd sky130_fd_pr__res_xhigh_po_0p35 L=30
-XRN2 mn gnd gnd sky130_fd_pr__res_xhigh_po_0p35 L=30
-XRD0 gnd gnd gnd sky130_fd_pr__res_xhigh_po_0p35 L=30
-XRD5 gnd gnd gnd sky130_fd_pr__res_xhigh_po_0p35 L=30
+XRP2 vsp mp gnd sky130_fd_pr__res_xhigh_po_0p35 L=20
+XRP1 mp gnd gnd sky130_fd_pr__res_xhigh_po_0p35 L=20
+XRN1 vsn mn gnd sky130_fd_pr__res_xhigh_po_0p35 L=20
+XRN2 mn gnd gnd sky130_fd_pr__res_xhigh_po_0p35 L=20
+XRD0 gnd gnd gnd sky130_fd_pr__res_xhigh_po_0p35 L=20
+XRD5 gnd gnd gnd sky130_fd_pr__res_xhigh_po_0p35 L=20
 .ends

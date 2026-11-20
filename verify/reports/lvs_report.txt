@@ -3,7 +3,7 @@ Flattening unmatched subcell sky130_fd_pr__cap_mim_m3_1_4SMZ5E in circuit vco_ad
 Flattening unmatched subcell sky130_fd_pr__res_xhigh_po_0p35_PZSUGD in circuit vco_adc_half (0)(7 instances)
 Flattening unmatched subcell csinv in circuit vco_core (1)(7 instances)
 Flattening unmatched subcell sky130_fd_pr__res_xhigh_po_0p35_4MFQX6 in circuit tt_um_arcadia1_vco_adc (0)(2 instances)
-Flattening unmatched subcell sky130_fd_pr__res_xhigh_po_0p35_JUTA22 in circuit tt_um_arcadia1_vco_adc (0)(1 instance)
+Flattening unmatched subcell sky130_fd_pr__res_xhigh_po_0p35_9LMN9P in circuit tt_um_arcadia1_vco_adc (0)(1 instance)
 Flattening unmatched subcell sky130_fd_pr__res_xhigh_po_0p35_V6BCNG in circuit tt_um_arcadia1_vco_adc (0)(1 instance)
 Flattening unmatched subcell vco_adc_half in circuit tt_um_arcadia1_vco_adc (0)(2 instances)
 Flattening unmatched subcell so_bias in circuit tt_um_arcadia1_vco_adc (1)(1 instance)

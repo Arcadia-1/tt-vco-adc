@@ -552,10 +552,10 @@ def so_half(cells):
 
 
 # ============================================================ top level
-RX, RY = XC, YV - 23.5           # resistor array centre
+RX, RY = XC, YV - 18.5           # resistor array centre (top kept, strips l 20)
 R_STRIP = [-2.075, -1.245, -0.415, 0.415, 1.245, 2.075]   # D N1 P1 P2 N2 D
-R_TOP, R_BOT = 16.0, -16.0   # contact pad centres (pads +/-1.05 tall)
-R_RING_X, R_RING_Y = 2.815, 17.645
+R_TOP, R_BOT = 11.0, -11.0   # contact pad centres (pads +/-1.05 tall)
+R_RING_X, R_RING_Y = 2.815, 12.645
 Y_SH_T, Y_INP, Y_INN, Y_SH_B = YV - 7.4, YV - 8.2, YV - 9.0, YV - 9.8
 DEC_Y0, DEC_ROWS = 6.0, 31
 BIAS_ROW = DEC_ROWS - 1         # top decap row: holds the reset inverter; the bias block sits on its VDPWR rail
@@ -697,7 +697,7 @@ def build_top(template, cells, verilog):
     # ---- resistor array on the centre line
     L.append(f"box {q(RX)} {q(RY)} {q(RX)} {q(RY)}")
     L.append("magic::gencell sky130::sky130_fd_pr__res_xhigh_po_0p35 RARR "
-             "w 0.35 l 30 nx 6 snake 0 guard 1")
+             "w 0.35 l 20 nx 6 snake 0 guard 1")
     L.append(f"load {TOP}")
     L.append("select cell RARR")
     L.append("set b [box values]")
