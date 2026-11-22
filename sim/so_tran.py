@@ -3,10 +3,13 @@
 Drives ua[0] = vcm + amp*sin and ua[1] = vcm - amp*sin (amp is per side), clocks the
 DFFs at fs, records uo_out[7:0] (P half) and uio_out[7:0] (N half), samples both phase
 words after every clock edge and runs the off-chip DSP: XOR difference + popcount per
-half, y = yP - yN. Works on the schematic netlist or on the extracted layout.
+half, y = yN - yP (the integrator inverts). Works on the schematic netlist or on the
+extracted layout.
 
-usage: python3 adc_tran.py <pdk_root> <outdir> [mode=sch|pex] [corner=tt] [temp=27]
-       [fs=10e6] [n=1024] [vcm=1.0] [amp=0.15] [bins=3] [pex=<file>] [tag=...]
+usage: python3 so_tran.py <pdk_root> <outdir> [mode=sch|pex] [corner=tt] [temp=27]
+       [fs=10e6] [n=1024] [amp=0.15] [bins=3] [pex=<file>] [tag=...] [dig=0|1]
+Sign-off accuracy (default): reltol 1e-4, max step 0.5 ns. A 2 ns step mislocates the
+digital edges and adds about 25 dB of fake DAC noise.
 """
 import os, re, subprocess, sys
 import numpy as np
@@ -49,7 +52,7 @@ def behav_cells(txt):
 
 pdk, out = sys.argv[1], sys.argv[2]
 opt = dict(mode='sch', corner='tt', temp='27', fs='10e6', n='1024', vcm='1.0', amp='0.15',
-           bins='3', pex='', tag='', redecode='0', vcmp='0.9', skip='60', params='', idealc='1', xopt='', tmax='2n', dig='0', idealota='0', lr='', q1dly='', retime='0', t1='0', t2='0', tmon='0', dump='0')
+           bins='3', pex='', tag='', redecode='0', vcmp='0.9', skip='60', params='', idealc='1', xopt='reltol:1e-4', tmax='0.5n', dig='0', idealota='0', lr='', t1='0', t2='0', tmon='0', dump='0')
 for a in sys.argv[3:]:
     k, v = a.split('=', 1); opt[k] = v
 fs, n = float(opt['fs']), int(opt['n'])
@@ -81,7 +84,7 @@ vcof = os.path.join(here, '../verify/vco_core_lvs.spice')
 if opt['lr']:                     # sizing: V-to-I resistor strip length (both strips of each half)
     t_ = open(vcof).read()
     for r_ in ('XRP2 vsp mp', 'XRP1 mp gnd', 'XRN1 vsn mn', 'XRN2 mn gnd'):
-        t_ = re.sub(rf"({r_} gnd \S+) L=30", rf"\1 L={opt['lr']}", t_)
+        t_ = re.sub(rf"({r_} gnd \S+) L=\S+", rf"\1 L={opt['lr']}", t_)
     vcof = os.path.join(out, f"vco_core_{opt['tag'] or 'x'}.spice")
     open(vcof, 'w').write(t_)
 if opt['mode'] == 'sch' and opt['dig'] == '1':
@@ -90,7 +93,6 @@ if opt['mode'] == 'sch' and opt['dig'] == '1':
     # level, t2=1 the second rank and the XORs that drive the DAC. Otherwise 3 fF per ring phase
     # stands in for the flip-flop input.
     sc = "sky130_fd_sc_hd__"
-    q1m = (lambda r, f: f"rise_delay={r} fall_delay={f}")(*opt['q1dly'].split(':')) if opt['q1dly'] else ""
     T1, T2 = opt['t1'] == '1', opt['t2'] == '1'
     ph = [f"p{i}" for i in range(7)] + [f"m{i}" for i in range(7)]
     dq = [f"q{i}" for i in range(7)] + [f"n{i + 1}" for i in range(7)]
@@ -107,7 +109,6 @@ if opt['mode'] == 'sch' and opt['dig'] == '1':
           ".model a2d adc_bridge(in_low=0.9 in_high=0.9)",
           ".model d2a dac_bridge(out_low=0 out_high=1.8 t_rise=0.3n t_fall=0.3n)",
           ".model dff d_dff(clk_delay=0.3n set_delay=0.3n reset_delay=0.3n)",
-          f".model dff1 d_dff(clk_delay=0.3n set_delay=0.3n reset_delay=0.3n {q1m})",
           ".model dxor d_xor(rise_delay=0.1n fall_delay=0.1n)",
           "Aclk [clk] [dclk] a2d",
           *(["XmonP p0 0 0 vdd vdd q7 sky130_fd_sc_hd__buf_4", "XmonN m0 0 0 vdd vdd n0 sky130_fd_sc_hd__buf_4"]
@@ -119,7 +120,7 @@ if opt['mode'] == 'sch' and opt['dig'] == '1':
     else:
         L_ += [f"Cph{p} {p} 0 3f" for p in ph]
         L_.append(f"Aph [{' '.join(ph)}] [{' '.join('d' + p for p in ph)}] a2d")
-        L_ += [f"Ad1{i} d{ph[i]} dclk null null d{dq[i]} nul1{i} dff1" for i in range(14)]
+        L_ += [f"Ad1{i} d{ph[i]} dclk null null d{dq[i]} nul1{i} dff" for i in range(14)]
         L_.append(f"Aq [{' '.join('d' + q for q in dq)}] [{' '.join(dq)}] d2a")
     if T2:      # second rank + XOR at transistor level, the XOR drives the DAC element
         L_ += [f"Xe{i} clk {dq[i]} 0 0 vdd vdd qq{i} {sc}dfxtp_1\nXx{i} {dq[i]} qq{i} 0 0 vdd vdd {bits[i]} {sc}xor2_1"
@@ -127,12 +128,7 @@ if opt['mode'] == 'sch' and opt['dig'] == '1':
     else:
         L_ += [f"Ad2{i} d{dq[i]} dclk null null dd{dq[i]} nul2{i} dff\nAx{i} [d{dq[i]} dd{dq[i]}] dx{i} dxor"
                for i in range(14)]
-        if opt['retime'] in ('1', '2'):
-            ck = 'dclk' if opt['retime'] == '1' else 'dclkb'
-            L_ += ["Aclkb dclk dclkb dinv", ".model dinv d_inverter(rise_delay=0.05n fall_delay=0.05n)"]
-            L_ += [f"Ar{i} dx{i} {ck} null null drx{i} nulr{i} dff" for i in range(14)]
-        xo = 'drx' if opt['retime'] in ('1', '2') else 'dx'
-        L_.append(f"Ab [{' '.join(f'{xo}{i}' for i in range(14))}] [{' '.join(bits)}] d2a")
+        L_.append(f"Ab [{' '.join(f'dx{i}' for i in range(14))}] [{' '.join(bits)}] d2a")
     dut = "\n".join(L_) + "\n"
 elif opt['mode'] == 'sch':
     sc = "sky130_fd_sc_hd__"
@@ -150,15 +146,7 @@ Xbias vref vbn vdd 0 so_bias
 Xrst rst_n 0 0 vdd vdd rst {sc}inv_1
 """ + "\n".join(f"XdP{i} clk p{i} 0 0 vdd vdd q{i} {sc}dfxtp_4\nXdN{i} clk m{i} 0 0 vdd vdd n{i + 1} {sc}dfxtp_4\n"
                 f"XeP{i} clk q{i} 0 0 vdd vdd qq{i} {sc}dfxtp_1\nXeN{i} clk n{i + 1} 0 0 vdd vdd nn{i} {sc}dfxtp_1\n"
-                + (f"XxP{i} q{i} qq{i} 0 0 vdd vdd xp{i} {sc}xor2_1\nXxN{i} n{i + 1} nn{i} 0 0 vdd vdd xn{i} {sc}xor2_1\n"
-                   + (f"XrP{i} clk xp{i} 0 0 vdd vdd bp{i} {sc}dfxtp_1\nXrN{i} clk xn{i} 0 0 vdd vdd bn{i} {sc}dfxtp_1"
-                      if opt['retime'] == '1' else
-                      f"XrP{i} clk xp{i} vdd 0 0 vdd vdd bp{i} {sc}dfrtn_1\nXrN{i} clk xn{i} vdd 0 0 vdd vdd bn{i} {sc}dfrtn_1"
-                      if opt['retime'] == '2' else
-                      f"XiP{i} clk 0 0 vdd vdd ckbp{i} {sc}clkinv_1\nXiN{i} clk 0 0 vdd vdd ckbn{i} {sc}clkinv_1\n"
-                      f"XrP{i} ckbp{i} xp{i} 0 0 vdd vdd bp{i} {sc}dfxtp_1\nXrN{i} ckbn{i} xn{i} 0 0 vdd vdd bn{i} {sc}dfxtp_1")
-                   if opt['retime'] in ('1', '2', '3') else
-                   f"XxP{i} q{i} qq{i} 0 0 vdd vdd bp{i} {sc}xor2_1\nXxN{i} n{i + 1} nn{i} 0 0 vdd vdd bn{i} {sc}xor2_1")
+                f"XxP{i} q{i} qq{i} 0 0 vdd vdd bp{i} {sc}xor2_1\nXxN{i} n{i + 1} nn{i} 0 0 vdd vdd bn{i} {sc}xor2_1"
                 for i in range(7)) + f"""
 XmonP p0 0 0 vdd vdd q7 {sc}buf_4
 XmonN m0 0 0 vdd vdd n0 {sc}buf_4

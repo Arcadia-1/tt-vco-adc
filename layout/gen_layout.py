@@ -126,7 +126,6 @@ XI0 = XG1 + 0.30
 XI1 = XI0 + 0.15
 XD0, XD1 = XI1 + 0.10, XI1 + 0.27
 XDE = XD1 + 0.06
-XC1 = 0.33 + 2.0
 RING = (XV - 1.6, YV - 4.6, XV + XSTAGE0 + PITCH * (NST - 1) + XDE + 1.4, YV + 9.6)
 
 # flip-flop block: four abutting rows above the VCO, placement and wiring from plan_ff.py
@@ -573,8 +572,7 @@ def so_half(cells):
 RX, RY = XC, YV - 18.5           # resistor array centre (top kept, strips l 20)
 R_STRIP = [-2.075, -1.245, -0.415, 0.415, 1.245, 2.075]   # D N1 P1 P2 N2 D
 R_TOP, R_BOT = 11.0, -11.0   # contact pad centres (pads +/-1.05 tall)
-R_RING_X, R_RING_Y = 2.815, 12.645
-Y_SH_T, Y_INP, Y_INN, Y_SH_B = YV - 7.4, YV - 8.2, YV - 9.0, YV - 9.8
+R_RING_Y = 12.645
 DEC_Y0, DEC_ROWS = 6.0, 31
 BIAS_ROW = DEC_ROWS - 1         # top decap row: holds the reset inverter; the bias block sits on its VDPWR rail
 N_RAILS = DEC_ROWS + 1          # row rails are drawn even in the no-decap copy (they power the bias block)

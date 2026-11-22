@@ -9,13 +9,12 @@ Two mirror-image second-order closed-loop VCO delta-sigma ADC halves. In each ha
 | `docs/info.md` | datasheet: how it works, how to test |
 | `VERIFICATION.md` | sign-off record: precheck, DRC, LVS, pre- and post-layout simulation |
 | `gds/`, `lef/`, `mag/` | final layout (generated) |
-| `layout/gen_layout.py`, `layout/flow.sh` | layout generator and build/DRC/LVS flow (Magic, netgen) |
+| `layout/gen_layout.py`, `layout/devlib.py`, `layout/flow.sh` | layout generator, hand-drawn device primitives and OTA, build/DRC/LVS flow (Magic, netgen) |
 | `layout/plan_ff.py`, `layout/ff_plan.json` | placement search for the flip-flop block (no spacing conflicts, each output straight to its pin) |
 | `netlist/vco_core.spice`, `netlist/so_core.spice` | parametrized VCO and loop (OTA, DAC, bias) netlists used for sizing |
-| `layout/devlib.py` | hand-drawn device primitives and the OTA layout |
 | `verify/` | LVS reference netlists, extracted RC netlist, precheck / LVS reports |
-| `sim/` | corner sweep (`fsweep.py`), full-tile transients with DSP (`so_tran.py` for the second-order loop, `adc_tran.py` for v1) |
-| `model/` | behavioral models (`so_model.py` for the second-order loop; first-order models) |
+| `sim/` | VCO tuning sweeps (`fsweep.py`, `vco_lin.py`) and the full-tile transient with DSP (`so_tran.py`, schematic or extracted layout) |
+| `model/` | behavioral model of the second-order loop (`so_model.py`, uses the ring decoder in `vco_adc_model.py`) |
 | `test/` | RP2350 capture script and decoder for the real chip |
 
 ## Tiny Tapeout Analog Project Template (original notes)
