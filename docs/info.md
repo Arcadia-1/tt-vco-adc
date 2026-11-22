@@ -32,7 +32,7 @@ This is the same number of ones the on-chip DAC fed back, so `y` is the loop's d
 
 Required: a differential source for `ua[0]`/`ua[1]` around 0.9 V, and a way to capture `uo_out[7:0]` and `uio[7:0]` continuously at fs.
 
-1. Select the project and give it a 10 MHz clock. Hold `rst_n` low for a few clock cycles, then release it (this clears the integrators). `ui_in` is not used.
+1. Select the project and give it a 10 MHz clock. Hold `rst_n` low for a few clock cycles, then release it (this clears the integrators) and wait about 30 µs for both loops to lock before capturing. `ui_in` is not used.
 2. **Loop check:** apply 0.9 V to both inputs. Both monitors (`uo_out[7]`, `uio[0]`) should run at about fs/4, and the average code of each half should be about 3.5.
 3. **ADC check:** apply VINP = 0.9 V + A·sin, VINN = 0.9 V − A·sin with A up to about 0.2 V and 1 kHz to 20 kHz. Capture all 16 outputs at every clock edge without gaps, for example with the RP2350 PIO and DMA (`test/capture_vco_adc.py` makes the clock and samples GPIO 25..40 in one state machine). Then run `test/decode_vco_adc.py` to get the spectrum and SNDR of each half and of the difference (the sign of the difference does not change the SNDR).
 

@@ -146,7 +146,10 @@ XD = [48.6 - 0.85 * r for r in range(NST)]            # met3 descents, Q bus -> 
 BLK_X = 49.0                                          # second register rows: tap dfxtp_1 xor2_1 tap
 XB = [61.4 + 0.85 * r for r in range(NST)]            # met3 bit descents to the DAC
 # xhigh resistors: parallel strips with guard ring (the snake generator fails rpm.1), chained in metal
-RD_XC, RD_YC, RD_LS, RD_NX = [15.0 + 6.6 * k for k in range(NST)], 167.8, 30.3, 6    # DAC resistors
+# DAC: one array of 7 x 6 strips plus a dummy at each end, one guard ring (left ring edge at 12.185)
+RD_YC, RD_LS, RD_NX, RD_DUM = 167.8, 30.3, 6, 1
+RDA_N = NST * RD_NX + 2 * RD_DUM
+RDA_XC = 12.185 + 0.415 * (RDA_N - 1) + 0.74
 RIN_XC, RIN_YC, RIN_LS = 9.5, 154.8, 4.3                                           # input resistor (2 strips)
 VG_BUS_Y = 149.8
 BIT_Y = [148.8 - 0.6 * r for r in range(NST)]
@@ -486,13 +489,28 @@ def so_half(cells):
         via2(XB[r], px[1])
         vwire("met3", XB[r], BIT_Y[r], px[1], 0.3)
     vwire("met3", SPINE_X, min(ylow), CLK_FEED_Y, 0.3)
-    # ---- DAC resistors, terminals at the bottom: left = bit, right = vg
+    # ---- DAC resistor array: element k = strips 6k+1 .. 6k+6 chained in met1, terminals at the
+    # bottom (left = bit k, right = vg); end dummies shorted to the guard ring at both ends
+    gencell("RDA", RES, f"w 0.35 l {RD_LS} nx {RDA_N} snake 0 guard 1", RDA_XC, RD_YC, HALF)
+    xs = [RDA_XC - 0.415 * (RDA_N - 1) + 0.83 * i for i in range(RDA_N)]
+    yjt, yjb = RD_YC + RD_LS / 2 + 1.0, RD_YC - RD_LS / 2 - 1.0
+    py0 = RD_YC - (RD_LS / 2 + 2.05)
+    for x in (xs[0], xs[-1]):          # bottom end to the ring; top left open (not parallel to other dummies)
+        for yp, yr in ((yjb, RD_YC - RD_LS / 2 - 2.645),):
+            vwire("met1", x, min(yp, yr), max(yp, yr), 0.25)
+            sq("mcon", x, yr, 0.17)
+            rect("met1", x - 0.125, yr - 0.205, x + 0.125, yr + 0.205)
     for k in range(NST):
-        (xl, xr), (py0, py1) = chain_res(f"RD{k}", RD_XC[k], RD_YC, RD_LS, RD_NX, HALF)
+        g = xs[RD_DUM + RD_NX * k: RD_DUM + RD_NX * (k + 1)]
+        for i in range(RD_NX - 1):
+            y = yjt if i % 2 == 0 else yjb
+            rect("met1", g[i] - 0.125, y - 0.15, g[i + 1] + 0.125, y + 0.15)
+        xl, xr = g[0], g[-1]
         vwire("met1", xr, VG_BUS_Y, py0 + 0.15, 0.25); via1(xr, VG_BUS_Y)
         vwire("met1", xl, BIT_Y[k], py0 + 0.15, 0.25); via1(xl, BIT_Y[k])
         via2(XB[k], BIT_Y[k])
         hwire("met2", xl, XB[k], BIT_Y[k], 0.3)
+    x_vg_last = xr
     # ---- input resistor: left = ua, right = vg
     (xl, xr), (py0, py1) = chain_res("RIN", RIN_XC, RIN_YC, RIN_LS, 2, HALF)
     vwire("met1", xr, VG_BUS_Y, py0 + 0.15, 0.25); via1(xr, VG_BUS_Y)
@@ -500,7 +518,7 @@ def so_half(cells):
     hwire("met3", xl, UA_X, UA_Y, 0.4)
     via3(UA_X, UA_Y)
     vwire("met4", UA_X, UA_LOW, UA_Y + 0.26, 0.6)
-    hwire("met2", VG_X - 0.15, res_pads(RD_XC[-1], RD_YC, RD_LS, RD_NX)[0][1] + 0.19, VG_BUS_Y, 0.3)
+    hwire("met2", VG_X - 0.15, x_vg_last + 0.19, VG_BUS_Y, 0.3)
     # ---- OTA
     o = D.ota(OTA_X0, OTA_Y0)
     # rails to the N-side edge stripes
@@ -688,11 +706,15 @@ def build_top(template, cells, verilog):
     hwire("met3", XC - 0.25, xk + 0.26, CLK_FEED_Y, 0.3)
     via2(XC, CLK_FEED_Y)
 
-    # ---- uio_oe tied high: each pin stub drops onto the VDPWR row rail at Y0 + 3 rows
-    y_tie = Y0 + 2.72 * 3
-    for xp in [pin_x(f"uio_oe[{i}]") for i in range(8)]:
+    # ---- uio_oe tied high: short pin stubs joined by a met4 bar above the core, fed from the
+    # inner VDPWR stripe (nothing drops through the flip-flop area)
+    y_tie = 222.0
+    xs_oe = [pin_x(f"uio_oe[{i}]") for i in range(8)]
+    for xp in xs_oe:
         met4_stub(xp, y_tie)
-        stack(xp, y_tie, 1, 4)
+    hwire("met4", min(xs_oe) - 0.3, max(xs_oe) + 0.3, y_tie, 0.6)
+    x_vdp = N(sum(INNER["VDPWR"][1]) / 2 - XC)
+    vwire("met4", x_vdp, INNER_Y[1] - 0.5, y_tie, 1.2)
 
     # ---- resistor array on the centre line
     L.append(f"box {q(RX)} {q(RY)} {q(RX)} {q(RY)}")

@@ -49,7 +49,7 @@ def behav_cells(txt):
 
 pdk, out = sys.argv[1], sys.argv[2]
 opt = dict(mode='sch', corner='tt', temp='27', fs='10e6', n='1024', vcm='1.0', amp='0.15',
-           bins='3', pex='', tag='', redecode='0', vcmp='0.9', skip='60', params='', idealc='1', xopt='', tmax='2n', dig='0', idealota='0', lr='')
+           bins='3', pex='', tag='', redecode='0', vcmp='0.9', skip='60', params='', idealc='1', xopt='', tmax='2n', dig='0', idealota='0', lr='', q1dly='', retime='0', t1='0', t2='0', tmon='0', dump='0')
 for a in sys.argv[3:]:
     k, v = a.split('=', 1); opt[k] = v
 fs, n = float(opt['fs']), int(opt['n'])
@@ -85,34 +85,55 @@ if opt['lr']:                     # sizing: V-to-I resistor strip length (both s
     vcof = os.path.join(out, f"vco_core_{opt['tag'] or 'x'}.spice")
     open(vcof, 'w').write(t_)
 if opt['mode'] == 'sch' and opt['dig'] == '1':
-    # fast sizing testbench: registers, XORs and the reset inverter as XSPICE digital models
-    # (about 1000 of the 1150 transistors); VCO, OTA, DAC, bias stay at transistor level.
-    # 3 fF per ring phase stands in for the flip-flop input and wiring.
+    # fast testbench: registers / XORs as XSPICE digital models; VCO, OTA, DAC, bias at transistor
+    # level. Diagnostics: t1=1 puts the first rank (dfxtp_4, sampling the ring) back at transistor
+    # level, t2=1 the second rank and the XORs that drive the DAC. Otherwise 3 fF per ring phase
+    # stands in for the flip-flop input.
+    sc = "sky130_fd_sc_hd__"
+    q1m = (lambda r, f: f"rise_delay={r} fall_delay={f}")(*opt['q1dly'].split(':')) if opt['q1dly'] else ""
+    T1, T2 = opt['t1'] == '1', opt['t2'] == '1'
     ph = [f"p{i}" for i in range(7)] + [f"m{i}" for i in range(7)]
     dq = [f"q{i}" for i in range(7)] + [f"n{i + 1}" for i in range(7)]
-    dut = f"""
-.include {vcof}
-.include {core}
-.param {' '.join(f'{k}={v}' for k, v in P.items())}
-XvcoP vcp vsp p0 p1 p2 p3 p4 p5 p6 vdd 0 vco_core
-XvcoN vcn vsn m0 m1 m2 m3 m4 m5 m6 vdd 0 vco_core
-Xr vsp vsn 0 rarray
-XlP ua0 vcp bp0 bp1 bp2 bp3 bp4 bp5 bp6 vref vbn rst vdd 0 so_loop
-XlN ua1 vcn bn0 bn1 bn2 bn3 bn4 bn5 bn6 vref vbn rst vdd 0 so_loop
-Xbias vref vbn vdd 0 so_bias
-Brst rst 0 V=1.8-V(rst_n)
-.model a2d adc_bridge(in_low=0.9 in_high=0.9)
-.model d2a dac_bridge(out_low=0 out_high=1.8 t_rise=0.3n t_fall=0.3n)
-.model dff d_dff(clk_delay=0.3n set_delay=0.3n reset_delay=0.3n)
-.model dxor d_xor(rise_delay=0.1n fall_delay=0.1n)
-Aclk [clk] [dclk] a2d
-Aph [{' '.join(ph)}] [{' '.join('d' + p for p in ph)}] a2d
-""" + "\n".join(f"Cph{p} {p} 0 3f" for p in ph) + "\n" + "\n".join(
-        f"Ad1{i} d{ph[i]} dclk null null d{dq[i]} nul1{i} dff\nAd2{i} d{dq[i]} dclk null null dd{dq[i]} nul2{i} dff\n"
-        f"Ax{i} [d{dq[i]} dd{dq[i]}] dx{i} dxor"
-        for i in range(14)) + "\n" + f"""
-Aout [{' '.join('d' + q for q in dq)} dp0 dm0 {' '.join(f'dx{i}' for i in range(14))}] [{' '.join(dq)} q7 n0 {' '.join(f'bp{i}' for i in range(7))} {' '.join(f'bn{i}' for i in range(7))}] d2a
-"""
+    bits = [f"bp{i}" for i in range(7)] + [f"bn{i}" for i in range(7)]
+    L_ = [f".include {vcof}", f".include {core}",
+          f".include {pdk}/sky130A/libs.ref/sky130_fd_sc_hd/spice/sky130_fd_sc_hd.spice",
+          f".param {' '.join(f'{k}={v}' for k, v in P.items())}",
+          "XvcoP vcp vsp p0 p1 p2 p3 p4 p5 p6 vdd 0 vco_core",
+          "XvcoN vcn vsn m0 m1 m2 m3 m4 m5 m6 vdd 0 vco_core",
+          "Xr vsp vsn 0 rarray",
+          "XlP ua0 vcp bp0 bp1 bp2 bp3 bp4 bp5 bp6 vref vbn rst vdd 0 so_loop",
+          "XlN ua1 vcn bn0 bn1 bn2 bn3 bn4 bn5 bn6 vref vbn rst vdd 0 so_loop",
+          "Xbias vref vbn vdd 0 so_bias", "Brst rst 0 V=1.8-V(rst_n)",
+          ".model a2d adc_bridge(in_low=0.9 in_high=0.9)",
+          ".model d2a dac_bridge(out_low=0 out_high=1.8 t_rise=0.3n t_fall=0.3n)",
+          ".model dff d_dff(clk_delay=0.3n set_delay=0.3n reset_delay=0.3n)",
+          f".model dff1 d_dff(clk_delay=0.3n set_delay=0.3n reset_delay=0.3n {q1m})",
+          ".model dxor d_xor(rise_delay=0.1n fall_delay=0.1n)",
+          "Aclk [clk] [dclk] a2d",
+          *(["XmonP p0 0 0 vdd vdd q7 sky130_fd_sc_hd__buf_4", "XmonN m0 0 0 vdd vdd n0 sky130_fd_sc_hd__buf_4"]
+            if opt['tmon'] == '1' else ["Amon [p0 m0] [dp0 dm0] a2d", "Amo [dp0 dm0] [q7 n0] d2a"])]
+    if T1:      # first rank at transistor level, its Q (analog, pin load) bridged into digital
+        L_ += [f"Xd{i} clk {ph[i]} 0 0 vdd vdd {dq[i]} {sc}dfxtp_4" for i in range(14)]
+        if not T2:
+            L_.append(f"Aq [{' '.join(dq)}] [{' '.join('d' + q for q in dq)}] a2d")
+    else:
+        L_ += [f"Cph{p} {p} 0 3f" for p in ph]
+        L_.append(f"Aph [{' '.join(ph)}] [{' '.join('d' + p for p in ph)}] a2d")
+        L_ += [f"Ad1{i} d{ph[i]} dclk null null d{dq[i]} nul1{i} dff1" for i in range(14)]
+        L_.append(f"Aq [{' '.join('d' + q for q in dq)}] [{' '.join(dq)}] d2a")
+    if T2:      # second rank + XOR at transistor level, the XOR drives the DAC element
+        L_ += [f"Xe{i} clk {dq[i]} 0 0 vdd vdd qq{i} {sc}dfxtp_1\nXx{i} {dq[i]} qq{i} 0 0 vdd vdd {bits[i]} {sc}xor2_1"
+               for i in range(14)]
+    else:
+        L_ += [f"Ad2{i} d{dq[i]} dclk null null dd{dq[i]} nul2{i} dff\nAx{i} [d{dq[i]} dd{dq[i]}] dx{i} dxor"
+               for i in range(14)]
+        if opt['retime'] in ('1', '2'):
+            ck = 'dclk' if opt['retime'] == '1' else 'dclkb'
+            L_ += ["Aclkb dclk dclkb dinv", ".model dinv d_inverter(rise_delay=0.05n fall_delay=0.05n)"]
+            L_ += [f"Ar{i} dx{i} {ck} null null drx{i} nulr{i} dff" for i in range(14)]
+        xo = 'drx' if opt['retime'] in ('1', '2') else 'dx'
+        L_.append(f"Ab [{' '.join(f'{xo}{i}' for i in range(14))}] [{' '.join(bits)}] d2a")
+    dut = "\n".join(L_) + "\n"
 elif opt['mode'] == 'sch':
     sc = "sky130_fd_sc_hd__"
     dut = f"""
@@ -129,7 +150,15 @@ Xbias vref vbn vdd 0 so_bias
 Xrst rst_n 0 0 vdd vdd rst {sc}inv_1
 """ + "\n".join(f"XdP{i} clk p{i} 0 0 vdd vdd q{i} {sc}dfxtp_4\nXdN{i} clk m{i} 0 0 vdd vdd n{i + 1} {sc}dfxtp_4\n"
                 f"XeP{i} clk q{i} 0 0 vdd vdd qq{i} {sc}dfxtp_1\nXeN{i} clk n{i + 1} 0 0 vdd vdd nn{i} {sc}dfxtp_1\n"
-                f"XxP{i} q{i} qq{i} 0 0 vdd vdd bp{i} {sc}xor2_1\nXxN{i} n{i + 1} nn{i} 0 0 vdd vdd bn{i} {sc}xor2_1"
+                + (f"XxP{i} q{i} qq{i} 0 0 vdd vdd xp{i} {sc}xor2_1\nXxN{i} n{i + 1} nn{i} 0 0 vdd vdd xn{i} {sc}xor2_1\n"
+                   + (f"XrP{i} clk xp{i} 0 0 vdd vdd bp{i} {sc}dfxtp_1\nXrN{i} clk xn{i} 0 0 vdd vdd bn{i} {sc}dfxtp_1"
+                      if opt['retime'] == '1' else
+                      f"XrP{i} clk xp{i} vdd 0 0 vdd vdd bp{i} {sc}dfrtn_1\nXrN{i} clk xn{i} vdd 0 0 vdd vdd bn{i} {sc}dfrtn_1"
+                      if opt['retime'] == '2' else
+                      f"XiP{i} clk 0 0 vdd vdd ckbp{i} {sc}clkinv_1\nXiN{i} clk 0 0 vdd vdd ckbn{i} {sc}clkinv_1\n"
+                      f"XrP{i} ckbp{i} xp{i} 0 0 vdd vdd bp{i} {sc}dfxtp_1\nXrN{i} ckbn{i} xn{i} 0 0 vdd vdd bn{i} {sc}dfxtp_1")
+                   if opt['retime'] in ('1', '2', '3') else
+                   f"XxP{i} q{i} qq{i} 0 0 vdd vdd bp{i} {sc}xor2_1\nXxN{i} n{i + 1} nn{i} 0 0 vdd vdd bn{i} {sc}xor2_1")
                 for i in range(7)) + f"""
 XmonP p0 0 0 vdd vdd q7 {sc}buf_4
 XmonN m0 0 0 vdd vdd n0 {sc}buf_4
@@ -155,6 +184,14 @@ else:
 
 tstop = (n + SKIP + 8) / fs
 outs = [f"q{i}" for i in range(8)] + [f"n{i}" for i in range(8)]
+# save only what is read back: the default (every node of the circuit) needs tens of GB at
+# a 0.5 ns step and drove the server out of memory
+sv = ['v(clk)'] + [f'v({o})' for o in outs] + ['i(vdd)']
+if opt['mode'] == 'sch':
+    sv += ['v(vcp)', 'v(vcn)', 'v(vref)', 'v(vbn)', 'v(xlp.vg)']
+if opt['dump'] == '1':
+    sv += [f'v({x}{i})' for i in range(7) for x in ('bp', 'q', 'p')]
+save_line = '.save ' + ' '.join(dict.fromkeys(sv))
 net = f"""* {tag}
 .lib {pdk}/sky130A/libs.tech/ngspice/sky130.lib.spice {opt['corner']}
 {dut}
@@ -165,12 +202,14 @@ Vrst rst_n 0 pwl(0 0 {SKIP / 3 / fs} 0 {SKIP / 3 / fs + 1e-9} 1.8)
 Vclk clk 0 pulse(0 1.8 {0.5/fs} 1n 1n {0.5/fs - 1e-9} {1/fs})
 """ + "\n".join(f"Cl_{o} {o} 0 1p" for o in outs) + f"""
 .option temp={opt['temp']} method=gear {opt['xopt'].replace(':', '=')}
+{save_line}
 .tran 1n {tstop} 0 {opt['tmax']}
 .control
 run
 meas tran idd avg i(vdd) from={20/fs} to={tstop}
 wrdata {tag}.dat v(clk) {' '.join(f'v({o})' for o in outs)}
-wrdata {tag}_vc.dat v(vcp) v(vcn) v(vref) v(vbn) v(xlp.vg)
+{'wrdata ' + tag + '_vc.dat v(vcp) v(vcn) v(vref) v(vbn) v(xlp.vg)' if opt['mode'] == 'sch' else ''}
+{'wrdata ' + tag + '_bits.dat v(clk) v(xlp.vg) ' + ' '.join(f'v(bp{i}) v(q{i}) v(p{i})' for i in range(7)) if opt['dump'] == '1' else ''}
 .endc
 .end
 """

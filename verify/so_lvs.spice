@@ -10,6 +10,8 @@ XRd3 b3 vg gnd sky130_fd_pr__res_xhigh_po_0p35 L=181.8
 XRd4 b4 vg gnd sky130_fd_pr__res_xhigh_po_0p35 L=181.8
 XRd5 b5 vg gnd sky130_fd_pr__res_xhigh_po_0p35 L=181.8
 XRd6 b6 vg gnd sky130_fd_pr__res_xhigh_po_0p35 L=181.8
+XRdm0 gnd dm0 gnd sky130_fd_pr__res_xhigh_po_0p35 L=30.3
+XRdm1 gnd dm1 gnd sky130_fd_pr__res_xhigh_po_0p35 L=30.3
 XM1a x vref t gnd sky130_fd_pr__nfet_01v8 W=4 L=1
 XM1b x vref t gnd sky130_fd_pr__nfet_01v8 W=4 L=1
 XM2a vctrl vg t gnd sky130_fd_pr__nfet_01v8 W=4 L=1
