@@ -21,7 +21,7 @@ D=[300+80*(i-3) for i in range(7)]
 lane=[500,520,540,None,540,520,500]
 FA,FB,XX=640,780,900
 for i in range(7):
-    mv(f"XFA{i}",FA,D[i]+10); mv(f"XFB{i}",FB,D[i]+20); mv(f"XX{i}",XX,D[i]+10); mv(pt[f"q{i}"],1000,D[i]-30,180)
+    mv(f"XFA{i}",FA,D[i]+10); mv(f"XFB{i}",FB,D[i]+20); mv(f"XX{i}",XX,D[i]+10); mv(pt[f"q{i}"],1000,D[i]-20,180)
 mv("XMON",FA,0); mv(pt["mon"],FA+80,0,180)
 mv(pt["vin"],40,240); mv(pt["vref"],40,170); mv(pt["vbn"],40,150); mv(pt["rst"],40,130)
 mv(pt["vdd"],260,110,90); mv(pt["gnd"],290,470,270); mv(pt["vs"],420,470,270); mv(pt["clk"],FA-80,D[6]+20)
@@ -39,8 +39,8 @@ cn(P("XMON","A"),P("XVCO","ph0"),[(500,0),(500,240)]); cn(P("XMON","X"),pp("mon"
 for i in range(7):
     d=D[i]
     cn(P(f"XFA{i}","Q"),P(f"XFB{i}","D"))
-    cn(P(f"XFA{i}","Q"),P(f"XX{i}","A"),[(690,d+10),(690,d-30),(XX-50,d-30),(XX-50,d)])
-    cn(pp(f"q{i}"),P(f"XX{i}","A"),[(XX-50,d-30),(XX-50,d)])
+    cn(P(f"XFA{i}","Q"),P(f"XX{i}","A"),[(690,d+10),(690,d-20),(XX-50,d-20),(XX-50,d)])
+    cn(pp(f"q{i}"),P(f"XX{i}","A"),[(XX-50,d-20),(XX-50,d)])
     cn(P(f"XFB{i}","Q"),P(f"XX{i}","B"))
     lab(f"XX{i}","X",XX+60,d+10,f"b{i}",XX+65,d+14)
     if i!=6: lab(f"XFA{i}","CLK",FA-60,d+20,"clk",FA-60,d+16)
