@@ -16734,7 +16734,8 @@
           "rotation": 90,
           "labels": [
             {
-              "anchor": { "fallback": [440, 321], "offset": [0, -19] },
+              "alignment": "start",
+              "anchor": { "fallback": [452, 345], "offset": [12, 5] },
               "bind": {
                 "kind": "cell-terminal-name",
                 "terminalId": "cell-terminal-fb94ab3e03ffdb2d"
@@ -17322,17 +17323,13 @@
           "coordinate": [400, 140],
           "labels": [
             {
-              "anchor": { "fallback": [400, 128], "offset": [0, -12] },
+              "anchor": { "fallback": [380, 126], "offset": [-20, -14] },
               "bind": { "kind": "cell-terminal-name", "terminalId": "terminal-1d96745d7d6a4399" },
               "format": {
                 "runs": [
                   {
-                    "children": ["V"],
-                    "styles": ["italic", "bold"]
-                  },
-                  {
-                    "children": ["DPWR"],
-                    "styles": ["subscript", "bold"]
+                    "children": ["VDPWR"],
+                    "styles": ["bold"]
                   }
                 ]
               },
@@ -17350,17 +17347,13 @@
           "labels": [
             {
               "alignment": "end",
-              "anchor": { "fallback": [388, 302], "offset": [-12, 12] },
+              "anchor": { "fallback": [390, 300], "offset": [-10, 10] },
               "bind": { "kind": "cell-terminal-name", "terminalId": "terminal-7a0f58e50a1b5c7c" },
               "format": {
                 "runs": [
                   {
-                    "children": ["V"],
-                    "styles": ["italic", "bold"]
-                  },
-                  {
-                    "children": ["GND"],
-                    "styles": ["subscript", "bold"]
+                    "children": ["VGND"],
+                    "styles": ["bold"]
                   }
                 ]
               },
@@ -17377,17 +17370,13 @@
           "coordinate": [400, 700],
           "labels": [
             {
-              "anchor": { "fallback": [400, 688], "offset": [0, -12] },
+              "anchor": { "fallback": [380, 686], "offset": [-20, -14] },
               "bind": { "kind": "cell-terminal-name", "terminalId": "terminal-1d968e5d7d6a6fc7" },
               "format": {
                 "runs": [
                   {
-                    "children": ["V"],
-                    "styles": ["italic", "bold"]
-                  },
-                  {
-                    "children": ["DPWR"],
-                    "styles": ["subscript", "bold"]
+                    "children": ["VDPWR"],
+                    "styles": ["bold"]
                   }
                 ]
               },
@@ -17404,18 +17393,13 @@
           "coordinate": [400, 610],
           "labels": [
             {
-              "alignment": "end",
-              "anchor": { "fallback": [388, 624], "offset": [-12, 14] },
+              "anchor": { "fallback": [400, 640], "offset": [0, 30] },
               "bind": { "kind": "cell-terminal-name", "terminalId": "terminal-7a0f4ee50a1b4b7e" },
               "format": {
                 "runs": [
                   {
-                    "children": ["V"],
-                    "styles": ["italic", "bold"]
-                  },
-                  {
-                    "children": ["GND"],
-                    "styles": ["subscript", "bold"]
+                    "children": ["VGND"],
+                    "styles": ["bold"]
                   }
                 ]
               },
@@ -18132,12 +18116,8 @@
           "format": {
             "runs": [
               {
-                "children": ["V"],
-                "styles": ["italic", "bold"]
-              },
-              {
-                "children": ["DPWR"],
-                "styles": ["subscript", "bold"]
+                "children": ["VDPWR"],
+                "styles": ["bold"]
               }
             ]
           },
@@ -18158,12 +18138,8 @@
           "format": {
             "runs": [
               {
-                "children": ["V"],
-                "styles": ["italic", "bold"]
-              },
-              {
-                "children": ["GND"],
-                "styles": ["subscript", "bold"]
+                "children": ["VGND"],
+                "styles": ["bold"]
               }
             ]
           },
@@ -18641,7 +18617,7 @@
         }
       },
       "sourceStatus": "connectivity-modified",
-      "revision": 61,
+      "revision": 64,
       "importReference": {
         "files": [
           {
