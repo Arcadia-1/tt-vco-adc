@@ -8,14 +8,14 @@ This tile is a **pseudo-differential, second-order closed-loop VCO delta-sigma A
 
 - The input (`ua[0]` = VINP, `ua[1]` = VINN) drives a 49 kΩ xhigh-poly resistor into the virtual ground of a 5-transistor OTA (NMOS input pair, DC gain about 42 dB). The OTA's non-inverting input sits at Vref = VDD/2 = 0.9 V.
 - Two 24 µm × 25 µm MIM capacitors (about 2.4 pF in total) between the virtual ground and the OTA output form the integrator. An NMOS switch across them clears the integrator while `rst_n` is low.
-- The OTA output (vctrl) sets the current of the **7-stage current-starved ring oscillator** through a V-to-I transistor on a 234 kΩ xhigh-poly resistor (one common-centroid array shared by both halves). The resistor is shorter than in the first version, so the V-to-I transistor stays saturated over the whole vctrl range at every corner; at the longer value its tuning curve compressed at the fast-NMOS corners and limited HD3.
+- The OTA output (vctrl) sets the current of the **7-stage current-starved ring oscillator** through a V-to-I transistor on a 234 kΩ xhigh-poly resistor (one common-centroid array shared by both halves). Its value keeps the V-to-I transistor saturated over the whole vctrl range at every corner, so the tuning curve does not compress at the fast-NMOS corners.
 - 7 flip-flops (`dfxtp_4`) sample the ring phases on every rising edge of `clk`; a second rank of 7 flip-flops holds the previous sample, and 7 XOR gates mark the stages that toggled in the last clock period.
 - Each XOR bit drives one element of a **7-element resistor DAC** (1.04 MΩ per element, NRZ, rail to rail) back into the virtual ground. The DAC has no clock-dependent element selection: the ring's own rotation spreads the use over all elements, which first-order shapes their mismatch.
 - Shared by both halves: the Vref divider with a MOS decoupling capacitor, the OTA tail bias (resistor into a diode-connected NMOS), and the `rst_n` inverter.
 
 Full scale is about ±0.3 V per input around 0.9 V (±0.6 V differential), where the input current equals the full DAC current; the best SNDR is reached around ±0.15 V per input, and distortion rises above about ±0.2 V. At mid-scale the loop holds each ring at fs/4 (2.5 MHz at fs = 10 MHz) regardless of process corner, so the per-stage toggle limit (f_vco < fs/2) is met with margin.
 
-**Outputs (unchanged from the first version)**
+**Outputs**
 
 - P half: `uo_out[6:0]` are the sampled phases, `uo_out[7]` is the unsampled ring stage 0 (frequency monitor).
 - N half: `uio_out[7:1]` are the sampled phases, `uio_out[0]` is the monitor (`uio_oe` is tied high, so all `uio` pins are outputs).

@@ -2,7 +2,7 @@
 
 # Second-order VCO Delta-Sigma ADC (Tiny Tapeout SKY26e, sky130A, 1x2 analog tile)
 
-Two mirror-image second-order closed-loop VCO delta-sigma ADC halves. In each half, VINP (`ua[0]`) or VINN (`ua[1]`) drives a resistor into an OTA-C integrator, whose output tunes a 7-stage current-starved ring oscillator; the sampled ring phases (P half on `uo_out`, N half on `uio`, one unsampled monitor each) are XORed with the previous sample on chip and fed back through a 7-element resistor DAC. The integrator plus the VCO phase give second-order noise shaping, and the loop suppresses the VCO nonlinearity. Off-chip, each half's code is the popcount of successive phase-word XORs and the ADC output is N minus P. The first-order open-loop version is tagged `v1.0-pseudodiff`.
+Two mirror-image second-order closed-loop VCO delta-sigma ADC halves. In each half, VINP (`ua[0]`) or VINN (`ua[1]`) drives a resistor into an OTA-C integrator, whose output tunes a 7-stage current-starved ring oscillator; the sampled ring phases (P half on `uo_out`, N half on `uio`, one unsampled monitor each) are XORed with the previous sample on chip and fed back through a 7-element resistor DAC. The integrator plus the VCO phase give second-order noise shaping, and the loop suppresses the VCO nonlinearity. Off-chip, each half's code is the popcount of successive phase-word XORs and the ADC output is N minus P.
 
 | Path | Content |
 |---|---|

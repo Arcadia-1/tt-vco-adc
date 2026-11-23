@@ -1,9 +1,9 @@
-"""Behavioral model of the open-loop VCO delta-sigma ADC.
+"""Ring-oscillator quantizer model: phase word of an N-stage ring sampled by DFFs.
 
-N-stage ring, every stage sampled by a DFF at fs. Off-chip the sampled
-phase word is differenced (XOR with previous sample) and popcounted:
-y[n] = number of stage transitions in one clock period. That is a
-first-order noise-shaped estimate of 2N * f_vco / fs.
+ring_phase_word() gives the sampled phase word; y[n] = popcount of the XOR with the
+previous word = number of stage transitions in one clock period. so_model.py uses it
+as the quantizer of the second-order loop; run alone, this file sweeps the open-loop
+quantizer by itself.
 
 Usage: python3 vco_adc_model.py   (prints SQNR vs settings)
 """
