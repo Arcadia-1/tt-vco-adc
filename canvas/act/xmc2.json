@@ -1,0 +1,1 @@
+{"actions": [{"kind": "set-orientation", "target": {"kind": "instance", "reference": "XMc"}, "rotation": 90, "mirror": "none"}, {"kind": "move", "target": {"kind": "instance", "reference": "XMc"}, "position": {"x": 340, "y": 200}}]}

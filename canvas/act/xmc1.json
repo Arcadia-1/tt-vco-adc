@@ -1,0 +1,1 @@
+{"actions": [{"kind": "delete", "target": {"kind": "route", "id": "wire-09440b3d-b267-4160-a32f-e65300474cc9-route-a-wire-db5d1ef5-5323-4282-b2a7-46b70950f76f-to"}}, {"kind": "delete", "target": {"kind": "route", "id": "wire-8868fa87-8bf4-4396-9770-bb84c633dfea-route"}}, {"kind": "delete", "target": {"kind": "route", "id": "wire-88bebc46-66ad-48e8-9e1f-dc7dc8b0d1b8-route"}}]}
