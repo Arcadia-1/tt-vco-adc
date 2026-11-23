@@ -1,0 +1,1 @@
+{"actions":[{"kind":"set-terminal-net","target":{"kind":"instance","id":"XHP"},"pin":"VDD","net":{"kind":"net","name":"VDPWR"}}]}

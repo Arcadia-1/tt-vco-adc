@@ -1,0 +1,1 @@
+{"actions": [{"kind": "set-terminal-net", "target": {"kind": "instance", "id": "XMb_2"}, "pin": "B", "net": {"kind": "net", "name": "VGND"}}]}

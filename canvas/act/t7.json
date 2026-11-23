@@ -1,0 +1,1 @@
+{"actions": [{"kind": "place-component", "symbol": "vdd-port", "id": "vdd_XHP", "reference": "VDPWR", "pinAnchor": {"pinName": "P", "position": {"x": 400, "y": 160}}}], "detail": "full"}

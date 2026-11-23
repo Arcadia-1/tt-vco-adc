@@ -1,0 +1,1 @@
+{"actions": [{"kind": "connect", "from": {"kind": "pin", "instance": {"kind": "instance", "id": "XHP"}, "pin": "vdd"}, "to": {"kind": "pin", "instance": {"kind": "instance", "id": "vdd_XHP"}, "pin": "P"}}], "detail": "full"}
