@@ -1,0 +1,834 @@
+{
+  "apiVersion": "3.0",
+  "requestId": "req-a2fe982c-cb01-4251-a3f3-238f94600a8a",
+  "operation": "snapshot",
+  "ok": true,
+  "projection": "pins",
+  "projectId": "project-4c0bb5849319a04f",
+  "structureRevision": 12,
+  "documentId": "document-e4c5b00d1de4863d",
+  "revision": 6,
+  "instances": [
+    {
+      "id": "XLOOP",
+      "reference": "XLOOP",
+      "masterName": "so_loop",
+      "symbolId": "hierarchical-symbol-e04a43931cce3771",
+      "symbolVariantId": null,
+      "target": "subcircuit:so_loop",
+      "model": null,
+      "parameters": {},
+      "placement": {
+        "position": {
+          "x": 260,
+          "y": 220
+        },
+        "rotation": 0,
+        "mirror": "none"
+      },
+      "bounds": {
+        "x": 190,
+        "y": 110,
+        "width": 140,
+        "height": 220
+      },
+      "pins": [
+        {
+          "name": "b0",
+          "role": "hierarchical-port",
+          "direction": "west",
+          "visibility": "visible",
+          "localPosition": {
+            "x": -70,
+            "y": -40
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 190,
+              "y": 180
+            },
+            "gridLanding": {
+              "x": 190,
+              "y": 180
+            },
+            "escapePath": [],
+            "outward": {
+              "x": -1,
+              "y": 0
+            }
+          },
+          "netId": "net-3c30988eb68686a1"
+        },
+        {
+          "name": "b1",
+          "role": "hierarchical-port",
+          "direction": "west",
+          "visibility": "visible",
+          "localPosition": {
+            "x": -70,
+            "y": -20
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 190,
+              "y": 200
+            },
+            "gridLanding": {
+              "x": 190,
+              "y": 200
+            },
+            "escapePath": [],
+            "outward": {
+              "x": -1,
+              "y": 0
+            }
+          },
+          "netId": "net-3c30978eb68684ee"
+        },
+        {
+          "name": "b2",
+          "role": "hierarchical-port",
+          "direction": "west",
+          "visibility": "visible",
+          "localPosition": {
+            "x": -70,
+            "y": 0
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 190,
+              "y": 220
+            },
+            "gridLanding": {
+              "x": 190,
+              "y": 220
+            },
+            "escapePath": [],
+            "outward": {
+              "x": -1,
+              "y": 0
+            }
+          },
+          "netId": "net-3c30968eb686833b"
+        },
+        {
+          "name": "b3",
+          "role": "hierarchical-port",
+          "direction": "west",
+          "visibility": "visible",
+          "localPosition": {
+            "x": -70,
+            "y": 20
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 190,
+              "y": 240
+            },
+            "gridLanding": {
+              "x": 190,
+              "y": 240
+            },
+            "escapePath": [],
+            "outward": {
+              "x": -1,
+              "y": 0
+            }
+          },
+          "netId": "net-3c30958eb6868188"
+        },
+        {
+          "name": "b4",
+          "role": "hierarchical-port",
+          "direction": "west",
+          "visibility": "visible",
+          "localPosition": {
+            "x": -70,
+            "y": 40
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 190,
+              "y": 260
+            },
+            "gridLanding": {
+              "x": 190,
+              "y": 260
+            },
+            "escapePath": [],
+            "outward": {
+              "x": -1,
+              "y": 0
+            }
+          },
+          "netId": "net-3c309c8eb6868d6d"
+        },
+        {
+          "name": "b5",
+          "role": "hierarchical-port",
+          "direction": "west",
+          "visibility": "visible",
+          "localPosition": {
+            "x": -70,
+            "y": 60
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 190,
+              "y": 280
+            },
+            "gridLanding": {
+              "x": 190,
+              "y": 280
+            },
+            "escapePath": [],
+            "outward": {
+              "x": -1,
+              "y": 0
+            }
+          },
+          "netId": "net-3c309b8eb6868bba"
+        },
+        {
+          "name": "b6",
+          "role": "hierarchical-port",
+          "direction": "west",
+          "visibility": "visible",
+          "localPosition": {
+            "x": -70,
+            "y": 80
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 190,
+              "y": 300
+            },
+            "gridLanding": {
+              "x": 190,
+              "y": 300
+            },
+            "escapePath": [],
+            "outward": {
+              "x": -1,
+              "y": 0
+            }
+          },
+          "netId": "net-3c309a8eb6868a07"
+        },
+        {
+          "name": "gnd",
+          "role": "hierarchical-port",
+          "direction": "south",
+          "visibility": "visible",
+          "localPosition": {
+            "x": 0,
+            "y": 110
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 260,
+              "y": 330
+            },
+            "gridLanding": {
+              "x": 260,
+              "y": 330
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 0,
+              "y": 1
+            }
+          },
+          "netId": "net-d02b1294d40724a1"
+        },
+        {
+          "name": "rst",
+          "role": "hierarchical-port",
+          "direction": "north",
+          "visibility": "visible",
+          "localPosition": {
+            "x": 0,
+            "y": -110
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 260,
+              "y": 110
+            },
+            "gridLanding": {
+              "x": 260,
+              "y": 110
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 0,
+              "y": -1
+            }
+          },
+          "netId": "net-72f3f9952fb88263"
+        },
+        {
+          "name": "vbn",
+          "role": "hierarchical-port",
+          "direction": "north",
+          "visibility": "visible",
+          "localPosition": {
+            "x": -20,
+            "y": -110
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 240,
+              "y": 110
+            },
+            "gridLanding": {
+              "x": 240,
+              "y": 110
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 0,
+              "y": -1
+            }
+          },
+          "netId": "net-52346d951db618f0"
+        },
+        {
+          "name": "vctrl",
+          "role": "hierarchical-port",
+          "direction": "east",
+          "visibility": "visible",
+          "localPosition": {
+            "x": 70,
+            "y": 0
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 330,
+              "y": 220
+            },
+            "gridLanding": {
+              "x": 330,
+              "y": 220
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 1,
+              "y": 0
+            }
+          },
+          "netId": "net-43c27596787e6bd3"
+        },
+        {
+          "name": "vdd",
+          "role": "hierarchical-port",
+          "direction": "north",
+          "visibility": "visible",
+          "localPosition": {
+            "x": 40,
+            "y": -110
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 300,
+              "y": 110
+            },
+            "gridLanding": {
+              "x": 300,
+              "y": 110
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 0,
+              "y": -1
+            }
+          },
+          "netId": "net-523b43951dbbf040"
+        },
+        {
+          "name": "vin",
+          "role": "hierarchical-port",
+          "direction": "west",
+          "visibility": "visible",
+          "localPosition": {
+            "x": -70,
+            "y": -80
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 190,
+              "y": 140
+            },
+            "gridLanding": {
+              "x": 190,
+              "y": 140
+            },
+            "escapePath": [],
+            "outward": {
+              "x": -1,
+              "y": 0
+            }
+          },
+          "netId": "net-52156f951d9b6bc7"
+        },
+        {
+          "name": "vref",
+          "role": "hierarchical-port",
+          "direction": "north",
+          "visibility": "visible",
+          "localPosition": {
+            "x": -40,
+            "y": -110
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 220,
+              "y": 110
+            },
+            "gridLanding": {
+              "x": 220,
+              "y": 110
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 0,
+              "y": -1
+            }
+          },
+          "netId": "net-4bd41d5ddfdeb386"
+        }
+      ],
+      "netlist": {
+        "binding": {
+          "kind": "subcircuit",
+          "childDocumentId": "document-e04a43931cce3771"
+        },
+        "parameters": {},
+        "terminalMapping": [
+          {
+            "sourcePosition": 0,
+            "pinName": "vin"
+          },
+          {
+            "sourcePosition": 1,
+            "pinName": "vctrl"
+          },
+          {
+            "sourcePosition": 2,
+            "pinName": "b0"
+          },
+          {
+            "sourcePosition": 3,
+            "pinName": "b1"
+          },
+          {
+            "sourcePosition": 4,
+            "pinName": "b2"
+          },
+          {
+            "sourcePosition": 5,
+            "pinName": "b3"
+          },
+          {
+            "sourcePosition": 6,
+            "pinName": "b4"
+          },
+          {
+            "sourcePosition": 7,
+            "pinName": "b5"
+          },
+          {
+            "sourcePosition": 8,
+            "pinName": "b6"
+          },
+          {
+            "sourcePosition": 9,
+            "pinName": "vref"
+          },
+          {
+            "sourcePosition": 10,
+            "pinName": "vbn"
+          },
+          {
+            "sourcePosition": 11,
+            "pinName": "rst"
+          },
+          {
+            "sourcePosition": 12,
+            "pinName": "vdd"
+          },
+          {
+            "sourcePosition": 13,
+            "pinName": "gnd"
+          }
+        ]
+      }
+    },
+    {
+      "id": "XVCO",
+      "reference": "XVCO",
+      "masterName": "vco_core",
+      "symbolId": "hierarchical-symbol-71956e2218d32199",
+      "symbolVariantId": null,
+      "target": "subcircuit:vco_core",
+      "model": null,
+      "parameters": {},
+      "placement": {
+        "position": {
+          "x": 440,
+          "y": 220
+        },
+        "rotation": 0,
+        "mirror": "none"
+      },
+      "bounds": {
+        "x": 390,
+        "y": 130,
+        "width": 100,
+        "height": 180
+      },
+      "pins": [
+        {
+          "name": "gnd",
+          "role": "hierarchical-port",
+          "direction": "south",
+          "visibility": "visible",
+          "localPosition": {
+            "x": -20,
+            "y": 90
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 420,
+              "y": 310
+            },
+            "gridLanding": {
+              "x": 420,
+              "y": 310
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 0,
+              "y": 1
+            }
+          },
+          "netId": "net-d02b1294d40724a1"
+        },
+        {
+          "name": "ph0",
+          "role": "hierarchical-port",
+          "direction": "east",
+          "visibility": "visible",
+          "localPosition": {
+            "x": 50,
+            "y": -60
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 490,
+              "y": 160
+            },
+            "gridLanding": {
+              "x": 490,
+              "y": 160
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 1,
+              "y": 0
+            }
+          },
+          "netId": "net-853191953a4ff6f2"
+        },
+        {
+          "name": "ph1",
+          "role": "hierarchical-port",
+          "direction": "east",
+          "visibility": "visible",
+          "localPosition": {
+            "x": 50,
+            "y": -40
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 490,
+              "y": 180
+            },
+            "gridLanding": {
+              "x": 490,
+              "y": 180
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 1,
+              "y": 0
+            }
+          },
+          "netId": "net-853192953a4ff8a5"
+        },
+        {
+          "name": "ph2",
+          "role": "hierarchical-port",
+          "direction": "east",
+          "visibility": "visible",
+          "localPosition": {
+            "x": 50,
+            "y": -20
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 490,
+              "y": 200
+            },
+            "gridLanding": {
+              "x": 490,
+              "y": 200
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 1,
+              "y": 0
+            }
+          },
+          "netId": "net-85318f953a4ff38c"
+        },
+        {
+          "name": "ph3",
+          "role": "hierarchical-port",
+          "direction": "east",
+          "visibility": "visible",
+          "localPosition": {
+            "x": 50,
+            "y": 0
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 490,
+              "y": 220
+            },
+            "gridLanding": {
+              "x": 490,
+              "y": 220
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 1,
+              "y": 0
+            }
+          },
+          "netId": "net-853190953a4ff53f"
+        },
+        {
+          "name": "ph4",
+          "role": "hierarchical-port",
+          "direction": "east",
+          "visibility": "visible",
+          "localPosition": {
+            "x": 50,
+            "y": 20
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 490,
+              "y": 240
+            },
+            "gridLanding": {
+              "x": 490,
+              "y": 240
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 1,
+              "y": 0
+            }
+          },
+          "netId": "net-85318d953a4ff026"
+        },
+        {
+          "name": "ph5",
+          "role": "hierarchical-port",
+          "direction": "east",
+          "visibility": "visible",
+          "localPosition": {
+            "x": 50,
+            "y": 40
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 490,
+              "y": 260
+            },
+            "gridLanding": {
+              "x": 490,
+              "y": 260
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 1,
+              "y": 0
+            }
+          },
+          "netId": "net-85318e953a4ff1d9"
+        },
+        {
+          "name": "ph6",
+          "role": "hierarchical-port",
+          "direction": "east",
+          "visibility": "visible",
+          "localPosition": {
+            "x": 50,
+            "y": 60
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 490,
+              "y": 280
+            },
+            "gridLanding": {
+              "x": 490,
+              "y": 280
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 1,
+              "y": 0
+            }
+          },
+          "netId": "net-85318b953a4fecc0"
+        },
+        {
+          "name": "vdd",
+          "role": "hierarchical-port",
+          "direction": "north",
+          "visibility": "visible",
+          "localPosition": {
+            "x": 0,
+            "y": -90
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 440,
+              "y": 130
+            },
+            "gridLanding": {
+              "x": 440,
+              "y": 130
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 0,
+              "y": -1
+            }
+          },
+          "netId": "net-523b43951dbbf040"
+        },
+        {
+          "name": "vin",
+          "role": "hierarchical-port",
+          "direction": "west",
+          "visibility": "visible",
+          "localPosition": {
+            "x": -50,
+            "y": 0
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 390,
+              "y": 220
+            },
+            "gridLanding": {
+              "x": 390,
+              "y": 220
+            },
+            "escapePath": [],
+            "outward": {
+              "x": -1,
+              "y": 0
+            }
+          },
+          "netId": "net-43c27596787e6bd3"
+        },
+        {
+          "name": "vs",
+          "role": "hierarchical-port",
+          "direction": "south",
+          "visibility": "visible",
+          "localPosition": {
+            "x": 20,
+            "y": 90
+          },
+          "connection": {
+            "contactPoint": {
+              "x": 460,
+              "y": 310
+            },
+            "gridLanding": {
+              "x": 460,
+              "y": 310
+            },
+            "escapePath": [],
+            "outward": {
+              "x": 0,
+              "y": 1
+            }
+          },
+          "netId": "net-3c744d8eb6bfd3fc"
+        }
+      ],
+      "netlist": {
+        "binding": {
+          "kind": "subcircuit",
+          "childDocumentId": "document-71956e2218d32199"
+        },
+        "parameters": {},
+        "terminalMapping": [
+          {
+            "sourcePosition": 0,
+            "pinName": "vin"
+          },
+          {
+            "sourcePosition": 1,
+            "pinName": "vs"
+          },
+          {
+            "sourcePosition": 2,
+            "pinName": "ph0"
+          },
+          {
+            "sourcePosition": 3,
+            "pinName": "ph1"
+          },
+          {
+            "sourcePosition": 4,
+            "pinName": "ph2"
+          },
+          {
+            "sourcePosition": 5,
+            "pinName": "ph3"
+          },
+          {
+            "sourcePosition": 6,
+            "pinName": "ph4"
+          },
+          {
+            "sourcePosition": 7,
+            "pinName": "ph5"
+          },
+          {
+            "sourcePosition": 8,
+            "pinName": "ph6"
+          },
+          {
+            "sourcePosition": 9,
+            "pinName": "vdd"
+          },
+          {
+            "sourcePosition": 10,
+            "pinName": "gnd"
+          }
+        ]
+      }
+    }
+  ],
+  "missingInstanceIds": []
+}

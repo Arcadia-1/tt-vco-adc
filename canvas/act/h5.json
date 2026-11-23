@@ -1,0 +1,4 @@
+{"actions":[
+{"kind":"delete","target":{"kind":"drafting","id":"text-4a478372-b3d9-4e23-b802-5f8bd58eda4e"}},
+{"kind":"move","target":{"kind":"annotation","id":"instance-label-XVCO"},"position":{"x":455,"y":432}}
+]}

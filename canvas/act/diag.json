@@ -1,0 +1,1554 @@
+{
+  "revision": 10,
+  "counts": {
+    "errors": 1,
+    "warnings": 41,
+    "total": 69
+  },
+  "items": [
+    {
+      "code": "VISUAL_LABEL_CLEARANCE",
+      "severity": "warning",
+      "category": "observation",
+      "confidence": "low",
+      "gateEligible": false,
+      "message": "Label text is drawn over a wire or a part's drawing; move the label or the wire",
+      "objectIds": [
+        "instance-label-XLOOP",
+        "wire-ddb0f74f-4b7d-4200-8c46-e33c5d84b5fe-route"
+      ],
+      "revision": 10,
+      "bounds": {
+        "x": 273.576752,
+        "y": 294.11648,
+        "width": 55.35479200000003,
+        "height": 15.938310399999999
+      },
+      "parameters": {
+        "conflictingObjectCount": 1
+      }
+    },
+    {
+      "code": "VISUAL_LABEL_CLEARANCE",
+      "severity": "warning",
+      "category": "observation",
+      "confidence": "low",
+      "gateEligible": false,
+      "message": "Label text is drawn over a wire or a part's drawing; move the label or the wire",
+      "objectIds": [
+        "instance-label-XVCO",
+        "wire-16e8bf7b-9ffe-4170-994c-5eff6e46a403-route-b-wire-0a788d3b-24e1-4036-b124-7068cdf62632-to",
+        "wire-1bfbd3aa-6eba-420c-8e7e-a7252e024277-route"
+      ],
+      "revision": 10,
+      "bounds": {
+        "x": 356.72136,
+        "y": 394.11648,
+        "width": 45.907291999999984,
+        "height": 15.938310399999999
+      },
+      "parameters": {
+        "conflictingObjectCount": 2
+      }
+    },
+    {
+      "code": "VISUAL_LABEL_CLEARANCE",
+      "severity": "warning",
+      "category": "observation",
+      "confidence": "low",
+      "gateEligible": false,
+      "message": "Label text is drawn over a wire or a part's drawing; move the label or the wire",
+      "objectIds": [
+        "instance-label-XFB0",
+        "wire-f485588f-26c6-40ff-8318-95a71130ecdf-route-a-wire-7436d4f2-6710-4f59-a671-1c3d94bd457e-to"
+      ],
+      "revision": 10,
+      "bounds": {
+        "x": 739.54533112,
+        "y": 99.11648,
+        "width": 39.923169919999964,
+        "height": 15.938310399999999
+      },
+      "parameters": {
+        "conflictingObjectCount": 1
+      }
+    },
+    {
+      "code": "VISUAL_LABEL_CLEARANCE",
+      "severity": "warning",
+      "category": "observation",
+      "confidence": "low",
+      "gateEligible": false,
+      "message": "Label text is drawn over a wire or a part's drawing; move the label or the wire",
+      "objectIds": [
+        "instance-label-XX0",
+        "route-canonical-10ed69f1968989e5"
+      ],
+      "revision": 10,
+      "bounds": {
+        "x": 864.01966712,
+        "y": 99.11648,
+        "width": 30.974497919999976,
+        "height": 15.938310399999999
+      },
+      "parameters": {
+        "conflictingObjectCount": 1
+      }
+    },
+    {
+      "code": "VISUAL_LABEL_CLEARANCE",
+      "severity": "warning",
+      "category": "observation",
+      "confidence": "low",
+      "gateEligible": false,
+      "message": "Label text is drawn over a wire or a part's drawing; move the label or the wire",
+      "objectIds": [
+        "instance-label-XFB1",
+        "wire-f7cb0cfe-ef76-4b0c-84de-e22b904ea030-route-a-wire-dc8dc012-5b07-45f5-8512-ab7855ff2f6d-to"
+      ],
+      "revision": 10,
+      "bounds": {
+        "x": 741.1364412800001,
+        "y": 179.11648,
+        "width": 36.37332847999994,
+        "height": 15.938310399999999
+      },
+      "parameters": {
+        "conflictingObjectCount": 1
+      }
+    },
+    {
+      "code": "VISUAL_LABEL_CLEARANCE",
+      "severity": "warning",
+      "category": "observation",
+      "confidence": "low",
+      "gateEligible": false,
+      "message": "Label text is drawn over a wire or a part's drawing; move the label or the wire",
+      "objectIds": [
+        "instance-label-XX1",
+        "route-canonical-2a3ef658d290e353"
+      ],
+      "revision": 10,
+      "bounds": {
+        "x": 865.6107772800001,
+        "y": 179.11648,
+        "width": 27.424656479999953,
+        "height": 15.938310399999999
+      },
+      "parameters": {
+        "conflictingObjectCount": 1
+      }
+    },
+    {
+      "code": "VISUAL_LABEL_CLEARANCE",
+      "severity": "warning",
+      "category": "observation",
+      "confidence": "low",
+      "gateEligible": false,
+      "message": "Label text is drawn over a wire or a part's drawing; move the label or the wire",
+      "objectIds": [
+        "instance-label-XFB2",
+        "wire-a0144d24-cbeb-4ba1-9816-cff1833e03ec-route-a-wire-12d8907d-f895-4860-af4e-c190e51b8ec7-to"
+      ],
+      "revision": 10,
+      "bounds": {
+        "x": 740.0565542400001,
+        "y": 259.11648,
+        "width": 38.82030655999995,
+        "height": 15.938310399999999
+      },
+      "parameters": {
+        "conflictingObjectCount": 1
+      }
+    },
+    {
+      "code": "VISUAL_LABEL_CLEARANCE",
+      "severity": "warning",
+      "category": "observation",
+      "confidence": "low",
+      "gateEligible": false,
+      "message": "Label text is drawn over a wire or a part's drawing; move the label or the wire",
+      "objectIds": [
+        "instance-label-XX2",
+        "route-canonical-a20d1a131c3e0fb1"
+      ],
+      "revision": 10,
+      "bounds": {
+        "x": 864.5308902400001,
+        "y": 259.11648,
+        "width": 29.87163455999996,
+        "height": 15.938310399999999
+      },
+      "parameters": {
+        "conflictingObjectCount": 1
+      }
+    },
+    {
+      "code": "VISUAL_LABEL_CLEARANCE",
+      "severity": "warning",
+      "category": "observation",
+      "confidence": "low",
+      "gateEligible": false,
+      "message": "Label text is drawn over a wire or a part's drawing; move the label or the wire",
+      "objectIds": [
+        "instance-label-XFB3",
+        "wire-e3fef70f-185d-4df7-bf08-269f819559f1-route-a-wire-644a2ea5-7294-4e05-a15d-52b2a616fa5c-to"
+      ],
+      "revision": 10,
+      "bounds": {
+        "x": 740.0622983200001,
+        "y": 339.11648,
+        "width": 38.88923551999994,
+        "height": 15.938310399999999
+      },
+      "parameters": {
+        "conflictingObjectCount": 1
+      }
+    },
+    {
+      "code": "VISUAL_LABEL_CLEARANCE",
+      "severity": "warning",
+      "category": "observation",
+      "confidence": "low",
+      "gateEligible": false,
+      "message": "Label text is drawn over a wire or a part's drawing; move the label or the wire",
+      "objectIds": [
+        "instance-label-XX3",
+        "route-canonical-37ffcc7147986081"
+      ],
+      "revision": 10,
+      "bounds": {
+        "x": 864.5366343200001,
+        "y": 339.11648,
+        "width": 29.940563519999955,
+        "height": 15.938310399999999
+      },
+      "parameters": {
+        "conflictingObjectCount": 1
+      }
+    },
+    {
+      "code": "VISUAL_LABEL_CLEARANCE",
+      "severity": "warning",
+      "category": "observation",
+      "confidence": "low",
+      "gateEligible": false,
+      "message": "Label text is drawn over a wire or a part's drawing; move the label or the wire",
+      "objectIds": [
+        "instance-label-XFB4",
+        "wire-9291cd02-dd8b-4d5a-8009-2667b44db26d-route-a-wire-cbfa3e08-ce2b-45cd-898e-c308c170a714-to"
+      ],
+      "revision": 10,
+      "bounds": {
+        "x": 739.8153028800001,
+        "y": 419.11648,
+        "width": 39.47513167999989,
+        "height": 15.938310399999999
+      },
+      "parameters": {
+        "conflictingObjectCount": 1
+      }
+    },
+    {
+      "code": "VISUAL_LABEL_CLEARANCE",
+      "severity": "warning",
+      "category": "observation",
+      "confidence": "low",
+      "gateEligible": false,
+      "message": "Label text is drawn over a wire or a part's drawing; move the label or the wire",
+      "objectIds": [
+        "instance-label-XX4",
+        "route-canonical-3365ab2a005fde9e"
+      ],
+      "revision": 10,
+      "bounds": {
+        "x": 864.2896388800001,
+        "y": 419.11648,
+        "width": 30.526459679999903,
+        "height": 15.938310399999999
+      },
+      "parameters": {
+        "conflictingObjectCount": 1
+      }
+    },
+    {
+      "code": "VISUAL_LABEL_CLEARANCE",
+      "severity": "warning",
+      "category": "observation",
+      "confidence": "low",
+      "gateEligible": false,
+      "message": "Label text is drawn over a wire or a part's drawing; move the label or the wire",
+      "objectIds": [
+        "instance-label-XFB5",
+        "wire-5e57fbed-5af8-4944-8c49-4926cafb9991-route-a-wire-a81d86cc-e002-4a35-a2b0-3b747130c95a-to"
+      ],
+      "revision": 10,
+      "bounds": {
+        "x": 740.0278338400001,
+        "y": 499.11648,
+        "width": 38.95816447999994,
+        "height": 15.938310399999999
+      },
+      "parameters": {
+        "conflictingObjectCount": 1
+      }
+    },
+    {
+      "code": "VISUAL_LABEL_CLEARANCE",
+      "severity": "warning",
+      "category": "observation",
+      "confidence": "low",
+      "gateEligible": false,
+      "message": "Label text is drawn over a wire or a part's drawing; move the label or the wire",
+      "objectIds": [
+        "instance-label-XX5",
+        "route-canonical-b732dc0c8bf536fa"
+      ],
+      "revision": 10,
+      "bounds": {
+        "x": 864.5021698400001,
+        "y": 499.11648,
+        "width": 30.00949247999995,
+        "height": 15.938310399999999
+      },
+      "parameters": {
+        "conflictingObjectCount": 1
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3fa105713c39b1a3",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-90bce1065ba6f7d5"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-90bce1065ba6f7d5 exports as net0",
+      "objectIds": [
+        "net-90bce1065ba6f7d5"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3fa105713c39b1a3"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3fa105713c39b1a3",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-90bce1065ba6f7d5"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_27_47# cannot be encoded for spice: Net name a_27_47# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-90bce1065ba6f7d5",
+        "connectivity-evidence-b24ad8d406ed0438"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3fa105713c39b1a3"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-055ecd19c2147a01"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-055ecd19c2147a01 exports as net0",
+      "objectIds": [
+        "net-055ecd19c2147a01"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-1469e4145cf15854"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-1469e4145cf15854 exports as net1",
+      "objectIds": [
+        "net-1469e4145cf15854"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-19b1d99b2093e4c3"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-19b1d99b2093e4c3 exports as net2",
+      "objectIds": [
+        "net-19b1d99b2093e4c3"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-248ce0c3a99e3b09"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-248ce0c3a99e3b09 exports as net3",
+      "objectIds": [
+        "net-248ce0c3a99e3b09"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-276d4d7330491830"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-276d4d7330491830 exports as net4",
+      "objectIds": [
+        "net-276d4d7330491830"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-56bbf2850f955622"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-56bbf2850f955622 exports as net5",
+      "objectIds": [
+        "net-56bbf2850f955622"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-823a5ef191f445e0"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-823a5ef191f445e0 exports as net6",
+      "objectIds": [
+        "net-823a5ef191f445e0"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-acd39f56a8622a2b"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-acd39f56a8622a2b exports as net7",
+      "objectIds": [
+        "net-acd39f56a8622a2b"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-c723f6e45f0a100b"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-c723f6e45f0a100b exports as net8",
+      "objectIds": [
+        "net-c723f6e45f0a100b"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-fa2b1cc8438840b2"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-fa2b1cc8438840b2 exports as net9",
+      "objectIds": [
+        "net-fa2b1cc8438840b2"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-ff39a1219ce97a3a"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-ff39a1219ce97a3a exports as net10",
+      "objectIds": [
+        "net-ff39a1219ce97a3a"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-055ecd19c2147a01"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_592_47# cannot be encoded for spice: Net name a_592_47# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-055ecd19c2147a01",
+        "connectivity-evidence-486a0d78b49b9ada"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-1469e4145cf15854"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_466_413# cannot be encoded for spice: Net name a_466_413# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-1469e4145cf15854",
+        "connectivity-evidence-b2ddccb04a7e151d"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-19b1d99b2093e4c3"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_1059_315# cannot be encoded for spice: Net name a_1059_315# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-19b1d99b2093e4c3",
+        "connectivity-evidence-2a620fb1a762a5dd"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-248ce0c3a99e3b09"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_975_413# cannot be encoded for spice: Net name a_975_413# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-248ce0c3a99e3b09",
+        "connectivity-evidence-b275dfd6ad4ed38f"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-276d4d7330491830"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_634_159# cannot be encoded for spice: Net name a_634_159# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-276d4d7330491830",
+        "connectivity-evidence-51f24b8fa15bfcd1"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-56bbf2850f955622"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_193_47# cannot be encoded for spice: Net name a_193_47# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-56bbf2850f955622",
+        "connectivity-evidence-dd38630ea06dee59"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-823a5ef191f445e0"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_1017_47# cannot be encoded for spice: Net name a_1017_47# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-823a5ef191f445e0",
+        "connectivity-evidence-555880c27d63b807"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-acd39f56a8622a2b"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_27_47# cannot be encoded for spice: Net name a_27_47# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-acd39f56a8622a2b",
+        "connectivity-evidence-fda5965c975b86a8"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-c723f6e45f0a100b"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_381_47# cannot be encoded for spice: Net name a_381_47# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-c723f6e45f0a100b",
+        "connectivity-evidence-201c0d9e0e51580c"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-fa2b1cc8438840b2"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_891_413# cannot be encoded for spice: Net name a_891_413# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-fa2b1cc8438840b2",
+        "connectivity-evidence-d718ae0fefa168f5"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac54736dd9041",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-ff39a1219ce97a3a"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_561_413# cannot be encoded for spice: Net name a_561_413# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-ff39a1219ce97a3a",
+        "connectivity-evidence-e8204a4813be3e13"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac54736dd9041"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-17d91013bc385a29"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-17d91013bc385a29 exports as net0",
+      "objectIds": [
+        "net-17d91013bc385a29"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-2d074ca62b1e6b7f"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-2d074ca62b1e6b7f exports as net1",
+      "objectIds": [
+        "net-2d074ca62b1e6b7f"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-30fb17065f3c7d58"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-30fb17065f3c7d58 exports as net2",
+      "objectIds": [
+        "net-30fb17065f3c7d58"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-7b1216edf8954026"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-7b1216edf8954026 exports as net3",
+      "objectIds": [
+        "net-7b1216edf8954026"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-937778062d3eaafa"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-937778062d3eaafa exports as net4",
+      "objectIds": [
+        "net-937778062d3eaafa"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-c9bef5b5f2c58650"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-c9bef5b5f2c58650 exports as net5",
+      "objectIds": [
+        "net-c9bef5b5f2c58650"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-dbf018d2d0a648bd"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-dbf018d2d0a648bd exports as net6",
+      "objectIds": [
+        "net-dbf018d2d0a648bd"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-dc5551705a4ec9ba"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-dc5551705a4ec9ba exports as net7",
+      "objectIds": [
+        "net-dc5551705a4ec9ba"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-f2c1699f19ead579"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-f2c1699f19ead579 exports as net8",
+      "objectIds": [
+        "net-f2c1699f19ead579"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-f4c3849d23015eaa"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-f4c3849d23015eaa exports as net9",
+      "objectIds": [
+        "net-f4c3849d23015eaa"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-fe649a4858ee51a8"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-fe649a4858ee51a8 exports as net10",
+      "objectIds": [
+        "net-fe649a4858ee51a8"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-17d91013bc385a29"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_891_413# cannot be encoded for spice: Net name a_891_413# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-17d91013bc385a29",
+        "connectivity-evidence-b021ba59a7296964"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-2d074ca62b1e6b7f"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_475_413# cannot be encoded for spice: Net name a_475_413# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-2d074ca62b1e6b7f",
+        "connectivity-evidence-3364480e21900e25"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-30fb17065f3c7d58"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_568_413# cannot be encoded for spice: Net name a_568_413# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-30fb17065f3c7d58",
+        "connectivity-evidence-0606954e515054ce"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-7b1216edf8954026"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_975_413# cannot be encoded for spice: Net name a_975_413# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-7b1216edf8954026",
+        "connectivity-evidence-0cfc2865431ef4c2"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-937778062d3eaafa"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_27_47# cannot be encoded for spice: Net name a_27_47# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-937778062d3eaafa",
+        "connectivity-evidence-160cbd42734c2324"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-c9bef5b5f2c58650"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_572_47# cannot be encoded for spice: Net name a_572_47# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-c9bef5b5f2c58650",
+        "connectivity-evidence-4963b760133256da"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-dbf018d2d0a648bd"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_1020_47# cannot be encoded for spice: Net name a_1020_47# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-dbf018d2d0a648bd",
+        "connectivity-evidence-0f9399b96af25eff"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-dc5551705a4ec9ba"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_634_183# cannot be encoded for spice: Net name a_634_183# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-dc5551705a4ec9ba",
+        "connectivity-evidence-4c7537de56919738"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-f2c1699f19ead579"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_193_47# cannot be encoded for spice: Net name a_193_47# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-f2c1699f19ead579",
+        "connectivity-evidence-51309920c0337e58"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-f4c3849d23015eaa"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_1062_300# cannot be encoded for spice: Net name a_1062_300# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-f4c3849d23015eaa",
+        "connectivity-evidence-0c78a011988bc9c1"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-3ffac84736dd955a",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-fe649a4858ee51a8"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_381_47# cannot be encoded for spice: Net name a_381_47# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-fe649a4858ee51a8",
+        "connectivity-evidence-dd749274ca24a2d5"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-3ffac84736dd955a"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-5470715b9c852c75",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-491f88ba7dd678fd"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-491f88ba7dd678fd exports as net0",
+      "objectIds": [
+        "net-491f88ba7dd678fd"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-5470715b9c852c75"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-5470715b9c852c75",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-528eb193bd719fe2"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-528eb193bd719fe2 exports as net1",
+      "objectIds": [
+        "net-528eb193bd719fe2"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-5470715b9c852c75"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-5470715b9c852c75",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-67a20572d5dc73c0"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-67a20572d5dc73c0 exports as net2",
+      "objectIds": [
+        "net-67a20572d5dc73c0"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-5470715b9c852c75"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-5470715b9c852c75",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-f9fb057afcb0160f"
+      },
+      "code": "GENERATED_NET_NAME",
+      "domain": "spice",
+      "severity": "info",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Unnamed logical Net net-f9fb057afcb0160f exports as net3",
+      "objectIds": [
+        "net-f9fb057afcb0160f"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-5470715b9c852c75"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-5470715b9c852c75",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-491f88ba7dd678fd"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_285_297# cannot be encoded for spice: Net name a_285_297# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-491f88ba7dd678fd",
+        "connectivity-evidence-fd847449c3db3b0d"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-5470715b9c852c75"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-5470715b9c852c75",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-528eb193bd719fe2"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_35_297# cannot be encoded for spice: Net name a_35_297# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-528eb193bd719fe2",
+        "connectivity-evidence-0a33e5a370bd6360"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-5470715b9c852c75"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-5470715b9c852c75",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-67a20572d5dc73c0"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_285_47# cannot be encoded for spice: Net name a_285_47# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-67a20572d5dc73c0",
+        "connectivity-evidence-7a96b6c2433d3fc4"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-5470715b9c852c75"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-5470715b9c852c75",
+        "hierarchyPath": [],
+        "kind": "net",
+        "objectId": "net-f9fb057afcb0160f"
+      },
+      "code": "UNREPRESENTABLE_SOURCE_NET_NAME",
+      "domain": "spice",
+      "severity": "warning",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Source node a_117_297# cannot be encoded for spice: Net name a_117_297# contains characters that ngspice cannot safely read as one node token",
+      "objectIds": [
+        "net-f9fb057afcb0160f",
+        "connectivity-evidence-4a621e5acc656394"
+      ],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-5470715b9c852c75"
+      }
+    },
+    {
+      "primary": {
+        "documentId": "document-e4c5b00d1de4863d",
+        "hierarchyPath": [],
+        "kind": "document",
+        "objectId": "document-e4c5b00d1de4863d"
+      },
+      "code": "MODEL_LEGACY_IMPLEMENTATION_UNVERIFIED",
+      "domain": "spice",
+      "severity": "error",
+      "category": "structural",
+      "confidence": "high",
+      "gateEligible": true,
+      "message": "Legacy declaration sky130_fd_pr__special_nfet_01v8 has no Project-owned implementation; resolve its source explicitly in Cell Manager",
+      "objectIds": [],
+      "revision": 10,
+      "parameters": {
+        "documentId": "document-e4c5b00d1de4863d"
+      }
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"actions": [{"kind": "set-cell-symbol-pins", "pins": [{"name": "gnd", "side": "south", "offset": -20}]}]}
