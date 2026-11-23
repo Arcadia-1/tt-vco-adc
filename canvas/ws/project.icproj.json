@@ -18635,21 +18635,21 @@
                   "at": { "x": -40, "y": -10 },
                   "direction": "west",
                   "name": "D",
-                  "presentation": { "showName": true, "visibility": "visible" },
+                  "presentation": { "leadLength": 15, "showName": true, "visibility": "visible" },
                   "role": "input"
                 },
                 {
                   "at": { "x": -40, "y": 10 },
                   "direction": "west",
                   "name": "CLK",
-                  "presentation": { "showName": false, "visibility": "visible" },
+                  "presentation": { "leadLength": 15, "showName": false, "visibility": "visible" },
                   "role": "input"
                 },
                 {
                   "at": { "x": 40, "y": -10 },
                   "direction": "east",
                   "name": "Q",
-                  "presentation": { "showName": true, "visibility": "visible" },
+                  "presentation": { "leadLength": 15, "showName": true, "visibility": "visible" },
                   "role": "output"
                 }
               ],
@@ -20751,7 +20751,7 @@
         }
       },
       "sourceStatus": "geometry-only-changed",
-      "revision": 3,
+      "revision": 4,
       "importReference": {
         "files": [
           {
@@ -21468,21 +21468,21 @@
                   "at": { "x": -40, "y": -10 },
                   "direction": "west",
                   "name": "D",
-                  "presentation": { "showName": true, "visibility": "visible" },
+                  "presentation": { "leadLength": 15, "showName": true, "visibility": "visible" },
                   "role": "input"
                 },
                 {
                   "at": { "x": -40, "y": 10 },
                   "direction": "west",
                   "name": "CLK",
-                  "presentation": { "showName": false, "visibility": "visible" },
+                  "presentation": { "leadLength": 15, "showName": false, "visibility": "visible" },
                   "role": "input"
                 },
                 {
                   "at": { "x": 40, "y": -10 },
                   "direction": "east",
                   "name": "Q",
-                  "presentation": { "showName": true, "visibility": "visible" },
+                  "presentation": { "leadLength": 15, "showName": true, "visibility": "visible" },
                   "role": "output"
                 }
               ],
@@ -23266,7 +23266,7 @@
         }
       },
       "sourceStatus": "geometry-only-changed",
-      "revision": 3,
+      "revision": 4,
       "importReference": {
         "files": [
           {
@@ -28009,21 +28009,21 @@
                   "at": { "x": -40, "y": -10 },
                   "direction": "west",
                   "name": "D",
-                  "presentation": { "showName": true, "visibility": "visible" },
+                  "presentation": { "leadLength": 15, "showName": true, "visibility": "visible" },
                   "role": "input"
                 },
                 {
                   "at": { "x": -40, "y": 10 },
                   "direction": "west",
                   "name": "CLK",
-                  "presentation": { "showName": false, "visibility": "visible" },
+                  "presentation": { "leadLength": 15, "showName": false, "visibility": "visible" },
                   "role": "input"
                 },
                 {
                   "at": { "x": 40, "y": -10 },
                   "direction": "east",
                   "name": "Q",
-                  "presentation": { "showName": true, "visibility": "visible" },
+                  "presentation": { "leadLength": 15, "showName": true, "visibility": "visible" },
                   "role": "output"
                 }
               ],
@@ -28205,21 +28205,36 @@
             "at": [-40, -10],
             "direction": "west",
             "name": "D",
-            "presentation": { "displayName": "D", "showName": true, "visibility": "visible" },
+            "presentation": {
+              "displayName": "D",
+              "leadLength": 15,
+              "showName": true,
+              "visibility": "visible"
+            },
             "role": "input"
           },
           {
             "at": [-40, 10],
             "direction": "west",
             "name": "CLK",
-            "presentation": { "displayName": "CLK", "showName": false, "visibility": "visible" },
+            "presentation": {
+              "displayName": "CLK",
+              "leadLength": 15,
+              "showName": false,
+              "visibility": "visible"
+            },
             "role": "input"
           },
           {
             "at": [40, -10],
             "direction": "east",
             "name": "Q",
-            "presentation": { "displayName": "Q", "showName": true, "visibility": "visible" },
+            "presentation": {
+              "displayName": "Q",
+              "leadLength": 15,
+              "showName": true,
+              "visibility": "visible"
+            },
             "role": "output"
           },
           {
@@ -28300,21 +28315,21 @@
                   "at": { "x": -40, "y": -10 },
                   "direction": "west",
                   "name": "D",
-                  "presentation": { "showName": true, "visibility": "visible" },
+                  "presentation": { "leadLength": 15, "showName": true, "visibility": "visible" },
                   "role": "input"
                 },
                 {
                   "at": { "x": -40, "y": 10 },
                   "direction": "west",
                   "name": "CLK",
-                  "presentation": { "showName": false, "visibility": "visible" },
+                  "presentation": { "leadLength": 15, "showName": false, "visibility": "visible" },
                   "role": "input"
                 },
                 {
                   "at": { "x": 40, "y": -10 },
                   "direction": "east",
                   "name": "Q",
-                  "presentation": { "showName": true, "visibility": "visible" },
+                  "presentation": { "leadLength": 15, "showName": true, "visibility": "visible" },
                   "role": "output"
                 }
               ],
@@ -28496,21 +28511,36 @@
             "at": [-40, -10],
             "direction": "west",
             "name": "D",
-            "presentation": { "displayName": "D", "showName": true, "visibility": "visible" },
+            "presentation": {
+              "displayName": "D",
+              "leadLength": 15,
+              "showName": true,
+              "visibility": "visible"
+            },
             "role": "input"
           },
           {
             "at": [-40, 10],
             "direction": "west",
             "name": "CLK",
-            "presentation": { "displayName": "CLK", "showName": false, "visibility": "visible" },
+            "presentation": {
+              "displayName": "CLK",
+              "leadLength": 15,
+              "showName": false,
+              "visibility": "visible"
+            },
             "role": "input"
           },
           {
             "at": [40, -10],
             "direction": "east",
             "name": "Q",
-            "presentation": { "displayName": "Q", "showName": true, "visibility": "visible" },
+            "presentation": {
+              "displayName": "Q",
+              "leadLength": 15,
+              "showName": true,
+              "visibility": "visible"
+            },
             "role": "output"
           },
           {
@@ -32907,5 +32937,5 @@
     "sourcePolicy": "copy"
   },
   "symbolLibrary": { "hash": "razavi-reference-v1", "id": "razavi-symbols", "version": "1" },
-  "structureRevision": 21
+  "structureRevision": 23
 }
