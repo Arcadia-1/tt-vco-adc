@@ -1,6 +1,6 @@
-import { initChip } from './layout3d.js';
-import { initAdcSim } from './adc-sim.js';
-import { initMeasurementCharts } from './charts.js';
+import { initChip } from './layout3d.js?v=2';
+import { initAdcSim } from './adc-sim.js?v=2';
+import { initMeasurementCharts } from './charts.js?v=2';
 
 // ---- scroll tour: the step nearest the middle of the viewport picks the scene ----
 const chipEl = document.getElementById('chip');
