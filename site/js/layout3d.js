@@ -355,7 +355,7 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
     mesh.instanceColor.needsUpdate = true;
     mesh.frustumCulled = false;
     scene.add(mesh);
-    return { mesh, mat, count, centers, zMid, base: col.clone(), isDecap, fullOpacity: isWell ? 0.4 : 1 };
+    return { mesh, mat, count, centers, zMid, zH, base: col.clone(), isDecap, fullOpacity: isWell ? 0.4 : 1 };
   }
 
   gds.layers.forEach((l, i) => {
@@ -367,6 +367,56 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
     };
   });
   const layerList = Object.values(layers).sort((a, b) => a.index - b.index);
+
+  // Contacts and vias: unit-height pillars, stretched per frame to span the gap
+  // between the two layers they join, so they stay connected as the stack separates.
+  const VIA_SPAN = { licon: ['diff', 'li1'], mcon: ['li1', 'met1'], via: ['met1', 'met2'], via2: ['met2', 'met3'], via3: ['met3', 'met4'] };
+  const viaList = [];
+  let showVias = true;
+  function buildVias(rects, v, isDecap) {
+    const count = rects.length / 4;
+    if (!count) return null;
+    const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.3, transparent: true, opacity: 0 });
+    const mesh = new THREE.InstancedMesh(unitBox, mat, count);
+    const centers = new Float32Array(count * 2);
+    const col = new THREE.Color(isDecap ? '#6f7699' : '#e4e7ff');
+    for (let i = 0; i < count; i++) {
+      const x0 = rects[i * 4] * U, y0 = rects[i * 4 + 1] * U, x1 = rects[i * 4 + 2] * U, y1 = rects[i * 4 + 3] * U;
+      const cx = (x0 + x1) * 0.5, cy = (y0 + y1) * 0.5;
+      centers[i * 2] = cx;
+      centers[i * 2 + 1] = cy;
+      dummy.position.set(cx - CX, 0, -(cy - CY));
+      dummy.scale.set(x1 - x0, 1, y1 - y0);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+      mesh.setColorAt(i, col);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.instanceColor.needsUpdate = true;
+    mesh.frustumCulled = false;
+    scene.add(mesh);
+    return { mesh, mat, count, centers, base: col.clone(), isDecap, fullOpacity: 1 };
+  }
+  for (const v of gds.vias || []) {
+    const [lo, hi] = (VIA_SPAN[v.key] || []).map((k) => layers[k]);
+    if (!lo || !hi) continue;
+    let core = v.core;
+    if (v.key === 'via3' && layers.capm) {
+      // over a MIM capacitor via3 lands on the top plate, not on metal 3
+      const caps = gds.layers.find((l) => l.key === 'capm').core;
+      const onCap = [], rest = [];
+      for (let i = 0; i < core.length; i += 4) {
+        const cx = (core[i] + core[i + 2]) / 2, cy = (core[i + 1] + core[i + 3]) / 2;
+        let hit = false;
+        for (let j = 0; j < caps.length; j += 4) if (cx > caps[j] && cx < caps[j + 2] && cy > caps[j + 1] && cy < caps[j + 3]) { hit = true; break; }
+        (hit ? onCap : rest).push(core[i], core[i + 1], core[i + 2], core[i + 3]);
+      }
+      core = rest;
+      viaList.push({ key: 'via3-mim', lo: layers.capm, hi, objs: [buildVias(onCap, v, false)].filter(Boolean) });
+    }
+    viaList.push({ key: v.key, lo, hi, objs: [buildVias(core, v, false), buildVias(v.decap, v, true)].filter(Boolean) });
+  }
+  const paintList = [...layerList, ...viaList];
 
   // ---- state -----------------------------------------------------------------------
   let explode = 3.4;          // current stack explode factor
@@ -395,6 +445,18 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
         if (o.mat.transparent === opaque) { o.mat.transparent = !opaque; o.mat.depthWrite = true; o.mat.needsUpdate = true; }
       }
     }
+    for (const V of viaList) {
+      const a = V.lo.objs[0], b = V.hi.objs[0];
+      const bot = a.mesh.position.y + a.zMid + a.zH * 0.5 - 0.02;
+      const top = b.mesh.position.y + b.zMid - b.zH * 0.5 + 0.02;
+      const r = Math.min(V.lo.reveal, V.hi.reveal);
+      for (const o of V.objs) {
+        o.mesh.scale.y = Math.max(top - bot, 0.01);
+        o.mesh.position.y = (top + bot) * 0.5;
+        o.mat.opacity = r;
+        if (o.mat.transparent === (r >= 1)) { o.mat.transparent = r < 1; o.mat.needsUpdate = true; }
+      }
+    }
     const zTop = STACK_TOP * explode;
     hiGroup.scale.y = zTop + 2;
     pinGroup.position.y = zTop + 1.2;
@@ -411,7 +473,7 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
     activeBlock = blk.id;
     const filter = blk.regions.length > 0;
     const pad = 0.6;
-    for (const L of layerList) {
+    for (const L of paintList) {
       for (const o of L.objs) {
         cA.copy(o.base).lerp(new THREE.Color(0xffffff), 0.12);
         cB.copy(o.base).multiplyScalar(0.13).lerp(cBg, 0.5);
@@ -616,6 +678,10 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
     for (const L of layerList) {
       for (const o of L.objs) o.mesh.visible = (!ex || (L.visible && !showPhoto)) && (!o.isDecap || !ex || showDecap);
     }
+    for (const V of viaList) {
+      const on = !ex || (showVias && V.lo.visible && V.hi.visible && !showPhoto);
+      for (const o of V.objs) o.mesh.visible = on && (!o.isDecap || !ex || showDecap);
+    }
     photoPlane.visible = ex && showPhoto;
     pinGroup.visible = !ex || showPins;
     touch();
@@ -664,6 +730,7 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
   toggle('btn-toggle-decap', () => (showDecap = !showDecap));
   toggle('btn-toggle-photo', () => (showPhoto = !showPhoto));
   toggle('btn-toggle-pins', () => (showPins = !showPins));
+  toggle('btn-toggle-vias', () => (showVias = !showVias));
   toggle('btn-toggle-labels', () => { showLabels = !showLabels; renderLabels(); return showLabels; });
   $('explore-open')?.addEventListener('click', () => setExplore(true));
   document.querySelectorAll('[data-explore]').forEach((b) => b.addEventListener('click', () => {
@@ -804,7 +871,7 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
   let introDone = reduceMotion;
   if (reduceMotion) {
     layerList.forEach((L) => { L.reveal = 1; });
-    if (ticker) ticker.textContent = '14,954 rectangles on 9 layers';
+    if (ticker) ticker.textContent = '14,954 rectangles and 48,126 vias';
   }
   applyStack();
   root.classList.add('ready');
@@ -829,7 +896,7 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
       if (ticker && current) ticker.textContent = `Depositing ${current.meta.label}  ${current.gdsNum}`;
       if (t > layerList.length * 0.26 + 0.9) {
         introDone = true;
-        if (ticker) ticker.textContent = '14,954 rectangles on 9 layers';
+        if (ticker) ticker.textContent = '14,954 rectangles and 48,126 vias';
       }
       applyStack();
     }

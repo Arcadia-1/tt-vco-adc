@@ -1,6 +1,6 @@
-import { initChip } from './layout3d.js?v=2';
-import { initAdcSim } from './adc-sim.js?v=2';
-import { initMeasurementCharts } from './charts.js?v=2';
+import { initChip } from './layout3d.js?v=3';
+import { initAdcSim } from './adc-sim.js?v=3';
+import { initMeasurementCharts } from './charts.js?v=3';
 
 // ---- scroll tour: the step nearest the middle of the viewport picks the scene ----
 const chipEl = document.getElementById('chip');
@@ -27,7 +27,7 @@ function pickScene() {
 addEventListener('scroll', pickScene, { passive: true });
 addEventListener('resize', pickScene);
 
-initChip('data/layout3d.json').then((c) => { chip = c; pickScene(); });
+initChip('data/layout3d.json?v=3').then((c) => { chip = c; pickScene(); });
 pickScene();
 
 // ---- the title's thin-film sheen follows the pointer ----
