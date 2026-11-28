@@ -8,6 +8,7 @@ extracted layout.
 
 usage: python3 so_tran.py <pdk_root> <outdir> [mode=sch|pex] [corner=tt] [temp=27]
        [fs=10e6] [n=1024] [amp=0.15] [bins=3] [pex=<file>] [tag=...] [dig=0|1]
+       [v2=1|0] [threads=1]
 Sign-off accuracy (default): reltol 1e-4, max step 0.5 ns. A 2 ns step mislocates the
 digital edges and adds about 25 dB of fake DAC noise.
 """
@@ -52,34 +53,43 @@ def behav_cells(txt):
 
 pdk, out = sys.argv[1], sys.argv[2]
 opt = dict(mode='sch', corner='tt', temp='27', fs='10e6', n='1024', vcm='1.0', amp='0.15',
-           bins='3', pex='', tag='', redecode='0', vcmp='0.9', skip='60', params='', idealc='1', xopt='reltol:1e-4', tmax='0.5n', dig='0', idealota='0', lr='', t1='0', t2='0', tmon='0', dump='0')
+           bins='3', pex='', tag='', redecode='0', vcmp='0.9', skip='60', params='', idealc='1',
+           xopt='reltol:1e-4', tmax='0.5n', dig='0', idealota='0', lr='', t1='0', t2='0',
+           tmon='0', dump='0', v2='1', threads='1')
 for a in sys.argv[3:]:
     k, v = a.split('=', 1); opt[k] = v
 fs, n = float(opt['fs']), int(opt['n'])
 vcm, amp = float(opt['vcmp']), float(opt['amp'])
 SKIP = int(opt['skip'])
-P = dict(WI=8, LI=1, WL=8, LL=1, WT=4, LT=2, LRIN=8.56, LRD=183.6, WCAP=25, LCAP=24, LRB=52.5, LRV=35)
+if opt['v2'] == '1':
+    P = dict(WI=48, LI=3, WL=16, LL=2, WT=8, LT=2, LRIN=8.6, LRD=181.8, WCAP=24, LCAP=25,
+             LRB=7.3, LRV=35, WS=0.42, LS=8, WLD=0.42, LLD=8, WPD=6, LPD=0.5, WC=4, LC=3)
+else:
+    P = dict(WI=8, LI=1, WL=8, LL=1, WT=4, LT=2, LRIN=8.6, LRD=181.8, WCAP=24, LCAP=25,
+             LRB=13.0, LRV=35, WS=0.42, LS=8, WLD=0.42, LLD=8, WPD=6, LPD=0.5, WC=4, LC=3)
 for kv in filter(None, opt['params'].split(',')):
     k, v = kv.split(':'); P[k] = float(v)
 fin = int(opt['bins']) * fs / n
 here = os.path.dirname(os.path.abspath(__file__))
 os.makedirs(out, exist_ok=True)
 open(os.path.join(out, '.spiceinit'), 'w').write(
-    'set ngbehavior=hsa\nset skywaterpdk\nset ng_nomodcheck\nset num_threads=1\noption noinit\noption klu\n')
+    f"set ngbehavior=hsa\nset skywaterpdk\nset ng_nomodcheck\nset num_threads={opt['threads']}\noption noinit\noption klu\n")
 tag = opt['tag'] or f"{opt['mode']}_{opt['corner']}_{opt['temp']}_{int(fs/1e6)}M_{amp}"
 
 core = os.path.join(here, '../netlist/so_core.spice')
-if opt['idealc'] == '1':      # MIM model (series R network) doubles the run time; use an ideal C for sizing
-    txt = open(core).read()
+txt_core = open(core).read()
+if opt['v2'] == '0':              # legacy v1 schematic without active vctrl clamp
+    txt_core = re.sub(r"^XM_(sns|ld1|ld2|ld|pd|c)\b[^\n]*\n", "", txt_core, flags=re.M)
+if opt['idealc'] == '1':          # MIM model (series R network) doubles the run time; use an ideal C for sizing
     for c in ('XC1', 'XC2'):
-        txt = txt.replace(f"{c} vg vctrl sky130_fd_pr__cap_mim_m3_1 W={{WCAP}} L={{LCAP}}",
-                          f"{c[1:]} vg vctrl {{2e-15*WCAP*LCAP + 0.38e-15*(WCAP+LCAP)}}")
-    if opt['idealota'] == '1':     # diagnostic: OTA as a stiff gain-2000 amplifier
-        import re as _re
-        txt = _re.sub(r"\.subckt ota5t.*?\.ends", ".subckt ota5t inp inn out vbn vdd gnd\n"
-                      "Bo out gnd V=max(0.05, min(1.75, 1.0 + 2000*(V(inp)-V(inn))))\n.ends", txt, flags=_re.S)
+        txt_core = txt_core.replace(f"{c} vg vctrl sky130_fd_pr__cap_mim_m3_1 W={{WCAP}} L={{LCAP}}",
+                                    f"{c[1:]} vg vctrl {{2e-15*WCAP*LCAP + 0.38e-15*(WCAP+LCAP)}}")
+if opt['idealota'] == '1':        # diagnostic: OTA as a stiff gain-2000 amplifier
+    txt_core = re.sub(r"\.subckt ota5t.*?\.ends", ".subckt ota5t inp inn out vbn vdd gnd\n"
+                      "Bo out gnd V=max(0.05, min(1.75, 1.0 + 2000*(V(inp)-V(inn))))\n.ends", txt_core, flags=re.S)
+if opt['idealc'] == '1' or opt['idealota'] == '1' or opt['v2'] == '0':
     core = os.path.join(out, f"so_core_{opt['tag'] or 'x'}.spice")
-    open(core, 'w').write(txt)
+    open(core, 'w').write(txt_core)
 vcof = os.path.join(here, '../verify/vco_core_lvs.spice')
 if opt['lr']:                     # sizing: V-to-I resistor strip length (both strips of each half)
     t_ = open(vcof).read()
@@ -89,13 +99,13 @@ if opt['lr']:                     # sizing: V-to-I resistor strip length (both s
     open(vcof, 'w').write(t_)
 if opt['mode'] == 'sch' and opt['dig'] == '1':
     # fast testbench: registers / XORs as XSPICE digital models; VCO, OTA, DAC, bias at transistor
-    # level. Diagnostics: t1=1 puts the first rank (dfxtp_4, sampling the ring) back at transistor
-    # level, t2=1 the second rank and the XORs that drive the DAC. Otherwise 3 fF per ring phase
-    # stands in for the flip-flop input.
+    # level. Diagnostics: t1=1 puts the first rank back at transistor level, t2=1 the second rank
+    # and the XORs that drive the DAC. Otherwise 3 fF per ring phase stands in for the flip-flop input.
     sc = "sky130_fd_sc_hd__"
     T1, T2 = opt['t1'] == '1', opt['t2'] == '1'
     ph = [f"p{i}" for i in range(7)] + [f"m{i}" for i in range(7)]
     dq = [f"q{i}" for i in range(7)] + [f"n{i + 1}" for i in range(7)]
+    qi = [f"qip{i}" for i in range(7)] + [f"qin{i}" for i in range(7)]
     bits = [f"bp{i}" for i in range(7)] + [f"bn{i}" for i in range(7)]
     L_ = [f".include {vcof}", f".include {core}",
           f".include {pdk}/sky130A/libs.ref/sky130_fd_sc_hd/spice/sky130_fd_sc_hd.spice",
@@ -113,25 +123,43 @@ if opt['mode'] == 'sch' and opt['dig'] == '1':
           "Aclk [clk] [dclk] a2d",
           *(["XmonP p0 0 0 vdd vdd q7 sky130_fd_sc_hd__buf_4", "XmonN m0 0 0 vdd vdd n0 sky130_fd_sc_hd__buf_4"]
             if opt['tmon'] == '1' else ["Amon [p0 m0] [dp0 dm0] a2d", "Amo [dp0 dm0] [q7 n0] d2a"])]
-    if T1:      # first rank at transistor level, its Q (analog, pin load) bridged into digital
-        L_ += [f"Xd{i} clk {ph[i]} 0 0 vdd vdd {dq[i]} {sc}dfxtp_4" for i in range(14)]
+    qint = qi if (opt['v2'] == '1' and T1) else dq
+    if T1:
+        if opt['v2'] == '1':
+            L_ += [f"Xd{i} clk {ph[i]} 0 0 vdd vdd {qi[i]} {sc}dfxtp_1\n"
+                   f"Xb{i} {qi[i]} 0 0 vdd vdd {dq[i]} {sc}buf_4" for i in range(14)]
+        else:
+            L_ += [f"Xd{i} clk {ph[i]} 0 0 vdd vdd {dq[i]} {sc}dfxtp_4" for i in range(14)]
         if not T2:
-            L_.append(f"Aq [{' '.join(dq)}] [{' '.join('d' + q for q in dq)}] a2d")
+            L_.append(f"Aq [{' '.join(qint)}] [{' '.join('d' + q for q in qint)}] a2d")
     else:
         L_ += [f"Cph{p} {p} 0 3f" for p in ph]
         L_.append(f"Aph [{' '.join(ph)}] [{' '.join('d' + p for p in ph)}] a2d")
-        L_ += [f"Ad1{i} d{ph[i]} dclk null null d{dq[i]} nul1{i} dff" for i in range(14)]
-        L_.append(f"Aq [{' '.join('d' + q for q in dq)}] [{' '.join(dq)}] d2a")
+        L_ += [f"Ad1{i} d{ph[i]} dclk null null d{qint[i]} nul1{i} dff" for i in range(14)]
+        L_.append(f"Aq [{' '.join('d' + q for q in qint)}] [{' '.join(qint)}] d2a")
     if T2:      # second rank + XOR at transistor level, the XOR drives the DAC element
-        L_ += [f"Xe{i} clk {dq[i]} 0 0 vdd vdd qq{i} {sc}dfxtp_1\nXx{i} {dq[i]} qq{i} 0 0 vdd vdd {bits[i]} {sc}xor2_1"
+        L_ += [f"Xe{i} clk {qint[i]} 0 0 vdd vdd qq{i} {sc}dfxtp_1\nXx{i} {qint[i]} qq{i} 0 0 vdd vdd {bits[i]} {sc}xor2_1"
                for i in range(14)]
     else:
-        L_ += [f"Ad2{i} d{dq[i]} dclk null null dd{dq[i]} nul2{i} dff\nAx{i} [d{dq[i]} dd{dq[i]}] dx{i} dxor"
+        L_ += [f"Ad2{i} d{qint[i]} dclk null null dd{qint[i]} nul2{i} dff\nAx{i} [d{qint[i]} dd{qint[i]}] dx{i} dxor"
                for i in range(14)]
         L_.append(f"Ab [{' '.join(f'dx{i}' for i in range(14))}] [{' '.join(bits)}] d2a")
     dut = "\n".join(L_) + "\n"
 elif opt['mode'] == 'sch':
     sc = "sky130_fd_sc_hd__"
+    if opt['v2'] == '1':
+        dff_lines = "\n".join(
+            f"XdP{i} clk p{i} 0 0 vdd vdd qiP{i} {sc}dfxtp_1\nXbP{i} qiP{i} 0 0 vdd vdd q{i} {sc}buf_4\n"
+            f"XdN{i} clk m{i} 0 0 vdd vdd qiN{i} {sc}dfxtp_1\nXbN{i} qiN{i} 0 0 vdd vdd n{i + 1} {sc}buf_4\n"
+            f"XeP{i} clk qiP{i} 0 0 vdd vdd qq{i} {sc}dfxtp_1\nXeN{i} clk qiN{i} 0 0 vdd vdd nn{i} {sc}dfxtp_1\n"
+            f"XxP{i} qiP{i} qq{i} 0 0 vdd vdd bp{i} {sc}xor2_1\nXxN{i} qiN{i} nn{i} 0 0 vdd vdd bn{i} {sc}xor2_1"
+            for i in range(7))
+    else:
+        dff_lines = "\n".join(
+            f"XdP{i} clk p{i} 0 0 vdd vdd q{i} {sc}dfxtp_4\nXdN{i} clk m{i} 0 0 vdd vdd n{i + 1} {sc}dfxtp_4\n"
+            f"XeP{i} clk q{i} 0 0 vdd vdd qq{i} {sc}dfxtp_1\nXeN{i} clk n{i + 1} 0 0 vdd vdd nn{i} {sc}dfxtp_1\n"
+            f"XxP{i} q{i} qq{i} 0 0 vdd vdd bp{i} {sc}xor2_1\nXxN{i} n{i + 1} nn{i} 0 0 vdd vdd bn{i} {sc}xor2_1"
+            for i in range(7))
     dut = f"""
 .include {vcof}
 .include {pdk}/sky130A/libs.ref/sky130_fd_sc_hd/spice/sky130_fd_sc_hd.spice
@@ -144,10 +172,7 @@ XlP ua0 vcp bp0 bp1 bp2 bp3 bp4 bp5 bp6 vref vbn rst vdd 0 so_loop
 XlN ua1 vcn bn0 bn1 bn2 bn3 bn4 bn5 bn6 vref vbn rst vdd 0 so_loop
 Xbias vref vbn vdd 0 so_bias
 Xrst rst_n 0 0 vdd vdd rst {sc}inv_1
-""" + "\n".join(f"XdP{i} clk p{i} 0 0 vdd vdd q{i} {sc}dfxtp_4\nXdN{i} clk m{i} 0 0 vdd vdd n{i + 1} {sc}dfxtp_4\n"
-                f"XeP{i} clk q{i} 0 0 vdd vdd qq{i} {sc}dfxtp_1\nXeN{i} clk n{i + 1} 0 0 vdd vdd nn{i} {sc}dfxtp_1\n"
-                f"XxP{i} q{i} qq{i} 0 0 vdd vdd bp{i} {sc}xor2_1\nXxN{i} n{i + 1} nn{i} 0 0 vdd vdd bn{i} {sc}xor2_1"
-                for i in range(7)) + f"""
+{dff_lines}
 XmonP p0 0 0 vdd vdd q7 {sc}buf_4
 XmonN m0 0 0 vdd vdd n0 {sc}buf_4
 """
@@ -161,13 +186,13 @@ else:
         opt['pex'] = pexf
     m = re.search(r"^\.subckt tt_um_arcadia1_vco_adc (.*?)\n(?!\+)", txt, re.S | re.M)
     pins = m.group(1).replace('\n+', ' ').split()
-    conn = {'VGND': '0', 'VDPWR': 'vdd', 'clk': 'clk', 'rst_n': 'rst_n', 'ua[0]': 'ua0', 'ua[1]': 'ua1'}
+    conn = {'VGND': '0', 'VDPWR': 'vdd', 'clk': 'clk', 'ena': 'vdd', 'rst_n': 'rst_n', 'ua[0]': 'ua0', 'ua[1]': 'ua1'}
     conn.update({f'uo_out[{i}]': f'q{i}' for i in range(8)})
     conn.update({f'uio_out[{i}]': f'n{i}' for i in range(8)})
-    conn.update({f'uio_oe[{i}]': 'vdd' for i in range(8)})
+    conn.update({f'uio_oe[{i}]': f'oe{i}' for i in range(8)})
     # stripes left unconnected in a copy without the decap field come out as VDPWR_uq<n> / VGND_uq<n>
     conn.update({p: ('vdd' if p.startswith('VDPWR') else '0') for p in pins if re.match(r'(VDPWR|VGND)_uq', p)})
-    nodes = [conn.get(p, f"nc_{re.sub(r'[^A-Za-z0-9]', '_', p)}") for p in pins]
+    nodes = [conn.get(p, '0') for p in pins]
     dut = f".include {os.path.abspath(opt['pex'])}\nXdut {' '.join(nodes)} tt_um_arcadia1_vco_adc\n"
 
 tstop = (n + SKIP + 8) / fs

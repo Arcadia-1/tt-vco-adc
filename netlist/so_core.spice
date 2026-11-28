@@ -1,8 +1,9 @@
-* Second-order closed-loop VCO ADC additions (parametrized, for sizing).
+* Second-order closed-loop VCO ADC additions (parametrized, v2).
 * Per half (so_loop): input resistor Rin and a 7-element NRZ resistor DAC into the
-* virtual ground vg of a 5T OTA integrator (MIM capacitor vg-vctrl, reset switch).
-* vctrl drives the existing VCO (vco_core), whose 7 phases are registered twice;
-* b_i = Q1_i xor Q2_i (stage i toggled in the last period) drives DAC element i.
+* virtual ground vg of a 5T OTA integrator (MIM capacitor vg-vctrl, active vctrl clamp,
+* reset switch). vctrl drives the VCO (vco_core), whose 7 phases are registered twice
+* (first rank dfxtp_1 isolated from external pads by buf_4); b_i = Q1_i xor Q2_i drives
+* DAC element i.
 * Shared (so_bias): Vref = VDD/2 divider with MOS decoupling, OTA tail bias.
 
 .subckt ota5t inp inn out vbn vdd gnd
@@ -23,6 +24,11 @@ XRd4 b4  vg  gnd sky130_fd_pr__res_xhigh_po_0p35 L={LRD}
 XRd5 b5  vg  gnd sky130_fd_pr__res_xhigh_po_0p35 L={LRD}
 XRd6 b6  vg  gnd sky130_fd_pr__res_xhigh_po_0p35 L={LRD}
 Xota vref vg vctrl vbn vdd gnd ota5t
+XM_sns clmp gnd vctrl vdd sky130_fd_pr__pfet_01v8 W={WS} L={LS}
+XM_ld1 clmp vbn clmp_m1 gnd sky130_fd_pr__nfet_01v8 W={WLD} L={LLD}
+XM_ld2 clmp_m1 vbn gnd gnd sky130_fd_pr__nfet_01v8 W={WLD} L={LLD}
+XM_pd  vctrl clmp gnd gnd sky130_fd_pr__nfet_01v8 W={WPD} L={LPD}
+XM_c   clmp vctrl clmp gnd sky130_fd_pr__nfet_01v8 W={WC} L={LC}
 XC1 vg vctrl sky130_fd_pr__cap_mim_m3_1 W={WCAP} L={LCAP}
 XC2 vg vctrl sky130_fd_pr__cap_mim_m3_1 W={WCAP} L={LCAP}
 XMr vg rst vctrl gnd sky130_fd_pr__nfet_01v8 W=0.42 L=0.15

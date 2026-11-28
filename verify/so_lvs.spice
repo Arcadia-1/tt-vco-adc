@@ -1,6 +1,7 @@
-* LVS reference for the second-order loop (concrete sizes as drawn by layout/gen_layout.py).
-* so_ana: one half (input resistor, 7-element resistor DAC, 5T OTA, MIM integrator caps, reset switch)
-* so_bias: shared Vref divider + MOS decoupling cap, tail reference (Rb into diode Mb)
+* LVS reference for the second-order loop v2 (concrete sizes as drawn by layout/gen_layout.py).
+* so_ana: one half (input resistor, 7-element resistor DAC, common-centroid A B B A 5T OTA,
+*         3-FET active vctrl clamp, MIM integrator caps, reset switch)
+* so_bias: shared Vref divider + MOS decoupling cap, tail reference (Rb into 4-finger diode Mb)
 .subckt so_ana vin vctrl b0 b1 b2 b3 b4 b5 b6 vref vbn rst vdd gnd
 XRin vin vg gnd sky130_fd_pr__res_xhigh_po_0p35 L=8.6
 XRd0 b0 vg gnd sky130_fd_pr__res_xhigh_po_0p35 L=181.8
@@ -12,25 +13,43 @@ XRd5 b5 vg gnd sky130_fd_pr__res_xhigh_po_0p35 L=181.8
 XRd6 b6 vg gnd sky130_fd_pr__res_xhigh_po_0p35 L=181.8
 XRdm0 gnd dm0 gnd sky130_fd_pr__res_xhigh_po_0p35 L=30.3
 XRdm1 gnd dm1 gnd sky130_fd_pr__res_xhigh_po_0p35 L=30.3
-XM1a x vref t gnd sky130_fd_pr__nfet_01v8 W=4 L=1
-XM1b x vref t gnd sky130_fd_pr__nfet_01v8 W=4 L=1
-XM2a vctrl vg t gnd sky130_fd_pr__nfet_01v8 W=4 L=1
-XM2b vctrl vg t gnd sky130_fd_pr__nfet_01v8 W=4 L=1
-XM3a x x vdd vdd sky130_fd_pr__pfet_01v8 W=4 L=1
-XM3b x x vdd vdd sky130_fd_pr__pfet_01v8 W=4 L=1
-XM4a vctrl x vdd vdd sky130_fd_pr__pfet_01v8 W=4 L=1
-XM4b vctrl x vdd vdd sky130_fd_pr__pfet_01v8 W=4 L=1
+XM1a x vref t gnd sky130_fd_pr__nfet_01v8 W=12 L=3
+XM1b x vref t gnd sky130_fd_pr__nfet_01v8 W=12 L=3
+XM1c x vref t gnd sky130_fd_pr__nfet_01v8 W=12 L=3
+XM1d x vref t gnd sky130_fd_pr__nfet_01v8 W=12 L=3
+XM2a vctrl vg t gnd sky130_fd_pr__nfet_01v8 W=12 L=3
+XM2b vctrl vg t gnd sky130_fd_pr__nfet_01v8 W=12 L=3
+XM2c vctrl vg t gnd sky130_fd_pr__nfet_01v8 W=12 L=3
+XM2d vctrl vg t gnd sky130_fd_pr__nfet_01v8 W=12 L=3
+XM3a x x vdd vdd sky130_fd_pr__pfet_01v8 W=4 L=2
+XM3b x x vdd vdd sky130_fd_pr__pfet_01v8 W=4 L=2
+XM3c x x vdd vdd sky130_fd_pr__pfet_01v8 W=4 L=2
+XM3d x x vdd vdd sky130_fd_pr__pfet_01v8 W=4 L=2
+XM4a vctrl x vdd vdd sky130_fd_pr__pfet_01v8 W=4 L=2
+XM4b vctrl x vdd vdd sky130_fd_pr__pfet_01v8 W=4 L=2
+XM4c vctrl x vdd vdd sky130_fd_pr__pfet_01v8 W=4 L=2
+XM4d vctrl x vdd vdd sky130_fd_pr__pfet_01v8 W=4 L=2
 XM5a t vbn gnd gnd sky130_fd_pr__nfet_01v8 W=2 L=2
 XM5b t vbn gnd gnd sky130_fd_pr__nfet_01v8 W=2 L=2
+XM5c t vbn gnd gnd sky130_fd_pr__nfet_01v8 W=2 L=2
+XM5d t vbn gnd gnd sky130_fd_pr__nfet_01v8 W=2 L=2
+XM_sns clmp gnd vctrl vdd sky130_fd_pr__pfet_01v8 W=0.42 L=8
+XM_ld1 clmp vbn clmp_m1 gnd sky130_fd_pr__nfet_01v8 W=0.42 L=8
+XM_ld2 clmp_m1 vbn gnd gnd sky130_fd_pr__nfet_01v8 W=0.42 L=8
+XM_pda vctrl clmp gnd gnd sky130_fd_pr__nfet_01v8 W=3 L=0.5
+XM_pdb vctrl clmp gnd gnd sky130_fd_pr__nfet_01v8 W=3 L=0.5
+XM_c clmp vctrl clmp gnd sky130_fd_pr__nfet_01v8 W=4 L=3
 XC0 vg vctrl sky130_fd_pr__cap_mim_m3_1 W=24 L=25
 XC1 vg vctrl sky130_fd_pr__cap_mim_m3_1 W=24 L=25
 XMr vg rst vctrl gnd sky130_fd_pr__nfet_01v8 W=0.42 L=0.15
 .ends
 
 .subckt so_bias vref vbn vdd gnd
-XRb vdd vbn gnd sky130_fd_pr__res_xhigh_po_0p35 L=13.0
+XRb vdd vbn gnd sky130_fd_pr__res_xhigh_po_0p35 L=7.3
 XMba vbn vbn gnd gnd sky130_fd_pr__nfet_01v8 W=2 L=2
 XMbb vbn vbn gnd gnd sky130_fd_pr__nfet_01v8 W=2 L=2
+XMbc vbn vbn gnd gnd sky130_fd_pr__nfet_01v8 W=2 L=2
+XMbd vbn vbn gnd gnd sky130_fd_pr__nfet_01v8 W=2 L=2
 XRt vdd vref gnd sky130_fd_pr__res_xhigh_po_0p35 L=35.0
 XRbt vref gnd gnd sky130_fd_pr__res_xhigh_po_0p35 L=35.0
 XMc1 gnd vref gnd gnd sky130_fd_pr__nfet_01v8 W=5 L=10

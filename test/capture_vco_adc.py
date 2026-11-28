@@ -17,6 +17,7 @@
 import array
 import machine
 import rp2
+import time
 from ttboard.demoboard import DemoBoard
 
 SYS_HZ = 150_000_000
@@ -28,10 +29,16 @@ UIO0_PIN = 25
 tt = DemoBoard.get()
 tt.shuttle.tt_um_arcadia1_vco_adc.enable()
 tt.clock_project_stop()          # release the clock pin from the SDK PWM
-tt.reset_project(False)          # the design has no reset, keep rst_n high
 for p in range(UIO0_PIN, UIO0_PIN + 8):   # the chip drives uio, the RP2350 must only read
     machine.Pin(p, machine.Pin.IN)
 machine.freq(SYS_HZ)
+
+# Pulse rst_n low to close the integrator reset switches (vg = vctrl), then allow
+# the bias and second-order loop to settle before starting the PIO capture.
+tt.reset_project(True)
+time.sleep_us(10)
+tt.reset_project(False)
+time.sleep_us(50)
 
 
 @rp2.asm_pio(sideset_init=rp2.PIO.OUT_LOW, in_shiftdir=rp2.PIO.SHIFT_LEFT,

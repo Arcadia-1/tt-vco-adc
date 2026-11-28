@@ -2,15 +2,19 @@
 
 Floorplan (mirror-symmetric about the tile centre line x = XC):
   * cell vco_adc_half: VCO (V-to-I M1, bias mirror, 7-stage current-starved ring,
-    NMOS load caps) inside a p-tap guard ring, the 7 sampling flip-flops plus a
-    monitor buffer above it, local phase routing, rails strapped to the edge stripes.
+    NMOS load caps) inside a p-tap guard ring, 7 isolated sampling pairs
+    (dfxtp_1 + buf_4) plus a monitor buf_4 above it, local phase routing, planar
+    internal Q bus to the second register (dq/xq) and resistor DAC, common-centroid
+    A B B A low-noise 5T OTA + 3-FET active vctrl clamp + MIM integrator caps + reset
+    switch, rails strapped to the edge stripes.
     Placed twice: P half as drawn right of XC, N half mirrored left of XC.
   * Bias resistors of both halves: one xhigh-poly array on the centre line,
     D N P P N D (common centroid, dummies at both ends) with its own guard ring.
-  * VINP / VINN: a parallel met3 pair with VGND shield lines on both sides.
+  * uio_oe[7:0]: 8 dedicated sky130_fd_sc_hd__conb_1 tie-high cells (rows k=2,3 in the
+    open halfN pocket), planar met4 fanout to uio_oe[0..7] (zero VDPWR shorts).
   * Clock: from the clk pin to a met2 spine on the centre line, then a met3 bus that
     reaches both halves with equal length.
-  * Power: VGND/VDPWR met4 stripes at both edges (mirror positions), decap rows
+  * Power: VGND/VDPWR met4 stripes at both edges (mirror positions), 28 decap rows
     (sky130_fd_sc_hd__decap_12) fill the lower part of the tile.
 
 usage: python3 gen_layout.py <template.def> <outdir>
@@ -98,7 +102,7 @@ STRIPES = {"VGND": [(1.0, 2.6), (158.4, 160.0)], "VDPWR": [(3.4, 5.0), (156.0, 1
 INNER = {"VGND": [(XC - 28.2, XC - 27.0), (XC + 27.0, XC + 28.2)],
          "VDPWR": [(XC - 30.96, XC - 29.76), (XC + 29.76, XC + 30.96)]}
 STRIPE_Y = (5.0, 220.76)
-INNER_Y = (186.0, 220.76)     # inner stripes only strap the VCO / flip-flop core (plain metal, not ports)
+INNER_Y = (186.0, 219.50)     # inner stripes strap VCO / FF core (stop cleanly below uio_oe met4 fanout tracks >= 220.8)
 UA0_X, UA1_X = 152.26, 132.94
 
 # ============================================================ half-cell constants
@@ -133,13 +137,16 @@ import json as _json
 PLAN = _json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "ff_plan.json")))
 assert abs(PLAN["XV"] - XV) < 1e-9 and abs(PLAN["YV"] - YV) < 1e-9
 Y0 = PLAN["Y0"]
-TAPW, DFFW, BUFW = 0.46, 8.74, 2.76
+TAPW, DFFW, BUFW = 0.46, 7.36, 2.76                  # dfxtp_1 (7.36) + abutted buf_4 (2.76) = 10.12 um
 SLOTS = [1.38 + 2.76 * j for j in range(8)]          # top pin columns; slot j = uo_out[7-j] (P) / uio_out[j] (N)
 TRK = [YV + 10.4 + 0.8 * t for t in range(NST)]      # met3 phase tracks between VCO and flip-flops
 CLK_FEED_Y = Y0 + 16.02      # above the Q bus (second-order loop)
 
 # second-order loop (local x outward from the axis, absolute y)
-QBUS_Y = [219.4 + 0.6 * j for j in range(NST)]       # met2 Q bus above the flip-flops
+# Floorplan shifted down by -8.16 um (3 decap rows) below OTA top (142.34 <= 142.5) to host the
+# taller W=48/L=3 common-centroid OTA + active clamp while keeping everything above y=143 unchanged.
+DY_SHIFT = 8.16
+QBUS_Y = [219.4 + 0.6 * j for j in range(NST)]       # met2 internal Q bus above the flip-flops
 SPINE_X = 39.0                                        # met3 clock spine of the second register
 XD = [48.6 - 0.85 * r for r in range(NST)]            # met3 descents, Q bus -> row r (staircase)
 BLK_X = 49.0                                          # second register rows: tap dfxtp_1 xor2_1 tap
@@ -152,16 +159,24 @@ RDA_XC = 12.185 + 0.415 * (RDA_N - 1) + 0.74
 RIN_XC, RIN_YC, RIN_LS = 9.5, 154.8, 4.3                                           # input resistor (2 strips)
 VG_BUS_Y = 149.8
 BIT_Y = [148.8 - 0.6 * r for r in range(NST)]
-UA_Y, UA_X, UA_LOW = 144.0, 63.0, 97.8
-OTA_X0, OTA_Y0 = 9.0, 130.5
-CAP_XC, CAP_YC, CAP_W, CAP_L = (19.2, 47.6), 116.0, 24, 25
-VG_X, VG_BR_Y, VG_H_Y = 8.0, 130.2, 130.75
-VCTRL_X, VCTRL_Y = 4.0, 136.0
+UA_Y, UA_X, UA_LOW = 144.0, 63.0, 97.8 - DY_SHIFT
+OTA_X0, OTA_Y0 = 9.0, 130.5 - DY_SHIFT                # 122.34 -> OTA top at 142.34 (<= 142.5)
+OTA_GND_DY, OTA_VDD_DY = 0.22, 14.4                   # p-tap and n-tap offsets from OTA_Y0
+CAP_XC, CAP_YC, CAP_W, CAP_L = (19.2, 47.6), 116.0 - DY_SHIFT, 24, 25
+VG_X, VG_BR_Y, VG_H_Y = 8.0, 130.2 - DY_SHIFT, 130.75 - DY_SHIFT
+VCTRL_X = 4.0
 VREF_X, VBN_X, RST_X = 4.9, 5.8, 6.7
-PAD_Y, RST_Y = 131.35, 134.47
-RES_X0, RES_Y = 23.0, 133.5
-BUS_Y = dict(vref=95.0, vbn=95.8, rst=96.6)
-RAIL_END, NVDP, NVGN = 72.6, 69.4, 71.8              # half-cell rails reach the N-side edge stripes
+PAD_Y = OTA_Y0 + 0.85                                 # 123.19 (bottom gate strap y = yn - 0.55)
+VBN_JOG_Y = PAD_Y + 0.85                              # 124.04 (met3 bridge over M1/M2 vref vias to clamp XM_ld)
+Y_BP = OTA_Y0 + 2.5                                   # 124.84 (vctrl met3 track to MIM bottom-plate strips)
+VREF_HI_Y = Y_BP + 0.86                               # 125.70 (met4 bridge joining M1 outer gates, above CM0 xsrp0)
+RES_X0, RES_Y = 58.4, OTA_Y0 + 3.3                    # 125.64 (right of OTA + 5-FET CLAMP_A5)
+RST_Y = RES_Y + 0.42 + 0.55                           # 126.61 (reset switch gate pad y, +0.91 above VREF_HI_Y)
+BUS_Y = dict(vref=95.0 - DY_SHIFT, vbn=95.8 - DY_SHIFT, rst=96.6 - DY_SHIFT)
+RAIL_END, NVDP, NVGN = 72.6, 69.4, 71.8               # half-cell rails reach the N-side edge stripes
+
+# Final locked 5-FET brick-wall active vctrl clamp (CLAMP_A5), matched with verify/so_lvs.spice & netlist/so_core.spice
+CLAMP_PARAMS = dict(ws=0.42, ls=8.0, wld=0.42, lld=8.0, wpd=6.0, lpd=0.5, wc=4.0, lc=3.0)
 
 # local positions exported to the top level
 GATE = (XV + 0.83, YV - 2.535)       # VIN gate via1
@@ -190,7 +205,6 @@ def lmcon(x, y):
 
 
 def draw_vco():
-    ring_end = XSTAGE0 + PITCH * NST
     lrect("nwell", -0.4, Y_NW[0], XSTAGE0 + PITCH * (NST - 1) + XDE + 0.4, Y_NW[1])   # 0.4 past the last pdiff
     rect("met1", XV - 0.5, YV + Y_GND[0], VGN_X[1] - 0.3, YV + Y_GND[1])
     rect("met1", XV - 0.5, YV + Y_VDD[0], VDP_X[1] - 0.3, YV + Y_VDD[1])   # rails end on the inner stripes
@@ -313,7 +327,8 @@ def pin_pad(x, y, h=0.5):
 
 
 def build_half():
-    """cell vco_adc_half: VCO + guard ring, four flip-flop rows, phase tracks, clock spine, outputs to pins."""
+    """cell vco_adc_half: VCO + guard ring, four isolated FF+buf rows, phase tracks,
+    clock spine, isolated external pin outputs, and second-order loop."""
     L.append("drc off")
     L.append("snap internal")
     L.append("addpath $::env(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/mag")
@@ -339,13 +354,24 @@ def build_half():
             x += TAPW
             if m == "buf":
                 place("sky130_fd_sc_hd__buf_4", x, yplace, "mon", orient)
-                cells.append(dict(n=m, D=(x + 0.28, fy(1.195)), Dh=0.36, Q=(x + 1.94, fy(2.15)), C=None, row=r))
+                cells.append(dict(n=m, D=(x + 0.28, fy(1.195)), Dh=0.36,
+                                  QI=None, Q=(x + 1.94, fy(2.15)), C=None, row=r))
                 x += BUFW
             else:
-                place("sky130_fd_sc_hd__dfxtp_4", x, yplace, f"dff{m}", orient)
-                cells.append(dict(n=m, D=(x + 1.58, fy(1.36)), Dh=0.5, Q=(x + (7.155, 8.005)[PLAN["qcol"][int(m)]], fy(2.15)),
-                                  C=(x + 0.265, fy(1.3)), row=r))
-                x += DFFW
+                place("sky130_fd_sc_hd__dfxtp_1", x, yplace, f"dff{m}", orient)
+                place("sky130_fd_sc_hd__buf_4", x + DFFW, yplace, f"obuf{m}", orient)
+                # Local met1 jumper: dff.Q_low (7.19, fy(1.195)) -> abutted obuf.A (7.36 + 0.28, fy(1.195))
+                qlx, qly = x + 7.19, fy(1.195)
+                ax = x + DFFW + 0.28
+                sq("mcon", qlx, qly, 0.17)
+                sq("mcon", ax, qly, 0.17)
+                rect("met1", qlx - 0.145, qly - 0.145, ax + 0.145, qly + 0.145)
+                xc = (1.10, 1.94)[PLAN["xcol"][int(m)]]
+                cells.append(dict(n=m, D=(x + 1.51, fy(0.95)), Dh=0.36,
+                                  QI=(x + 7.05, fy(2.05)),
+                                  Q=(x + DFFW + xc, fy(2.15)),
+                                  C=(x + 0.265, fy(1.30)), row=r))
+                x += DFFW + BUFW
         place("sky130_fd_sc_hd__tapvpwrvgnd_1", x, yplace, f"tap{r}_e", orient)
         ends.append(x + TAPW)
     # row rails out to the inner stripes: VGND at k = 0, 2, 4, VDPWR at k = 1, 3
@@ -374,7 +400,7 @@ def build_half():
                 via2(xd, ty)
                 xs.append(xd)
         hwire("met3", min(xs) - 0.25, max(xs) + 0.25, ty, 0.5)
-    # outputs: Q pad -> via2 -> short met3 jog -> via3 under its own pin -> met4 to the pin
+    # external pin outputs: obuf.X (or mon.X) -> via2 -> short met3 jog -> via3 under its own pin -> met4
     for c in cells:
         xq, yq = c["Q"]
         pin_pad(xq, yq, h=0.36)
@@ -437,11 +463,11 @@ def chain_res(name, xc, yc, ls, nx, top):
 
 def so_half(cells):
     """Second-order loop of one half: second register + XOR (pocket), resistor DAC, input
-    resistor, 5T OTA integrator with MIM capacitors and reset switch, vctrl to the VCO gate."""
+    resistor, common-centroid A B B A 5T OTA + active vctrl clamp, MIM capacitors, reset switch."""
     import devlib as D
     D.init(rect, sq)
-    phase, slot = PLAN["phase"], PLAN["slot"]
-    n_of = {phase[c["n"]]: c["n"] for c in cells if c["n"] != "buf"}   # phase -> DFF1 cell
+    phase, qtrack = PLAN["phase"], PLAN["qtrack"]
+    cell_of_phase = {phase[c["n"]]: c for c in cells if c["n"] != "buf"}   # phase -> DFF1 cell dict
     # ---- rails of the second-register rows (k = -3 .. -1 are new; k >= 0 extended above)
     for k in (-3, -2, -1):
         y = Y0 + 2.72 * k
@@ -474,15 +500,17 @@ def so_half(cells):
         via2(SPINE_X, pc[1])
         hwire("met2", SPINE_X, pc[0], pc[1], 0.3)
         ylow.append(pc[1])
-        # Q bus line r (Q of the DFF1 cell sampling phase r) -> descent -> D and A
-        n = n_of[r]
-        xs, yq = SLOTS[slot[n]], QBUS_Y[r]
-        via3(xs, yq); via2(xs, yq)
-        hwire("met2", xs, XD[r], yq, 0.3)
+        # Internal DFF1 Q_hi -> planar met2 staircase -> QBUS_Y[qtrack[n]] -> XD[r] -> D and A
+        c_n = cell_of_phase[r]
+        qix, qiy = c_n["QI"]
+        yq = QBUS_Y[qtrack[c_n["n"]]]
+        pin_pad(qix, qiy, h=0.36)
+        vwire("met2", qix, qiy, yq + 0.15, 0.30)
+        hwire("met2", qix - 0.15, XD[r], yq, 0.30)
         via2(XD[r], yq)
-        vwire("met3", XD[r], pd[1] - 0.15, yq, 0.3)
+        vwire("met3", XD[r], pd[1] - 0.15, yq, 0.30)
         via2(*pd); via2(*pa)
-        hwire("met3", XD[r] - 0.15, pa[0] + 0.25, pd[1], 0.3)
+        hwire("met3", XD[r] - 0.15, pa[0] + 0.25, pd[1], 0.30)
         # bit r: xor X -> met2 jog -> met3 descent -> DAC element r
         hwire("met2", px[0], XB[r], px[1], 0.3)
         via2(XB[r], px[1])
@@ -518,12 +546,15 @@ def so_half(cells):
     via3(UA_X, UA_Y)
     vwire("met4", UA_X, UA_LOW, UA_Y + 0.26, 0.6)
     hwire("met2", VG_X - 0.15, x_vg_last + 0.19, VG_BUS_Y, 0.3)
-    # ---- OTA
-    o = D.ota(OTA_X0, OTA_Y0)
-    # rails to the N-side edge stripes
+    # ---- Upgraded common-centroid A B B A OTA + 5-FET active vctrl clamp (CLAMP_A5)
+    o = D.ota(OTA_X0, OTA_Y0, vbn_jog_y=VBN_JOG_Y, clamp_params=CLAMP_PARAMS)
+    assert abs(o["gnd_y"] - (OTA_Y0 + OTA_GND_DY)) < 1e-6
+    assert abs(o["vdd_y"] - (OTA_Y0 + OTA_VDD_DY)) < 1e-6
+    # rails to the N-side edge stripes (plus local p-tap right under reset switch)
+    D.tap("p", RES_X0 - 0.2, OTA_Y0, RES_X0 + 1.2, OTA_Y0 + 0.44)
     hwire("met1", o["x1"] - 0.3, RAIL_END, o["gnd_y"], 0.32); stack(NVGN, o["gnd_y"], 1, 4)
-    hwire("met1", o["x1"] - 0.3, RAIL_END, o["vdd_y"], 0.32); stack(NVDP, o["vdd_y"], 1, 4)
-    # vg: bus -> vertical -> OTA inn, reset drain, capacitor top plates
+    hwire("met1", o["vdd_x1"] - 0.3, RAIL_END, o["vdd_y"], 0.32); stack(NVDP, o["vdd_y"], 1, 4)
+    # vg: bus -> vertical -> OTA inn (M2 center), reset drain, capacitor top plates
     vwire("met2", VG_X, VG_BR_Y, VG_BUS_Y, 0.3)
     xin, yin = o["inn"]
     hwire("met2", VG_X - 0.15, RES_X0 + 0.665 + 0.15, VG_H_Y, 0.3)
@@ -533,35 +564,48 @@ def so_half(cells):
         via2(x, VG_BR_Y); via3(x, VG_BR_Y)
         rect("met4", x - 1.0, CAP_YC + CAP_L / 2 - 0.5, x + 1.0, VG_BR_Y + 0.26)
     # vctrl: OTA out -> left riser to the VCO gate, down to the capacitor bottom plates
-    xo, _ = o["out"]
-    via2(xo, VCTRL_Y)
-    hwire("met3", VCTRL_X - 0.15, xo, VCTRL_Y, 0.3)
-    y_bp = RES_Y - 0.5                 # vctrl met3 track to both bottom-plate terminal strips
+    xo, yo = o["out"]
+    via2(xo, yo)
+    hwire("met3", VCTRL_X - 0.15, xo, yo, 0.3)
+    y_bp = Y_BP                        # vctrl met3 track to both bottom-plate terminal strips
     for xc in CAP_XC:
         xsrp = xc + CAP_W / 2 + 0.82
         rect("met4", xsrp - 0.24, CAP_YC, xsrp + 0.24, y_bp + 0.26)
         via3(xsrp, y_bp)
     hwire("met3", xo - 0.15, CAP_XC[1] + CAP_W / 2 + 0.82, y_bp, 0.3)
-    vwire("met3", xo, y_bp, VCTRL_Y, 0.3)
-    vwire("met3", VCTRL_X, VCTRL_Y - 0.15, GATE[1] + 0.15, 0.3)
+    vwire("met3", xo, y_bp - 0.15, yo, 0.3)
+    vwire("met3", VCTRL_X, yo - 0.15, GATE[1] + 0.15, 0.3)
     rect("met3", GATE[0] - 0.25, GATE[1] - 0.25, VCTRL_X + 0.15, GATE[1] + 0.25)   # solid junction, no notches
     via1(*GATE); via2(*GATE)
-    # MIM capacitors (top = vg, bottom = vctrl) and the bottom-plate bridge
+    # MIM capacitors (top = vg, bottom = vctrl)
     for i, xc in enumerate(CAP_XC):
         gencell(f"CM{i}", "sky130_fd_pr__cap_mim_m3_1", f"w {CAP_W} l {CAP_L}", xc, CAP_YC, HALF)
-    # vref / vbn: risers from the shared bias buses to the OTA gate pads
+    # vref: riser -> met4 to M1 left gate (inp_l), then jogs up on met4 to VREF_HI_Y (125.70)
+    # to clear CM0 bottom-plate strip (xsrp0 = 32.02, ends at 125.10) before dropping to inp_r
     vwire("met2", VREF_X, BUS_Y["vref"], PAD_Y, 0.3); via2(VREF_X, PAD_Y); via3(VREF_X, PAD_Y)
-    xp_, yp_ = o["inp"]
-    hwire("met4", VREF_X, xp_, PAD_Y, 0.3); via3(xp_, yp_); via2(xp_, yp_); via1(xp_, yp_)
+    xl_, yl_ = o["inp_l"]
+    xr_, yr_ = o["inp_r"]
+    hwire("met4", VREF_X, xl_, PAD_Y, 0.3)
+    vwire("met4", xl_, PAD_Y, VREF_HI_Y + 0.15, 0.3)
+    hwire("met4", xl_ - 0.15, xr_ + 0.15, VREF_HI_Y, 0.3)
+    vwire("met4", xr_, PAD_Y, VREF_HI_Y + 0.15, 0.3)
+    for xp_, yp_ in ((xl_, yl_), (xr_, yr_)):
+        via3(xp_, yp_); via2(xp_, yp_); via1(xp_, yp_)
+    # vbn: riser -> met3 to M5 gate, then jogs up to VBN_JOG_Y (124.04) to clear M1 vref via2/via3
+    # stacks and connects via2 to the clamp's met2 vbn riser (xbc, ybc == VBN_JOG_Y)
     vwire("met2", VBN_X, BUS_Y["vbn"], PAD_Y, 0.3); via2(VBN_X, PAD_Y)
     xb_, yb_ = o["vbn"]
+    xbc, ybc = o["vbn_c"]
     hwire("met3", VBN_X, xb_, PAD_Y, 0.3); via2(xb_, yb_); via1(xb_, yb_)
+    vwire("met3", xb_, PAD_Y, VBN_JOG_Y + 0.15, 0.3)
+    hwire("met3", xb_ - 0.15, xbc + 0.15, VBN_JOG_Y, 0.3)
+    via2(xbc, ybc)
     # reset switch: drain vg, source vctrl, gate rst
     m = D.fet("n", RES_X0, RES_Y, 0.42, 0.15, 1, gate="top")
     xs_, xd_ = m["cols"][0][0], m["cols"][1][0]
     vwire("met1", xd_, VG_H_Y + 1.25, RES_Y + 0.1, 0.29); via1(xd_, VG_H_Y + 1.25)
     vwire("met2", xd_, VG_H_Y, VG_H_Y + 1.25, 0.3)
-    vwire("met1", xs_, RES_Y - 0.5, RES_Y + 0.1, 0.29); via1(xs_, RES_Y - 0.5); via2(xs_, RES_Y - 0.5)
+    vwire("met1", xs_, y_bp, RES_Y + 0.1, 0.29); via1(xs_, y_bp); via2(xs_, y_bp)
     gx, gy = m["g"]
     vwire("met2", RST_X, BUS_Y["rst"], RST_Y, 0.3); via2(RST_X, RST_Y); via3(RST_X, RST_Y)
     hwire("met4", RST_X, gx, RST_Y, 0.3)
@@ -573,10 +617,10 @@ RX, RY = XC, YV - 18.5           # resistor array centre (top kept, strips l 20)
 R_STRIP = [-2.075, -1.245, -0.415, 0.415, 1.245, 2.075]   # D N1 P1 P2 N2 D
 R_TOP, R_BOT = 11.0, -11.0   # contact pad centres (pads +/-1.05 tall)
 R_RING_Y = 12.645
-DEC_Y0, DEC_ROWS = 6.0, 31
-BIAS_ROW = DEC_ROWS - 1         # top decap row: holds the reset inverter; the bias block sits on its VDPWR rail
-N_RAILS = DEC_ROWS + 1          # row rails are drawn even in the no-decap copy (they power the bias block)
-if os.environ.get("NODECAP"):   # post-layout simulation copy: decaps only load the ideal supply
+DEC_Y0, DEC_ROWS = 6.0, 28       # dropped 3 rows (-8.16 um) for larger common-centroid OTA
+BIAS_ROW = DEC_ROWS - 1          # row 27 (odd, flipped): bottom rail = VDPWR (79.44), top rail = VGND (82.16)
+N_RAILS = DEC_ROWS + 1           # row rails are drawn even in the no-decap copy (they power the bias block)
+if os.environ.get("NODECAP"):    # post-layout simulation copy: decaps only load the ideal supply
     DEC_ROWS = 0
 DEC_X0, DEC_X1 = 5.6, 155.4
 # the top decap row leaves a gap (on the 0.46 site grid) for the reset inverter of the bias block
@@ -606,16 +650,23 @@ def met4_stub(xp, y):
 
 def so_top():
     """Shared parts of the second-order loop: bias block on the axis (Vref divider + MOS
-    decoupling, tail-current reference, reset inverter), buses, analog inputs, rst_n,
-    P-side rail extensions."""
+    decoupling, upgraded 4-finger tail reference Mb + 2-strip Rb, reset inverter), buses,
+    analog inputs, rst_n, P-side rail extensions."""
     import devlib as D
     D.init(rect, sq)
-    gy, py = DEC_Y0 + 2.72 * BIAS_ROW, DEC_Y0 + 2.72 * (BIAS_ROW + 1)   # VGND / VDPWR rails under the bias block
-    yb = py + 0.74                    # bottom of the bias devices (clear of the row nwell)
+    # BIAS_ROW = 27 is odd (flipped): bottom rail k=27 is VDPWR, top rail k=28 is VGND!
+    flip_bias = BIAS_ROW % 2 == 1
+    y_bot = DEC_Y0 + 2.72 * BIAS_ROW
+    y_top = DEC_Y0 + 2.72 * (BIAS_ROW + 1)
+    gy, py = (y_top, y_bot) if flip_bias else (y_bot, y_top)
+    yb = y_top + 0.74                 # bottom of the bias devices (clear of the top decap rail)
     X = lambda lx: XC + lx
 
     def to_gnd(x, y):                 # met2 jumper from a device column down onto the VGND rail
         via1(x, y); vwire("met2", x, gy, y, 0.3); via1(x, gy)
+
+    def to_vdd(x, y):                 # met2 jumper from a device column down onto the VDPWR rail
+        via1(x, y); vwire("met2", x, py, y, 0.3); via1(x, py)
 
     # one compact row on the top decap rail, left to right: Rb | Mb | Mc | Rt | Rbt
     # MOS decoupling cap on Vref (gate, 2 x W5/L10) with grounded source/drain
@@ -625,44 +676,56 @@ def so_top():
     via1(*mc["g"]); vwire("met2", mc["g"][0], mc["g"][1], BUS_Y["vref"], 0.3); via2(mc["g"][0], BUS_Y["vref"])
     tp = D.tap("p", X(-10.2), mc["g"][1] + 0.85, X(10.2), mc["g"][1] + 1.29)   # substrate tap above the MOS cap
     to_gnd(X(-9.6), tp)
-    # tail reference: Rb (VDPWR -> vbn) into diode Mb
-    mb = D.fet("n", X(-17.2), yb + 1.7, 2.0, 2.0, 2)
-    xd = mb["cols"][1][0]
-    rect("met1", xd - 0.145, mb["g"][1], xd + 0.145, mb["y0"] + 0.1)
+    # tail reference: Rb (2 x 3.65 um = 7.30 um, VDPWR -> vbn) into 4-finger diode Mb (W=8, L=2)
+    x_mb = X(-21.8)
+    mb = D.fet("n", x_mb, yb + 1.7, 2.0, 2.0, 4, gate="bottom", gx=x_mb + D.END + 2.0 + 0.185)
+    xd1, xd3 = mb["cols"][1][0], mb["cols"][3][0]
+    rect("met1", xd1 - 0.145, mb["g"][1], xd1 + 0.145, mb["y0"] + 0.1)         # diode tie: col 1 -> gate
     for x, k in mb["cols"]:
         if k == "S":
             to_gnd(x, mb["y0"] + 0.2)
-    via1(xd, mb["y0"] + 1.8); vwire("met2", xd, mb["y0"] + 1.8, BUS_Y["vbn"], 0.3); via2(xd, BUS_Y["vbn"])
-    tap_y = D.tap("p", mb["x0"], mb["y1"] + 0.6, mb["x1"], mb["y1"] + 1.04)   # substrate tap next to Mb
-    to_gnd(mb["x0"] + 0.4, tap_y)
-    lb = 3.25                          # Rb = 4 x 3.25 um (about 74 kOhm): about 15 uA tail per OTA
-    (xl, xr), (p0, _) = chain_res("RB", X(-21.8), py + 2.0 + lb / 2 + 2.645, lb, 4, TOP)
+    ym_d = mb["y0"] + 1.8
+    via1(xd1, ym_d); via1(xd3, ym_d)
+    hwire("met2", xd1, xd3, ym_d, 0.3)
+    vwire("met2", xd1, ym_d, BUS_Y["vbn"], 0.3); via2(xd1, BUS_Y["vbn"])
+    tap_y = D.tap("p", mb["x0"], mb["y1"] + 0.6, mb["x1"], mb["y1"] + 1.04)    # substrate tap above Mb
+    to_gnd(mb["x0"] + 0.8, tap_y)
+    lb = 3.65                          # Rb = 2 x 3.65 um (L_total = 7.30 um, ~43 kOhm -> Itail ~ 24 uA)
+    (xl, xr), (p0, _) = chain_res("RB", X(-25.5), y_top + 2.0 + lb / 2 + 2.645, lb, 2, TOP)
     xrb = xr
-    vwire("met1", xl, py, p0 + 0.15, 0.25)
+    if flip_bias:
+        to_vdd(xl, p0 + 0.3)
+    else:
+        vwire("met1", xl, py, p0 + 0.15, 0.25)
     via1(xr, p0 + 1.0); vwire("met2", xr, p0 + 1.0, BUS_Y["vbn"], 0.3); via2(xr, BUS_Y["vbn"])
     # Vref divider: Rt (VDPWR -> vref), Rbt (vref -> VGND)
     lt = 4.375
-    yt_c = py + 2.0 + lt / 2 + 2.645
+    yt_c = y_top + 2.0 + lt / 2 + 2.645
     (tl, tr), (p0, _) = chain_res("RT", X(15.5), yt_c, lt, 8, TOP)
     (bl, br), _ = chain_res("RBT", X(24.0), yt_c, lt, 8, TOP)
-    vwire("met1", tl, py, p0 + 0.15, 0.25)
+    if flip_bias:
+        to_vdd(tl, p0 + 0.3)
+    else:
+        vwire("met1", tl, py, p0 + 0.15, 0.25)
     yv = p0 + 0.8
     via1(tr, yv); via1(bl, yv); hwire("met2", tr, bl, yv, 0.3)
     vwire("met2", tr, yv, BUS_Y["vref"], 0.3); via2(tr, BUS_Y["vref"])
     to_gnd(br, p0 + 0.3)
     # reset inverter in the gap of the top decap row
-    place("sky130_fd_sc_hd__tapvpwrvgnd_1", INV_GAP[0], gy, "itap0")
-    place("sky130_fd_sc_hd__inv_1", INV_GAP[0] + 0.46, gy, "irst")
-    place("sky130_fd_sc_hd__tapvpwrvgnd_1", INV_GAP[0] + 1.84, gy, "itap1")
-    place("sky130_fd_sc_hd__fill_1", INV_GAP[0] + 2.3, gy, "ifill")
-    xa, ya = INV_GAP[0] + 0.46 + 0.485, gy + 1.195
-    xy, yy = INV_GAP[0] + 0.46 + 0.885, gy + 1.9
+    yp_inv, ori_inv = (y_top, "v") if flip_bias else (y_bot, "")
+    fy_inv = (lambda y: y_top - y) if flip_bias else (lambda y: y_bot + y)
+    place("sky130_fd_sc_hd__tapvpwrvgnd_1", INV_GAP[0], yp_inv, "itap0", ori_inv)
+    place("sky130_fd_sc_hd__inv_1", INV_GAP[0] + 0.46, yp_inv, "irst", ori_inv)
+    place("sky130_fd_sc_hd__tapvpwrvgnd_1", INV_GAP[0] + 1.84, yp_inv, "itap1", ori_inv)
+    place("sky130_fd_sc_hd__fill_1", INV_GAP[0] + 2.3, yp_inv, "ifill", ori_inv)
+    xa, ya = INV_GAP[0] + 0.46 + 0.485, fy_inv(1.195)
+    xy, yy = INV_GAP[0] + 0.46 + 0.885, fy_inv(1.9)
     pin_pad(xa, ya, h=0.36); via2(xa, ya); via3(xa, ya)
     xyr = X(8.2)                     # rst riser clear of the P half's rst via at X(RST_X)
     pin_pad(xy, yy, h=0.36); hwire("met2", xy - 0.15, xyr + 0.15, yy, 0.3)
     vwire("met2", xyr, yy, BUS_Y["rst"], 0.3); via2(xyr, BUS_Y["rst"])
     # rst_n: pin -> met4 down -> met3 west -> met4 down to the inverter input
-    xr_pin, y_rn = 141.22, 100.0
+    xr_pin, y_rn = 141.22, 100.0 - DY_SHIFT
     met4_stub(xr_pin, y_rn); via3(xr_pin, y_rn)
     hwire("met3", xa, xr_pin, y_rn, 0.3)
     via3(xa, y_rn); vwire("met4", xa, ya, y_rn, 0.3)
@@ -673,18 +736,62 @@ def so_top():
     for f in (P, N):
         via2(f(VREF_X), BUS_Y["vref"]); via2(f(VBN_X), BUS_Y["vbn"]); via2(f(RST_X), BUS_Y["rst"])
     # analog inputs: ua[0] -> P riser, ua[1] -> N riser (met4 up, met3 across)
-    for xu, xt, y in ((UA0_X, P(UA_X), 98.0), (UA1_X, N(UA_X), 98.8)):
+    for xu, xt, y in ((UA0_X, P(UA_X), 98.0 - DY_SHIFT), (UA1_X, N(UA_X), 98.8 - DY_SHIFT)):
         vwire("met4", xu, 0.0, y + 0.26, 0.9)
         via3(xu, y); via3(xt, y)
         hwire("met3", min(xu, xt), max(xu, xt), y, 0.4)
     # P side: half-cell rails continue to the P edge stripes
-    ys = [Y0 + 2.72 * k for k in range(-3, 5)] + [OTA_Y0 + 0.22, OTA_Y0 + 6.4]
+    ys = [Y0 + 2.72 * k for k in range(-3, 5)] + [OTA_Y0 + OTA_GND_DY, OTA_Y0 + OTA_VDD_DY]
     for y in ys:
         k = round((y - Y0) / 2.72) if y > 190 else None
-        gnd = (k % 2 == 0) if k is not None else abs(y - (OTA_Y0 + 0.22)) < 0.01
+        gnd = (k % 2 == 0) if k is not None else abs(y - (OTA_Y0 + OTA_GND_DY)) < 0.01
         w = 0.48 if k is not None else 0.32
         hwire("met1", P(RAIL_END) - 0.3, 159.8 if gnd else 157.4, y, w)
         stack(159.2 if gnd else 156.8, y, 1, 4)
+
+
+def draw_uio_oe():
+    """8 dedicated sky130_fd_sc_hd__conb_1 tie-high cells for uio_oe[0..7] on rows k=3 and k=2
+    in the open halfN pocket (x = 35.42..42.32, on the 0.46 site grid), with planar met4 fanout.
+    Each uio_oe[i] is an independent net -> zero VDPWR shorts and 0 port errors in LVS."""
+    # Row k=3 (yb=216.04, flip=True, yplace=218.76, orient="v"): tie_oe7, 5, 3, 1
+    # Row k=2 (yb=213.32, flip=False, yplace=213.32, orient=""): tie_oe6, 4, 2, 0
+    x_blk = 35.42                     # 77 * 0.46 um (exact site grid, aligned with halfN rails)
+    y_k3, y_k2 = Y0 + 2.72 * 3, Y0 + 2.72 * 2
+    place("sky130_fd_sc_hd__tapvpwrvgnd_1", x_blk, y_k3 + 2.72, "tap_oe3a", "v")
+    place("sky130_fd_sc_hd__fill_1", x_blk + 0.46 + 4 * 1.38, y_k3 + 2.72, "fill_oe3", "v")
+    place("sky130_fd_sc_hd__tapvpwrvgnd_1", x_blk + 0.46 + 4 * 1.38 + 0.46, y_k3 + 2.72, "tap_oe3b", "v")
+    place("sky130_fd_sc_hd__tapvpwrvgnd_1", x_blk, y_k2, "tap_oe2a")
+    place("sky130_fd_sc_hd__fill_1", x_blk + 0.46, y_k2, "fill_oe2")
+    place("sky130_fd_sc_hd__tapvpwrvgnd_1", x_blk + 0.46 + 0.46 + 4 * 1.38, y_k2, "tap_oe2b")
+
+    # (bit, row_k, cell_x, riser_x, track_y)
+    oe_spec = [
+        (7, 3, x_blk + 0.46 + 0 * 1.38, 35.60, 221.5),
+        (6, 2, x_blk + 0.92 + 0 * 1.38, 36.40, 222.2),
+        (5, 3, x_blk + 0.46 + 1 * 1.38, 37.20, 222.9),
+        (4, 2, x_blk + 0.92 + 1 * 1.38, 38.00, 223.6),
+        (3, 3, x_blk + 0.46 + 2 * 1.38, 38.80, 222.9),
+        (2, 2, x_blk + 0.92 + 2 * 1.38, 39.60, 222.2),
+        (1, 3, x_blk + 0.46 + 3 * 1.38, 40.40, 221.5),
+        (0, 2, x_blk + 0.92 + 3 * 1.38, 41.20, 220.8),
+    ]
+    for bit, rk, cx, x_v3, y_trk in oe_spec:
+        if rk == 3:
+            place("sky130_fd_sc_hd__conb_1", cx, y_k3 + 2.72, f"tie_oe{bit}", "v")
+            y_hi = y_k3 + 2.72 - 1.0
+        else:
+            place("sky130_fd_sc_hd__conb_1", cx, y_k2, f"tie_oe{bit}")
+            y_hi = y_k2 + 1.0
+        x_hi = cx + 0.345
+        pin_pad(x_hi, y_hi, h=0.36)
+        via2(x_hi, y_hi)
+        hwire("met3", min(x_hi, x_v3) - 0.26, max(x_hi, x_v3) + 0.26, y_hi, 0.52)
+        via3(x_v3, y_hi)
+        vwire("met4", x_v3, y_hi, y_trk + 0.15, 0.30)
+        xp = pin_x(f"uio_oe[{bit}]")
+        hwire("met4", min(x_v3, xp) - 0.15, max(x_v3, xp) + 0.15, y_trk, 0.30)
+        vwire("met4", xp, y_trk - 0.15, DIE_H, 0.30)
 
 
 def build_top(template, cells, verilog):
@@ -704,15 +811,8 @@ def build_top(template, cells, verilog):
     hwire("met3", XC - 0.25, xk + 0.26, CLK_FEED_Y, 0.3)
     via2(XC, CLK_FEED_Y)
 
-    # ---- uio_oe tied high: short pin stubs joined by a met4 bar above the core, fed from the
-    # inner VDPWR stripe (nothing drops through the flip-flop area)
-    y_tie = 222.0
-    xs_oe = [pin_x(f"uio_oe[{i}]") for i in range(8)]
-    for xp in xs_oe:
-        met4_stub(xp, y_tie)
-    hwire("met4", min(xs_oe) - 0.3, max(xs_oe) + 0.3, y_tie, 0.6)
-    x_vdp = N(sum(INNER["VDPWR"][1]) / 2 - XC)
-    vwire("met4", x_vdp, INNER_Y[1] - 0.5, y_tie, 1.2)
+    # ---- uio_oe[7:0] driven high by 8 dedicated sky130_fd_sc_hd__conb_1 cells
+    draw_uio_oe()
 
     # ---- resistor array on the centre line
     L.append(f"box {q(RX)} {q(RY)} {q(RX)} {q(RY)}")
@@ -759,7 +859,7 @@ def build_top(template, cells, verilog):
 
     so_top()
 
-    # ---- decap rows (split around the resistor column where they overlap it)
+    # ---- decap rows (split around the reset inverter gap in BIAS_ROW)
     decaps = []
 
     def fill_segment(r, xa, xb, yp, orient):
@@ -834,18 +934,19 @@ def build_top(template, cells, verilog):
                  "    input wire [7:0] uio_in, output wire [7:0] uio_out, output wire [7:0] uio_oe,\n"
                  "    inout wire [7:0] ua, input wire ena, input wire clk, input wire rst_n);\n")
         fv.write("  wire vsP, vsN, vref, vbn, rst;\n")
+        fv.write("  wire [7:0] oe_lo;\n")
         fv.write(f"  so_bias xbias (.vref(vref), .vbn(vbn), .vdd(VDPWR), .gnd(VGND));\n")
         fv.write(f"  {sc}inv_1 irst (.A(rst_n), .Y(rst), {pw});\n")
+        for bit in range(8):
+            fv.write(f"  {sc}conb_1 tie_oe{bit} (.HI(uio_oe[{bit}]), .LO(oe_lo[{bit}]), {pw});\n")
         for h, vin, port in (("P", "ua[0]", "uo_out"), ("N", "ua[1]", "uio_out")):
-            fv.write(f"  wire vctrl{h}, " + ", ".join(f"ph{h}{i}, qq{h}{i}, bit{h}{i}" for i in range(7)) + ";\n")
+            fv.write(f"  wire vctrl{h}, " + ", ".join(f"ph{h}{i}, qi{h}{i}, qq{h}{i}, bit{h}{i}" for i in range(7)) + ";\n")
             fv.write(f"  so_ana xana{h} (.vin({vin}), .vctrl(vctrl{h}), "
                      + ", ".join(f".b{i}(bit{h}{i})" for i in range(7))
                      + ", .vref(vref), .vbn(vbn), .rst(rst), .vdd(VDPWR), .gnd(VGND));\n")
-            qnet = lambda n: f"{port}[{7 - PLAN['slot'][n] if h == 'P' else PLAN['slot'][n]}]"
-            n_of = {PLAN["phase"][c["n"]]: c["n"] for c in cells if c["n"] != "buf"}
             for r in range(7):
-                fv.write(f"  {sc}dfxtp_1 dq{h}{r} (.CLK(clk), .D({qnet(n_of[r])}), .Q(qq{h}{r}), {pw});\n")
-                fv.write(f"  {sc}xor2_1 xq{h}{r} (.A({qnet(n_of[r])}), .B(qq{h}{r}), .X(bit{h}{r}), {pw});\n")
+                fv.write(f"  {sc}dfxtp_1 dq{h}{r} (.CLK(clk), .D(qi{h}{r}), .Q(qq{h}{r}), {pw});\n")
+                fv.write(f"  {sc}xor2_1 xq{h}{r} (.A(qi{h}{r}), .B(qq{h}{r}), .X(bit{h}{r}), {pw});\n")
             fv.write(f"  vco_core xvco{h} (.vin(vctrl{h}), .vs(vs{h}), "
                      + ", ".join(f".ph{i}(ph{h}{i})" for i in range(7)) + ", .vdd(VDPWR), .gnd(VGND));\n")
             for c in cells:
@@ -855,11 +956,11 @@ def build_top(template, cells, verilog):
                 if c["n"] == "buf":
                     fv.write(f"  {sc}buf_4 mon{h} (.A(ph{h}{ph}), .X({q_}), {pw});\n")
                 else:
-                    fv.write(f"  {sc}dfxtp_4 dff{h}{c['n']} (.CLK(clk), .D(ph{h}{ph}), .Q({q_}), {pw});\n")
+                    fv.write(f"  {sc}dfxtp_1 dff{h}{c['n']} (.CLK(clk), .D(ph{h}{ph}), .Q(qi{h}{ph}), {pw});\n")
+                    fv.write(f"  {sc}buf_4 obuf{h}{c['n']} (.A(qi{h}{ph}), .X({q_}), {pw});\n")
         fv.write("  rarray xr (.vsp(vsP), .vsn(vsN), .gnd(VGND));\n")
         for nme in decaps:
             fv.write(f"  {sc}decap_12 {nme} ({pw});\n")
-        fv.write("  assign uio_oe = {VDPWR, VDPWR, VDPWR, VDPWR, VDPWR, VDPWR, VDPWR, VDPWR};\n")
         fv.write("endmodule\n")
     return len(decaps)
 
