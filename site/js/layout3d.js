@@ -50,7 +50,7 @@ export const BLOCKS = [
     short: '5T OTA',
     tag: '48/3 µm',
     color: '#a98bff',
-    desc: 'NMOS input pair of 48/3 µm interdigitated A A B B B B A A, PMOS load of 16/2 µm, 23 µA tail. Eighteen times the gate area of the first version brings input noise down from 74.6 to 22.9 µVrms.',
+    desc: 'NMOS input pair of 48/3 µm interdigitated A A B B B B A A, PMOS load of 16/2 µm, 23 µA tail. Input-referred noise is 22.9 µVrms over 0.1 to 50 kHz.',
     metrics: ['A₀ = 47.8 dB', 'GBW = 14.7 MHz', 'PM = 72.2°', '22.9 µVrms'],
     regions: [
       { label: 'OTA, N', box: [26.38, 121.94, 54.63, 141.94] },
@@ -78,7 +78,7 @@ export const BLOCKS = [
   },
   {
     id: 'clamp',
-    name: 'CLAMP_A5 control-voltage clamp',
+    name: 'Control-voltage clamp',
     short: 'Clamp',
     tag: '5 FETs',
     color: '#ff6b5e',
@@ -115,7 +115,7 @@ export const BLOCKS = [
     tag: 'buf_4 isolation',
     color: '#5b8cff',
     desc: 'Per half: seven dfxtp_1 samplers, seven dfxtp_1 + xor2_1 differentiators that stay on-chip, and seven buf_4 output buffers plus one for the monitor. The buffers keep 1 to 5 pF of pad load off the feedback path.',
-    metrics: ['2 × (14 DFF + 7 XOR)', '16 buf_4', '19–90× less glitch', '20–215× less asymmetry'],
+    metrics: ['2 × (14 DFF + 7 XOR)', '16 buf_4', '≤ 0.16 ns glitch', '0.029 ns asymmetry'],
     regions: [
       { label: 'Digital, N', box: [12.91, 199.48, 73.79, 219.00] },
       { label: 'Digital, P', box: [73.41, 199.48, 134.29, 219.00] },

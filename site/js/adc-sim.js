@@ -6,7 +6,7 @@
  *            differenced, and the 0..7 count drives the resistor DAC.
  * Component values are the ones on the chip. Three things are idealised or fitted and
  * the page says so next to the plot: the sampler and DAC are ideal, the VCO curvature is
- * fitted to the first open-loop version (50-56 dB), and input noise is white at the
+ * a fitted polynomial, and input noise is white at the
  * 22.9 uVrms (0.1-50 kHz) that BSIM4 noise simulation reports.
  */
 const FS = 10e6;
@@ -19,8 +19,8 @@ const FS_HALF = 0.3;             // full-scale amplitude per half, volts
 const SIGMA_HALF = (22.9e-6 * Math.sqrt(FS / 2 / BW)) / Math.SQRT2;
 const C2 = 0.06, C3 = -0.036;    // VCO curvature on the normalised drive
 
-const INK = '#eceaf6', DIM = '#8a8fb5', LINE = 'rgba(160,170,255,0.16)';
-const GOLD = '#f2c14e', BLUE = '#5b8cff', TEAL = '#3fd1c1', PINK = '#ff5fa8', GREEN = '#3ddc84';
+const INK = '#111827', DIM = '#475569', LINE = 'rgba(15,23,42,0.12)';
+const GOLD = '#D97706', BLUE = '#2563EB', TEAL = '#147D64', PINK = '#BE185D', GREEN = '#15803D';
 
 function makeFFT(n) {
   const rev = new Uint32Array(n);
@@ -171,7 +171,7 @@ export function initAdcSim() {
     for (const lv of [-7, -3.5, 0, 3.5, 7]) { g.moveTo(padL, mid - lv * sc); g.lineTo(w - padR, mid - lv * sc); }
     g.stroke();
     // raw output code
-    g.strokeStyle = 'rgba(91,140,255,0.55)'; g.lineWidth = 1;
+    g.strokeStyle = 'rgba(37,99,235,0.55)'; g.lineWidth = 1;
     g.beginPath();
     const stepPx = (w - padL - padR) / snap.len;
     if (stepPx >= 0.6) {
@@ -203,7 +203,7 @@ export function initAdcSim() {
     g.stroke(); g.setLineDash([]);
     // playhead
     const px = X(play);
-    g.strokeStyle = 'rgba(236,234,246,0.7)'; g.lineWidth = 1;
+    g.strokeStyle = 'rgba(17,24,39,0.7)'; g.lineWidth = 1;
     g.beginPath(); g.moveTo(px, 6); g.lineTo(px, h - 6); g.stroke();
     g.font = '11px "Geist Mono", ui-monospace, monospace'; g.fillStyle = DIM; g.textBaseline = 'top';
     g.fillText(`${((snap.len / FS) * 1e6).toFixed(0)} µs`, w - padR - 46, h - 18);
@@ -235,7 +235,7 @@ export function initAdcSim() {
         const high = d < 7;
         const glow = Math.max(0, 1 - (d % 7) / 2.2);
         g.beginPath(); g.arc(x, y, 5 + 4 * glow, 0, Math.PI * 2);
-        g.fillStyle = high ? cols[k] : 'rgba(160,170,255,0.18)';
+        g.fillStyle = high ? cols[k] : 'rgba(15,23,42,0.12)';
         g.globalAlpha = high ? 0.55 + 0.45 * glow : 1;
         g.fill(); g.globalAlpha = 1;
       }
@@ -256,7 +256,7 @@ export function initAdcSim() {
     const f0 = 1e3, f1 = FS / 2, d0 = -170, d1 = 0;
     const X = (f) => pl + (Math.log10(f / f0) / Math.log10(f1 / f0)) * (w - pl - pr);
     const Y = (d) => pt + ((d1 - d) / (d1 - d0)) * (h - pt - pb);
-    g.fillStyle = 'rgba(242,193,78,0.07)';
+    g.fillStyle = 'rgba(217,119,6,0.08)';
     g.fillRect(pl, pt, X(BW) - pl, h - pt - pb);
     g.font = '11px "Geist Mono", ui-monospace, monospace'; g.textBaseline = 'middle';
     g.strokeStyle = LINE; g.lineWidth = 1; g.fillStyle = DIM;
@@ -276,13 +276,13 @@ export function initAdcSim() {
     for (let i = b1 - 80; i < b1 + 80; i++) ref += avg[i];
     const K = 10 * Math.log10(4 / (N * N * 0.25 * 49));         // amplitude 7 (differential full scale) = 0 dBFS
     const refDb = 10 * Math.log10(ref / 160) + K + 9;
-    g.strokeStyle = 'rgba(236,234,246,0.5)'; g.setLineDash([5, 5]); g.lineWidth = 1;
+    g.strokeStyle = 'rgba(17,24,39,0.5)'; g.setLineDash([5, 5]); g.lineWidth = 1;
     g.beginPath(); g.moveTo(X(4e4), Y(refDb + slope * Math.log10(4e4 / 1e6))); g.lineTo(X(2.5e6), Y(refDb + slope * Math.log10(2.5))); g.stroke();
     g.setLineDash([]);
     g.fillStyle = INK; g.fillText(`${slope} dB per decade`, X(2.2e5), Y(refDb + slope * Math.log10(0.22)) - 14);
     // spectrum, max per pixel column
     const grad = g.createLinearGradient(0, pt, 0, h - pb);
-    grad.addColorStop(0, 'rgba(91,140,255,0.55)'); grad.addColorStop(1, 'rgba(91,140,255,0)');
+    grad.addColorStop(0, 'rgba(37,99,235,0.55)'); grad.addColorStop(1, 'rgba(37,99,235,0)');
     g.beginPath();
     let started = false, lastX = pl;
     const cols = Math.floor(w - pl - pr);

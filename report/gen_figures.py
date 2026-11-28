@@ -95,7 +95,7 @@ def make_fig2():
     ax_ph  = fig.add_subplot(gs[1, 0], sharex=ax_mag)
     ax_nz  = fig.add_subplot(gs[:, 1])
 
-    # Panel (a): Use exact Tian closed-loop integrator stability sweeps (stb_V2_A5_2x8_m4x3_*.dat + stb_Base_S13_tt.dat)
+    # Panel (a): Use exact Tian closed-loop integrator stability sweeps (stb_V2_A5_2x8_m4x3_*.dat)
     def load_tian(fname):
         d = np.loadtxt(os.path.join(DATA_DIR, "stb", fname))
         freq = d[:, 0]
@@ -127,14 +127,10 @@ def make_fig2():
     dtt  = load_tian("stb_V2_A5_2x8_m4x3_tt.dat")
     dss  = load_tian("stb_V2_A5_2x8_m4x3_ss_hh.dat")
     dff  = load_tian("stb_V2_A5_2x8_m4x3_ff_ll.dat")
-    dbas = load_tian("stb_Base_S13_tt.dat")
-    # For Base_S13 without Miller clamp, high-frequency phase stays well above -180 deg;
-    # ensure plotting convention starts near 0 deg at midband peak
     curves_stb = [
-        (dtt,  "V2_A5 (tt, 27°C, 1.80 V)",     C_NAVY,  "-",  1.35),
-        (dss,  "V2_A5 (ss_hh, 85°C, 1.62 V)",  C_TEAL,  "--", 1.10),
-        (dff,  "V2_A5 (ff_ll, -20°C, 1.98 V)", C_CRIM,  "-.", 1.10),
-        (dbas, "Base_S13 (tt, 27°C, 1.80 V)",  C_AMBER, ":",  1.25),
+        (dtt,  "tt, 27°C, 1.80 V",     C_NAVY,  "-",  1.35),
+        (dss,  "ss_hh, 85°C, 1.62 V",  C_TEAL,  "--", 1.10),
+        (dff,  "ff_ll, -20°C, 1.98 V", C_CRIM,  "-.", 1.10),
     ]
     for d, lbl, col, ls, lw in curves_stb:
         f_mhz = d["freq"] / 1e6
@@ -174,11 +170,10 @@ def make_fig2():
     # Panel (b): BSIM4 Input-Referred Noise PSD
     nz = SIM["noise"]
     curves_nz = [
-        ("Base_S13_tt",   f"Base_S13 tt ({nz['Base_S13_tt']['dn50_uv']:.1f} µVrms, {nz['Base_S13_tt']['snr50_tone_db']:.1f} dB)", C_AMBER, "--", 1.35),
-        ("V2_NoClmp_tt",  f"V2 NoClamp tt ({nz['V2_NoClmp_tt']['dn50_uv']:.1f} µVrms, {nz['V2_NoClmp_tt']['snr50_tone_db']:.1f} dB)", C_SLATE, ":",  1.60),
-        ("V2_A5_tt",      f"V2_A5 tt ({nz['V2_A5_tt']['dn50_uv']:.1f} µVrms, {nz['V2_A5_tt']['snr50_tone_db']:.1f} dB)", C_NAVY,  "-",  1.35),
-        ("V2_A5_ss_hh",   f"V2_A5 ss_hh/85/1.62V ({nz['V2_A5_ss_hh']['snr50_tone_db']:.1f} dB)", C_TEAL,  "-.", 1.05),
-        ("V2_A5_ff_ll",   f"V2_A5 ff_ll/-20/1.98V ({nz['V2_A5_ff_ll']['snr50_tone_db']:.1f} dB)", C_CRIM,  "-.", 0.95),
+        ("V2_NoClmp_tt",  f"tt, clamp removed ({nz['V2_NoClmp_tt']['dn50_uv']:.1f} µVrms, {nz['V2_NoClmp_tt']['snr50_tone_db']:.1f} dB)", C_SLATE, ":",  1.60),
+        ("V2_A5_tt",      f"tt ({nz['V2_A5_tt']['dn50_uv']:.1f} µVrms, {nz['V2_A5_tt']['snr50_tone_db']:.1f} dB)", C_NAVY,  "-",  1.35),
+        ("V2_A5_ss_hh",   f"ss_hh/85/1.62V ({nz['V2_A5_ss_hh']['snr50_tone_db']:.1f} dB)", C_TEAL,  "-.", 1.05),
+        ("V2_A5_ff_ll",   f"ff_ll/-20/1.98V ({nz['V2_A5_ff_ll']['snr50_tone_db']:.1f} dB)", C_CRIM,  "-.", 0.95),
     ]
     ax_nz.axvspan(100, 50e3, color=C_BAND, alpha=0.32, lw=0)
     for key, lbl, col, ls, lw in curves_nz:
@@ -190,11 +185,9 @@ def make_fig2():
 
     ax_nz.axvline(50e3, color=C_SLATE, ls=":", lw=0.75)
     ax_nz.text(44e3, 3.3e3, "BW = 50 kHz", ha="right", va="top", fontsize=6.4, color=C_SLATE)
-    # Arrow showing +10.2 dB improvement
-    d_base = nz["Base_S13_tt"]["snr50_tone_db"]
     d_v2   = nz["V2_A5_tt"]["snr50_tone_db"]
     ax_nz.annotate(
-        f"+{d_v2 - d_base:.1f} dB SNR\n(0.00 dB clamp penalty)",
+        f"{nz['V2_A5_tt']['dn50_uv']:.1f} µVrms, {d_v2:.1f} dB SNR\n(0.00 dB clamp penalty)",
         xy=(1.0e3, 1.3e2), xytext=(3.0e3, 7.5e2),
         fontsize=6.5, fontweight="bold", color=C_NAVY,
         bbox=dict(boxstyle="round,pad=0.22", fc="white", ec=C_NAVY, lw=0.55, alpha=0.92),
@@ -251,7 +244,7 @@ def make_fig3():
                 ax_vco.plot(vc_cl, f_cl, "o", color=col, ms=4.2, mec="white", mew=0.6, zorder=6)
 
     ax_vco.annotate(
-        "CLAMP_A5\nceiling",
+        "Clamp\nceiling",
         xy=(civ["CLAMP_A5"]["tt_27_1.80"]["vctrl_clamped"],
             civ["CLAMP_A5"]["tt_27_1.80"]["f_clamped_mhz"]),
         xytext=(1.50, 3.65),
@@ -268,11 +261,10 @@ def make_fig3():
                   fontsize=5.6, handlelength=1.35, borderpad=0.22, labelspacing=0.16)
     ax_vco.set_title("(a) VCO Tuning & Brick-Wall Ceiling", pad=4)
 
-    # Inset in (a): CLAMP_A5 vs 1-FET diode leakage current (log scale), clean upper-left
+    # Inset in (a): clamp current vs control voltage (log scale), clean upper-left
     ax_in1 = ax_vco.inset_axes([0.16, 0.56, 0.34, 0.27])
     for cname, col, ls, lbl in [
-        ("1FET_W8",  C_AMBER, "--", "1-FET"),
-        ("CLAMP_A5", C_NAVY,  "-",  "A5"),
+        ("CLAMP_A5", C_NAVY,  "-",  "Clamp"),
     ]:
         d = civ[cname]["tt_27_1.80"]
         vc = np.array(d["vctrl"])
@@ -285,7 +277,6 @@ def make_fig3():
     ax_in1.tick_params(labelsize=4.9, pad=1.0)
     ax_in1.set_ylabel(r"$I_c$ (µA)", fontsize=5.1, labelpad=0.2)
     ax_in1.set_xlabel(r"$V_{\mathrm{ctrl}}$", fontsize=5.1, labelpad=0.3)
-    ax_in1.legend(loc="lower right", fontsize=4.8, frameon=False, handlelength=1.0, borderpad=0.1)
     ax_in1.set_facecolor("white")
 
     # Panel (b): No-reset startup & overload recovery at fs_ll/1.98V
@@ -293,20 +284,14 @@ def make_fig3():
     ax_tr.axhspan(7.5, 11.2, color=C_DANGER, alpha=0.75, lw=0)
     ax_tr.axhline(7.5, color=C_CRIM, ls="--", lw=0.75)
     ax_tr.axhline(2.5, color=C_SLATE, ls=":", lw=0.65)
-    b_ov = sw["Base_fsll198_ovl"]
     v_ov = sw["V2A5_fsll198_ovl"]
     v_nr = sw["V2A5_fsll198_norst"]
-    b_nr = sw["Base_fsll198_norst"]
     ax_tr.axvspan(10, 25, color="#FEF3C7", alpha=0.55, lw=0)
     ax_tr.text(17.5, 10.65, "Rail OVL", ha="center", va="top", fontsize=6.0, color="#92400E", fontweight="bold")
-    ax_tr.plot(b_ov["tf_us"], b_ov["fp_mhz"], color=C_CRIM, ls="--", lw=1.15,
-               label=f"Base OVL ({b_ov['f_end_mhz']:.1f} MHz)")
-    ax_tr.plot(b_nr["tf_us"], b_nr["fp_mhz"], color=C_AMBER, ls=":", lw=1.10,
-               label=f"Base NoRst ({b_nr['f_end_mhz']:.1f} MHz)")
     ax_tr.plot(v_ov["tf_us"], v_ov["fp_mhz"], color=C_NAVY, ls="-", lw=1.25,
-               label=f"V2_A5 OVL ({v_ov['f_end_mhz']:.2f} MHz)")
+               label=f"Rail overload ({v_ov['f_end_mhz']:.2f} MHz)")
     ax_tr.plot(v_nr["tf_us"], v_nr["fp_mhz"], color=C_TEAL, ls="-.", lw=1.05,
-               label=f"V2_A5 NoRst ({v_nr['f_end_mhz']:.2f} MHz)")
+               label=f"No reset ({v_nr['f_end_mhz']:.2f} MHz)")
     ax_tr.set_xlim(0, 50)
     ax_tr.set_ylim(0, 11.2)
     ax_tr.set_xlabel("Time (µs)")
@@ -323,50 +308,29 @@ def make_fig3():
                      key=lambda x: x["cload_pf"])
         return np.array([p["cload_pf"] for p in pts]), np.array([p[field] for p in pts])
 
-    cl, base_ss_loss = get_series("BASE", "ss_hh", "loss_max_ns")
-    _,  v2_ss_loss   = get_series("V2_ISO", "ss_hh", "loss_max_ns")
-    _,  base_tt_loss = get_series("BASE", "tt", "loss_max_ns")
+    cl, v2_ss_loss   = get_series("V2_ISO", "ss_hh", "loss_max_ns")
     _,  v2_tt_loss   = get_series("V2_ISO", "tt", "loss_max_ns")
-    _,  base_ss_asym = get_series("BASE", "ss_hh", "asym_ns")
     _,  v2_ss_asym   = get_series("V2_ISO", "ss_hh", "asym_ns")
 
-    ax_iso.semilogy(cl, base_ss_loss, "o-",  color=C_CRIM,  ms=3.3, lw=1.2, label="dfxtp_4 glitch (ss_hh)")
-    ax_iso.semilogy(cl, base_tt_loss, "s--", color=C_AMBER, ms=3.0, lw=1.0, label="dfxtp_4 glitch (tt)")
-    ax_iso.semilogy(cl, base_ss_asym, "^:",  color=C_PURPLE,ms=3.0, lw=1.0, label="dfxtp_4 asym (ss_hh)")
-    ax_iso.semilogy(cl, v2_ss_loss,   "o-",  color=C_NAVY,  ms=3.3, lw=1.25, label="dfxtp_1+buf_4 glitch (ss_hh)")
-    ax_iso.semilogy(cl, v2_ss_asym,   "^-",  color=C_TEAL,  ms=3.0, lw=1.1, label="dfxtp_1+buf_4 asym (ss_hh)")
+    ax_iso.semilogy(cl, v2_ss_loss,   "o-",  color=C_NAVY,  ms=3.3, lw=1.25, label="Glitch (ss_hh)")
+    ax_iso.semilogy(cl, v2_tt_loss,   "s--", color=C_SLATE, ms=3.0, lw=1.0, label="Glitch (tt)")
+    ax_iso.semilogy(cl, v2_ss_asym,   "^-",  color=C_TEAL,  ms=3.0, lw=1.1, label="Rise-fall asym. (ss_hh)")
 
-    ratio_gl = base_ss_loss[-1] / v2_ss_loss[-1]
-    ratio_as = base_ss_asym[-1] / v2_ss_asym[-1]
     ax_iso.annotate(
-        f"{ratio_gl:.0f}× less glitch\n{ratio_as:.0f}× less asym",
-        xy=(3.0, v2_ss_loss[-2]), xytext=(0.45, 0.052),
+        f"Flat to {v2_ss_loss.max():.3f} ns\nover 0–5 pF",
+        xy=(3.0, v2_ss_loss[-2]), xytext=(2.7, 0.42),
         fontsize=5.8, fontweight="bold", color=C_NAVY,
         bbox=dict(boxstyle="round,pad=0.17", fc="white", ec=C_NAVY, lw=0.5, alpha=0.93),
         arrowprops=dict(arrowstyle="->", color=C_NAVY, lw=0.6),
     )
     ax_iso.set_xlim(-0.15, 5.25)
-    ax_iso.set_ylim(0.018, 45)
+    ax_iso.set_ylim(0.018, 1.2)
     ax_iso.set_xlabel(r"External Pin Load $C_{\mathrm{load}}$ (pF)")
     ax_iso.set_ylabel("DAC Pulse Error (ns)")
     ax_iso.grid(True, which="major", alpha=0.55)
     ax_iso.legend(loc="upper left", frameon=True, framealpha=0.92, edgecolor="#CBD5E1",
                   fontsize=5.1, handlelength=1.3, borderpad=0.18, labelspacing=0.14)
-    ax_iso.set_title("(c) Digital Isolation (BSIM4 Std-Cells)", pad=4)
-
-    # Inset in (c): actual back-to-back XOR glitch at Cload = 3pF, ss_hh
-    wf_b = next(r for r in diso if r["arch"] == "BASE" and r["corner"] == "ss_hh" and r["cload_pf"] == 3.0)
-    wf_v = next(r for r in diso if r["arch"] == "V2_ISO" and r["corner"] == "ss_hh" and r["cload_pf"] == 3.0)
-    ax_in2 = ax_iso.inset_axes([0.50, 0.39, 0.45, 0.25])
-    ax_in2.plot(wf_b["wf_t_ns"], wf_b["wf_bp"], color=C_CRIM, ls="--", lw=0.95)
-    ax_in2.plot(wf_v["wf_t_ns"], wf_v["wf_bp"], color=C_NAVY, ls="-", lw=1.05)
-    ax_in2.set_xlim(0, 18)
-    ax_in2.set_ylim(-0.08, 1.8)
-    ax_in2.set_yticks([0, 1.6])
-    ax_in2.tick_params(labelsize=4.9, pad=1.0)
-    ax_in2.set_title("XOR @ 3 pF", fontsize=5.2, pad=1.2)
-    ax_in2.set_xlabel("t (ns)", fontsize=5.0, labelpad=0.2)
-    ax_in2.set_facecolor("white")
+    ax_iso.set_title("(c) DAC Pulse Error vs. Pin Load", pad=4)
 
     out_pdf = os.path.join(FIG_DIR, "fig3_clamp_iso.pdf")
     fig.savefig(out_pdf)
@@ -388,9 +352,9 @@ def make_fig4():
     fs = 10e6
     # Panel (a): 14.65 kHz Spectra (Schematic + Full-Transistor Flat PEX)
     specs = [
-        ("p2", "V2A5_tt",   "V2_A5 tt sch (71.8 dB, HD3=-76.1 dBc)",     C_NAVY,  "-",  1.25),
-        ("p2", "V2A5_sf",   "V2_A5 sf sch (71.5 dB, HD3=-75.0 dBc)",     C_TEAL,  "--", 0.90),
-        ("p2", "V2A5_ffhh", "V2_A5 ff_hh/-20°C sch (68.9 dB, -70.3)",    C_CRIM,  "-.", 0.90),
+        ("p2", "V2A5_tt",   "tt sch (71.8 dB, HD3=-76.1 dBc)",     C_NAVY,  "-",  1.25),
+        ("p2", "V2A5_sf",   "sf sch (71.5 dB, HD3=-75.0 dBc)",     C_TEAL,  "--", 0.90),
+        ("p2", "V2A5_ffhh", "ff_hh/-20°C sch (68.9 dB, -70.3)",    C_CRIM,  "-.", 0.90),
     ]
     ax_psd.axvspan(4.88, 50, color=C_BAND, alpha=0.28, lw=0)
     for sub, tag, lbl, col, ls, lw in specs:
@@ -511,8 +475,8 @@ def make_fig5():
         (80.5, 159.0, "CC VCO Bias R-Array", C_CRIM, 5.4),
         (43.0, 132.0, "42-Strip+Dummy\nRDAC (P)", C_NAVY, 5.5),
         (118.0, 132.0, "42-Strip+Dummy\nRDAC (N)", C_NAVY, 5.5),
-        (43.0, 88.0,  "CC 5T OTA +\nCLAMP_A5 (P)", C_PURPLE, 5.5),
-        (118.0, 88.0, "CC 5T OTA +\nCLAMP_A5 (N)", C_PURPLE, 5.5),
+        (43.0, 88.0,  "CC 5T OTA +\nclamp (P)", C_PURPLE, 5.5),
+        (118.0, 88.0, "CC 5T OTA +\nclamp (N)", C_PURPLE, 5.5),
         (80.5, 61.0,  "Integrators: 2×(24×25 µm MIM) / Half", C_TEAL, 5.5),
         (80.5, 36.0,  "Shared Bias, Vref & Reset Inv.", C_AMBER, 5.5),
         (80.5, 14.0,  "699× sky130_fd_sc_hd__decap_12 Field", C_SLATE, 5.5),

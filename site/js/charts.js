@@ -5,16 +5,16 @@
  */
 
 const C = {
-  navy: '#eceaf6',
-  teal: '#3fd1c1',
-  amber: '#f2c14e',
-  crimson: '#ff6b5e',
-  purple: '#a98bff',
-  blue: '#5b8cff',
-  slate: '#8a8fb5',
-  grid: 'rgba(160,170,255,0.14)',
-  band: 'rgba(91,140,255,0.22)',
-  danger: 'rgba(255,107,94,0.22)',
+  navy: '#0B3C5D',
+  teal: '#147D64',
+  amber: '#D97706',
+  crimson: '#B91C1C',
+  purple: '#6D28D9',
+  blue: '#2563EB',
+  slate: '#475569',
+  grid: 'rgba(15,23,42,0.10)',
+  band: '#DBEAFE',
+  danger: '#FEE2E2',
 };
 
 function el(tag, attrs = {}, text = '') {
@@ -99,7 +99,7 @@ function drawPlot(container, cfg) {
   }
 
   // Plot frame
-  svg.appendChild(el('rect', { x: pad.l, y: pad.t, width: pw, height: ph, fill: 'none', stroke: 'rgba(160,170,255,0.3)', 'stroke-width': 1 }));
+  svg.appendChild(el('rect', { x: pad.l, y: pad.t, width: pw, height: ph, fill: 'none', stroke: 'rgba(15,23,42,0.35)', 'stroke-width': 1 }));
 
   // Clip path for traces
   const clipId = 'clip-' + Math.random().toString(36).slice(2, 8);
@@ -135,7 +135,7 @@ function drawPlot(container, cfg) {
       for (let i = 0; i < s.x.length; i++) {
         traceGroup.appendChild(el('circle', {
           cx: xMap(s.x[i]), cy: yMap(s.y[i]), r: s.r || 3.2,
-          fill: s.color, stroke: '#06071a', 'stroke-width': 1,
+          fill: s.color, stroke: '#ffffff', 'stroke-width': 1,
         }));
       }
     }
@@ -145,21 +145,21 @@ function drawPlot(container, cfg) {
 
   // Title & Axis Labels
   if (cfg.title) {
-    svg.appendChild(el('text', { x: pad.l, y: 15, fill: '#eceaf6', 'font-size': 12.5, 'font-weight': 600, 'font-family': 'Geist, -apple-system, sans-serif' }, cfg.title));
+    svg.appendChild(el('text', { x: pad.l, y: 15, fill: '#111827', 'font-size': 12.5, 'font-weight': 600, 'font-family': 'Geist, -apple-system, sans-serif' }, cfg.title));
   }
   if (cfg.xLabel) {
-    svg.appendChild(el('text', { x: pad.l + pw / 2, y: H - 6, 'text-anchor': 'middle', fill: '#8a8fb5', 'font-size': 11, 'font-family': 'Geist, -apple-system, sans-serif' }, cfg.xLabel));
+    svg.appendChild(el('text', { x: pad.l + pw / 2, y: H - 6, 'text-anchor': 'middle', fill: '#475569', 'font-size': 11, 'font-family': 'Geist, -apple-system, sans-serif' }, cfg.xLabel));
   }
   if (cfg.yLabel) {
     svg.appendChild(el('text', {
       x: 14, y: pad.t + ph / 2, 'text-anchor': 'middle',
       transform: `rotate(-90 14 ${pad.t + ph / 2})`,
-      fill: '#8a8fb5', 'font-size': 11, 'font-family': 'Geist, -apple-system, sans-serif',
+      fill: '#475569', 'font-size': 11, 'font-family': 'Geist, -apple-system, sans-serif',
     }, cfg.yLabel));
   }
 
   // Interactive Crosshair
-  const cross = el('line', { x1: 0, y1: pad.t, x2: 0, y2: pad.t + ph, stroke: '#eceaf6', 'stroke-dasharray': '3 3', 'stroke-width': 0.9, opacity: 0 });
+  const cross = el('line', { x1: 0, y1: pad.t, x2: 0, y2: pad.t + ph, stroke: '#111827', 'stroke-dasharray': '3 3', 'stroke-width': 0.9, opacity: 0 });
   svg.appendChild(cross);
 
   container.innerHTML = '';
@@ -235,7 +235,7 @@ export async function initMeasurementCharts(dataUrl = 'data/sim_data.json') {
     { key: 'pex_tt_27',    short: 'Flat-PEX tt (70.1 dB)',    color: C.amber,   lw: 2.1, on: true },
     { key: 'pex_sf_27',    short: 'Flat-PEX sf (69.3 dB)',    color: C.crimson, lw: 1.7, on: true },
     { key: 'pex_fs_ll_27', short: 'Flat-PEX fs_ll (70.4 dB)', color: C.purple,  lw: 1.6, on: false },
-    { key: 'pex_ss_85',    short: 'Flat-PEX ss/85°C (69.0)',  color: '#7fd6ff', lw: 1.6, on: false },
+    { key: 'pex_ss_85',    short: 'Flat-PEX ss/85°C (69.0)',  color: '#0891B2', lw: 1.6, on: false },
     { key: 'V2A5_tt',      short: 'Sch. tt (71.8 dB)',        color: C.navy,    lw: 1.8, dash: '5 3', on: true },
     { key: 'V2A5_ffhh',    short: 'Sch. ff_hh/-20°C (68.9)',  color: C.teal,    lw: 1.5, dash: '3 2', on: false },
   ];
@@ -306,17 +306,16 @@ export async function initMeasurementCharts(dataUrl = 'data/sim_data.json') {
     `;
     drawPlot(document.getElementById('chart-noise'), {
       width: 560, height: 295, showLegend: true,
-      title: 'BSIM4 Diff. Input Noise PSD (+10.2 dB Ceiling, 0.00 dB Clamp Penalty)',
+      title: 'BSIM4 Diff. Input Noise PSD (22.8 µVrms, 0.1–50 kHz, tt)',
       xLabel: 'Frequency (Hz)', yLabel: 'Input Noise (nV / √Hz)',
       logX: true, logY: true, xMin: 10, xMax: 5e5, yMin: 40, yMax: 8000,
       xTicks: [{ v: 10, l: '10' }, { v: 100, l: '100' }, { v: 1e3, l: '1k' }, { v: 1e4, l: '10k' }, { v: 5e4, l: '50k' }, { v: 5e5, l: '500k' }],
       yTicks: [{ v: 50, l: '50' }, { v: 100, l: '100' }, { v: 500, l: '500' }, { v: 1000, l: '1k' }, { v: 5000, l: '5k' }],
       bands: [{ x0: 100, x1: 5e4, fill: C.band, opacity: 0.4, label: '100 Hz – 50 kHz' }],
       series: [
-        { short: 'Base_S13 tt (74.3 µVrms)', color: C.amber, dash: '4 3', lw: 1.9, x: sim.noise.Base_S13_tt.f_hz, y: sim.noise.Base_S13_tt.n_nv },
-        { short: 'V2_A5 tt (22.8 µVrms)',    color: C.navy,  lw: 2.2, x: sim.noise.V2_A5_tt.f_hz, y: sim.noise.V2_A5_tt.n_nv },
-        { short: 'V2_A5 ss_hh/85°C/1.62V',   color: C.teal,  dash: '5 3', lw: 1.6, x: sim.noise.V2_A5_ss_hh.f_hz, y: sim.noise.V2_A5_ss_hh.n_nv },
-        { short: 'V2_A5 ff_ll/-20°C/1.98V',  color: C.crimson, dash: '2 2', lw: 1.4, x: sim.noise.V2_A5_ff_ll.f_hz, y: sim.noise.V2_A5_ff_ll.n_nv },
+        { short: 'tt (22.8 µVrms)',    color: C.navy,  lw: 2.2, x: sim.noise.V2_A5_tt.f_hz, y: sim.noise.V2_A5_tt.n_nv },
+        { short: 'ss_hh/85°C/1.62V',   color: C.teal,  dash: '5 3', lw: 1.6, x: sim.noise.V2_A5_ss_hh.f_hz, y: sim.noise.V2_A5_ss_hh.n_nv },
+        { short: 'ff_ll/-20°C/1.98V',  color: C.crimson, dash: '2 2', lw: 1.4, x: sim.noise.V2_A5_ff_ll.f_hz, y: sim.noise.V2_A5_ff_ll.n_nv },
       ],
       fmtX: (v) => v >= 1e3 ? `${(v / 1e3).toFixed(1)} kHz` : `${v.toFixed(0)} Hz`,
       fmtY: (v) => `${v.toFixed(0)} nV/√Hz`,
@@ -331,10 +330,9 @@ export async function initMeasurementCharts(dataUrl = 'data/sim_data.json') {
       yTicks: [-20, -10, 0, 10, 20, 30].map((v) => ({ v, l: String(v) })),
       hLines: [{ y: 0, color: C.slate, dash: '4 3', label: '0 dB (fug = 4.95 MHz)', align: 'start', dy: 13 }],
       series: [
-        { short: 'V2_A5 tt (PM 72.2°)',      color: C.navy,    lw: 2.2, x: sim.stb.V2_A5_tt.f_mhz, y: sim.stb.V2_A5_tt.mag_db },
-        { short: 'V2_A5 ss_hh/85°C/1.62V',   color: C.teal,    dash: '5 3', lw: 1.7, x: sim.stb.V2_A5_ss_hh.f_mhz, y: sim.stb.V2_A5_ss_hh.mag_db },
-        { short: 'V2_A5 ff_ll/-20°C/1.98V',  color: C.crimson, dash: '3 2', lw: 1.7, x: sim.stb.V2_A5_ff_ll.f_mhz, y: sim.stb.V2_A5_ff_ll.mag_db },
-        { short: 'Base_S13 tt',              color: C.amber,   dash: '2 3', lw: 1.5, x: sim.stb.Base_S13_tt.f_mhz, y: sim.stb.Base_S13_tt.mag_db },
+        { short: 'tt (PM 72.2°)',      color: C.navy,    lw: 2.2, x: sim.stb.V2_A5_tt.f_mhz, y: sim.stb.V2_A5_tt.mag_db },
+        { short: 'ss_hh/85°C/1.62V',   color: C.teal,    dash: '5 3', lw: 1.7, x: sim.stb.V2_A5_ss_hh.f_mhz, y: sim.stb.V2_A5_ss_hh.mag_db },
+        { short: 'ff_ll/-20°C/1.98V',  color: C.crimson, dash: '3 2', lw: 1.7, x: sim.stb.V2_A5_ff_ll.f_mhz, y: sim.stb.V2_A5_ff_ll.mag_db },
       ],
       fmtX: (v) => v < 1 ? `${(v * 1e3).toFixed(0)} kHz` : `${v.toFixed(2)} MHz`,
       fmtY: (v) => `${v.toFixed(1)} dB`,
@@ -357,14 +355,12 @@ export async function initMeasurementCharts(dataUrl = 'data/sim_data.json') {
       yTicks: [0, 2.5, 5, 7.5, 10].map((v) => ({ v, l: String(v) })),
       bands: [
         { y0: 7.5, y1: 10.5, fill: C.danger, opacity: 0.7, label: 'Aliasing Latch-Up Zone (> 0.75 fs)', labelColor: C.crimson },
-        { x0: 10, x1: 25, y0: 0, y1: 7.5, fill: 'rgba(242,193,78,0.25)', opacity: 0.55, label: 'Rail OVL', labelColor: C.amber },
+        { x0: 10, x1: 25, y0: 0, y1: 7.5, fill: '#FEF3C7', opacity: 0.55, label: 'Rail OVL', labelColor: C.amber },
       ],
       hLines: [{ y: 2.5, color: C.slate, dash: '2 3', label: 'Lock = fs/4 (2.5 MHz)', align: 'end', dy: 14 }],
       series: [
-        { short: 'Base OVL (8.5 MHz)', color: C.crimson, dash: '5 3', lw: 1.9, x: sim.stress.Base_fsll198_ovl.t_us, y: sim.stress.Base_fsll198_ovl.f_mhz },
-        { short: 'Base NoRst (8.5 MHz)', color: C.amber, dash: '2 2', lw: 1.6, x: sim.stress.Base_fsll198_norst.t_us, y: sim.stress.Base_fsll198_norst.f_mhz },
-        { short: 'V2_A5 OVL (2.50 MHz)', color: C.navy, lw: 2.2, x: sim.stress.V2A5_fsll198_ovl.t_us, y: sim.stress.V2A5_fsll198_ovl.f_mhz },
-        { short: 'V2_A5 NoRst (2.50 MHz)', color: C.teal, dash: '6 2', lw: 1.7, x: sim.stress.V2A5_fsll198_norst.t_us, y: sim.stress.V2A5_fsll198_norst.f_mhz },
+        { short: 'OVL (2.50 MHz)', color: C.navy, lw: 2.2, x: sim.stress.V2A5_fsll198_ovl.t_us, y: sim.stress.V2A5_fsll198_ovl.f_mhz },
+        { short: 'NoRst (2.50 MHz)', color: C.teal, dash: '6 2', lw: 1.7, x: sim.stress.V2A5_fsll198_norst.t_us, y: sim.stress.V2A5_fsll198_norst.f_mhz },
       ],
       fmtX: (v) => `${v.toFixed(1)} µs`,
       fmtY: (v) => `${v.toFixed(2)} MHz`,
@@ -374,25 +370,19 @@ export async function initMeasurementCharts(dataUrl = 'data/sim_data.json') {
       const pts = sim.dig_iso.filter((r) => r.arch === arch && r.corner === corner).sort((a, b) => a.cload_pf - b.cload_pf);
       return { x: pts.map((p) => p.cload_pf), y: pts.map((p) => p[f]) };
     };
-    const bss = getIso('BASE', 'ss_hh', 'loss_ns');
-    const btt = getIso('BASE', 'tt', 'loss_ns');
-    const bas = getIso('BASE', 'ss_hh', 'asym_ns');
     const vss = getIso('V2_ISO', 'ss_hh', 'loss_ns');
     const vas = getIso('V2_ISO', 'ss_hh', 'asym_ns');
 
     drawPlot(document.getElementById('chart-iso'), {
       width: 560, height: 295, showLegend: true,
-      title: 'Full-Transistor Digital Output Isolation (19×–215× Lower Error)',
+      title: 'Full-Transistor Digital Output Isolation (dfxtp_1 + buf_4, ss_hh)',
       xLabel: 'External Pin Load Capacitance Cload (pF)', yLabel: 'DAC Pulse Error (ns)',
-      logY: true, xMin: 0, xMax: 5.2, yMin: 0.02, yMax: 25,
+      logY: true, xMin: 0, xMax: 5.2, yMin: 0.02, yMax: 0.3,
       xTicks: [0, 1, 2, 3, 4, 5].map((v) => ({ v, l: `${v} pF` })),
-      yTicks: [{ v: 0.03, l: '0.03' }, { v: 0.1, l: '0.1' }, { v: 1, l: '1' }, { v: 10, l: '10' }],
+      yTicks: [{ v: 0.03, l: '0.03' }, { v: 0.1, l: '0.1' }, { v: 0.3, l: '0.3' }],
       series: [
-        { short: 'dfxtp_4 glitch (ss_hh)', color: C.crimson, lw: 2.0, markers: true, x: bss.x, y: bss.y },
-        { short: 'dfxtp_4 glitch (tt)',    color: C.amber,   lw: 1.6, dash: '4 3', markers: true, x: btt.x, y: btt.y },
-        { short: 'dfxtp_4 asym (ss_hh)',   color: C.purple,  lw: 1.5, dash: '2 2', markers: true, x: bas.x, y: bas.y },
-        { short: 'dfxtp_1+buf_4 glitch',   color: C.navy,    lw: 2.2, markers: true, x: vss.x, y: vss.y },
-        { short: 'dfxtp_1+buf_4 asym',     color: C.teal,    lw: 1.9, markers: true, x: vas.x, y: vas.y },
+        { short: 'Glitch',   color: C.navy,    lw: 2.2, markers: true, x: vss.x, y: vss.y },
+        { short: 'Rise-fall asymmetry',     color: C.teal,    lw: 1.9, markers: true, x: vas.x, y: vas.y },
       ],
       fmtX: (v) => `${v.toFixed(2)} pF`,
       fmtY: (v) => `${v.toFixed(3)} ns`,

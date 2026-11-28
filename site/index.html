@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#06071a">
   <link rel="preload" href="assets/fonts/roboto-flex-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=6">
   <script type="importmap">
     { "imports": { "three": "./vendor/three.module.min.js", "three/addons/": "./vendor/addons/" } }
   </script>
@@ -112,7 +112,7 @@
           <div class="step-body">
             <p class="step-count mono">2 of 6</p>
             <h2>Five transistors hold the summing node</h2>
-            <p>The input pair is 48/3 µm, laid out A A B B B B A A around a common centroid. That is eighteen times the gate area of the first version, and it takes input noise from 74.6 down to 22.9 µVrms.</p>
+            <p>The input pair is 48/3 µm, laid out A A B B B B A A around a common centroid. The large gate area keeps flicker noise low: 22.9 µVrms referred to the input over 0.1 to 50 kHz.</p>
             <ul class="facts mono"><li>47.8 dB gain, 14.7 MHz GBW</li><li>72° phase margin, 23 µA tail</li></ul>
           </div>
         </article>
@@ -121,7 +121,7 @@
           <div class="step-body">
             <p class="step-count mono">3 of 6</p>
             <h2>2.43 pF remembers the error</h2>
-            <p>Two MIM capacitors per half sit between metal 3 and metal 4, pulled apart here so you can see them. They integrate the difference between input and feedback. This integrator is what turns a first-order VCO converter into a second-order one.</p>
+            <p>Two MIM capacitors per half sit between metal 3 and metal 4, pulled apart here so you can see them. They integrate the difference between input and feedback. The ring integrates its own phase as well, so the loop has two integrators and shapes quantization noise to second order.</p>
             <ul class="facts mono"><li>2 × 24 × 25 µm per half</li><li>Unity gain at 1.32 MHz</li></ul>
           </div>
         </article>
@@ -149,7 +149,7 @@
             <p class="step-count mono">6 of 6</p>
             <h2>Sample, XOR, count</h2>
             <p>Flip-flops sample all seven phases at 10 MHz. XOR with the previous sample marks every stage the edge crossed, and those bits drive the resistor DAC directly. Output buffers keep pad capacitance away from that feedback path.</p>
-            <ul class="facts mono"><li>14 flip-flops and 7 XOR gates per half</li><li>19 to 90× less glitch error with buf_4</li></ul>
+            <ul class="facts mono"><li>14 flip-flops and 7 XOR gates per half</li><li>Feedback glitch under 0.16 ns with 1 to 5 pF on the pins</li></ul>
           </div>
         </article>
 
@@ -215,7 +215,7 @@
             <canvas id="sim-spec" aria-label="Output spectrum with noise rising away from the signal band"></canvas>
           </figure>
         </div>
-        <p class="footnote">This is a behavioural model, not the sign-off data below. The sampler and DAC are ideal, the VCO curvature is fitted to the first open-loop version of this chip (50 to 56 dB after layout), and the noise is white at the level BSIM4 simulation reports. Closed loop it sits near the 79 dB noise ceiling; the extracted layout reaches 70.1 dB because of third-harmonic distortion the model leaves out.</p>
+        <p class="footnote">This is a behavioural model, not the sign-off data below. The sampler and DAC are ideal, the VCO tuning curvature is a fitted polynomial, and the noise is white at the level BSIM4 simulation reports. Closed loop it sits near the 79 dB noise ceiling; the extracted layout reaches 70.1 dB because of third-harmonic distortion the model leaves out.</p>
       </div>
     </section>
 
@@ -232,7 +232,7 @@
           <div><dd>79.3<small>dB</small></dd><dt>Noise-limited SNR at −6 dBFS, from 22.9 µVrms of input noise.</dt></div>
           <div><dd>173.4<small>µW</small></dd><dt>ADC core, 96.4 µA from 1.80 V. The clamp adds no static power.</dt></div>
           <div><dd>6.66<small>MHz</small></dd><dt>Fastest the clamp lets a ring run. False lock starts at 7.5 MHz.</dt></div>
-          <div><dd>19–215<small>×</small></dd><dt>Less feedback timing error with 1 to 5 pF hanging on the pins.</dt></div>
+          <div><dd>0.16<small>ns</small></dd><dt>Worst feedback glitch with 1 to 5 pF on every pin. Rise-fall asymmetry 0.029 ns.</dt></div>
           <div><dd>0<small>errors</small></dd><dt>DRC clean, 54 of 54 pins unique in LVS, 16 of 16 precheck items.</dt></div>
         </dl>
 
@@ -265,23 +265,6 @@
           </div>
           <p class="footnote">1.80 V, f<sub>s</sub> = 10 MHz, 50 kHz bandwidth, f<sub>in</sub> = 14.65 kHz. Current and power in this table include the output buffers driving 16 × 1 pF.</p>
         </details>
-
-        <h3 class="sub">Before and after: the first closed-loop layout (S13) and this one (V2_A5)</h3>
-        <div class="table-wrap">
-          <table class="eng-table compare">
-            <thead><tr><th></th><th>S13</th><th>V2_A5</th><th>Change</th></tr></thead>
-            <tbody>
-              <tr><th>OTA gain, GBW, phase margin</th><td>43.0 dB, 7.9 MHz</td><td>47.8 dB, 14.7 MHz, 72.2°</td><td>+4.8 dB gain</td></tr>
-              <tr><th>Input noise, 0.1 to 50 kHz</th><td>74.6 µVrms</td><td>22.9 µVrms</td><td>+10.2 dB SNR ceiling</td></tr>
-              <tr><th>Ring frequency under stress</th><td><span class="badge-fail">Latched at 7.85 to 8.49 MHz</span></td><td><span class="badge-pass">Held at or below 6.66 MHz</span></td><td>10 of 10 schematic, 4 of 4 PEX runs</td></tr>
-              <tr><th>Glitch with 1 to 5 pF on the pins</th><td>1.92 to 14.82 ns</td><td>0.10 to 0.16 ns</td><td>19 to 90× less</td></tr>
-              <tr><th>Rise and fall asymmetry</th><td>0.58 to 6.01 ns</td><td>0.029 ns</td><td>20 to 215× less</td></tr>
-              <tr><th>Corners and Monte Carlo</th><td>Not run with R, C and 1.98 V</td><td>68.5 to 73.4 dB over 17 corners, 71.1 dB median of 16 seeds</td><td>21 of 21 lock, σ = 1.17 dB</td></tr>
-              <tr><th>Core power</th><td>About 260 µW</td><td>173.4 µW</td><td>No static clamp current</td></tr>
-              <tr><th>Physical checks</th><td>0 DRC, LVS warning on uio_oe</td><td><span class="badge-pass">0 DRC, 54 of 54 LVS pins, 16 of 16 precheck</span></td><td>195 devices, 144 nets match</td></tr>
-            </tbody>
-          </table>
-        </div>
       </div>
     </section>
 
@@ -289,15 +272,15 @@
     <section class="band" id="circuit">
       <div class="container">
         <div class="section-head">
-          <h2>Three changes that made it tapeout-ready</h2>
-          <p>The architecture did not change: an OTA-C integrator ahead of a seven-stage ring in each half. Deeper verification found three ways the first layout could fail on silicon, and each got a small, local fix.</p>
+          <h2>Three details that keep it robust</h2>
+          <p>Each half is an OTA-C integrator ahead of a seven-stage ring. Three details protect it on silicon: a low-noise input pair, a clamp against false lock, and buffers between the pads and the feedback path.</p>
         </div>
 
         <div class="changes">
           <article style="--blk:#a98bff">
             <h3>A quieter input pair</h3>
-            <p>The NMOS pair grew to 48/3 µm in a common-centroid layout and the PMOS load to 16/2 µm. Flicker noise variance falls 14.4 times, while gain rises to 47.8 dB and phase margin stays at 72° over corners.</p>
-            <p class="stat mono">74.6 to 22.9 µVrms</p>
+            <p>A 48/3 µm NMOS pair in a common-centroid layout over a 16/2 µm PMOS load keeps flicker noise low. Gain is 47.8 dB and phase margin stays at 72° over corners.</p>
+            <p class="stat mono">22.9 µVrms input noise</p>
           </article>
           <article style="--blk:#ff6b5e">
             <h3>A clamp against false lock</h3>
@@ -306,8 +289,8 @@
           </article>
           <article style="--blk:#5b8cff">
             <h3>Pads kept off the feedback path</h3>
-            <p>Dedicated <code>buf_4</code> buffers separate the 1 to 5 pF pad and mux load from the flip-flops and XOR gates that drive the DAC. Glitch charge and rise-fall asymmetry stop depending on what is connected outside.</p>
-            <p class="stat mono">HD3 at the sf corner improves 11.5 dB</p>
+            <p>Dedicated <code>buf_4</code> buffers separate the 1 to 5 pF pad and mux load from the flip-flops and XOR gates that drive the DAC. Glitch charge and rise-fall asymmetry do not depend on what is connected outside.</p>
+            <p class="stat mono">0.10 to 0.16 ns glitch at 1 to 5 pF</p>
           </article>
         </div>
 
@@ -319,7 +302,7 @@
           <button class="tab-btn" data-sch="vco">Ring VCO</button>
         </div>
         <figure class="sch-frame">
-          <img id="sch-img" src="assets/sch_top.png" alt="Top-level schematic" data-zoom="true">
+          <img id="sch-img" src="assets/sch_top.png?v=6" alt="Top-level schematic" data-zoom="true">
           <figcaption>
             <span id="sch-cap"></span>
             <a href="https://analog-canvas.tokenzhang.com/g/xjr6hy5ce5" target="_blank" rel="noopener">Open the live schematic in Analog Canvas</a>
@@ -381,7 +364,7 @@ y[n]  = yN[n] - yP[n]                 <span class="c"># differential output</spa
               <p>The report has the equations, transistor operating points, the power and noise budgets, and the layout sign-off details.</p>
               <div class="step-actions">
                 <a href="report.html" class="btn btn-primary">Read the report</a>
-                <a href="assets/vco_adc_report.pdf" class="btn" target="_blank" rel="noopener">Download the PDF, 6 pages</a>
+                <a href="assets/vco_adc_report.pdf?v=6" class="btn" target="_blank" rel="noopener">Download the PDF, 6 pages</a>
               </div>
             </div>
           </div>
@@ -392,10 +375,10 @@ y[n]  = yN[n] - yP[n]                 <span class="c"># differential output</spa
 
   <footer class="site-footer">
     <div class="footer-inner">
-      <span><span class="mono">tt_um_arcadia1_vco_adc</span>, designed by Zhishuai Zhang for Tiny Tapeout SKY26e. Rev. V2_A5.</span>
+      <span><span class="mono">tt_um_arcadia1_vco_adc</span>, designed by Zhishuai Zhang for Tiny Tapeout SKY26e.</span>
       <span class="footer-links">
         <a href="report.html">Report</a>
-        <a href="assets/vco_adc_report.pdf" target="_blank" rel="noopener">PDF</a>
+        <a href="assets/vco_adc_report.pdf?v=6" target="_blank" rel="noopener">PDF</a>
         <a href="https://analog-canvas.tokenzhang.com/g/xjr6hy5ce5" target="_blank" rel="noopener">Schematic</a>
         <a href="https://github.com/Arcadia-1/tt-vco-adc" target="_blank" rel="noopener">GitHub</a>
       </span>
@@ -404,6 +387,6 @@ y[n]  = yN[n] - yP[n]                 <span class="c"># differential output</spa
 
   <div class="lightbox" id="lightbox" aria-hidden="true"><img id="lightbox-img" src="" alt="Enlarged schematic"></div>
 
-  <script type="module" src="js/main.js?v=3"></script>
+  <script type="module" src="js/main.js?v=6"></script>
 </body>
 </html>
