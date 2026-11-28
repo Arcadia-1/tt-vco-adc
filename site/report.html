@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Technical Report — tt_um_arcadia1_vco_adc (Zhishuai Zhang)</title>
+  <meta name="description" content="Web edition of the 6-page IEEE technical sign-off report for tt_um_arcadia1_vco_adc: a 1.8-V pseudo-differential second-order closed-loop VCO delta-sigma ADC in SkyWater 130 nm CMOS.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}]});"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-dot"></span>
+        <span class="mono">tt_um_arcadia1_vco_adc</span>
+        <span class="brand-tag">Technical Report</span>
+      </a>
+      <nav class="nav-links" aria-label="Report Navigation">
+        <a href="index.html">← 3D Showcase</a>
+        <a href="report.html" class="active">HTML Report</a>
+        <a href="assets/vco_adc_report.pdf" class="nav-pill" target="_blank" rel="noopener">Download 6-Page PDF ↓</a>
+        <a href="javascript:window.print()" class="nav-pill no-print">Print</a>
+        <a href="https://github.com/Arcadia-1/tt-vco-adc" class="nav-pill" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="report-shell">
+    <!-- Sticky Scroll-Spy Table of Contents -->
+    <aside class="report-toc" aria-label="Table of Contents">
+      <div class="report-toc-title">Contents</div>
+      <a href="#sec-abstract" class="active">Abstract &amp; Summary</a>
+      <a href="#sec-intro">I. Introduction</a>
+      <a href="#sec-arch">II. Circuit Architecture</a>
+      <a href="#sec-hand">III. Hand Analysis &amp; Budgets</a>
+      <a href="#sec-sim">IV. Simulation Results</a>
+      <a href="#sec-pvt">V. PVT, MC &amp; Physical Sign-Off</a>
+      <a href="#sec-disc">VI. Discussion &amp; Trade-Offs</a>
+      <a href="#sec-conc">VII. Conclusion</a>
+      <a href="#sec-refs">References</a>
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;">
+        <a href="index.html#layout" style="border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--accent);font-weight:600;text-align:center;">Open 3D GDS Viewer →</a>
+        <a href="assets/vco_adc_report.pdf" target="_blank" rel="noopener" style="border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--ink-2);text-align:center;">IEEE PDF (6 Pages)</a>
+      </div>
+    </aside>
+
+    <!-- Paper Article Body -->
+    <article class="paper-article">
+      <div class="eyebrow">Tiny Tapeout SKY26e Technical Report · Web Edition</div>
+      <h1>A 1.8-V Pseudo-Differential Second-Order Closed-Loop VCO ΔΣ ADC with Brick-Wall Active Clamp and Isolated Digital Feedback in 130-nm CMOS</h1>
+      <div class="paper-byline">
+        <span><strong>Zhishuai Zhang</strong> · Open-Source Silicon Tapeout (<code>sky130A</code>, 1×2 Analog Tile <code>161.0 × 225.76 µm²</code>)</span>
+        <span class="mono" style="font-size:12px;">Rev. V2_A5 / V2_03 · Nov 2026</span>
+      </div>
+
+      <!-- Abstract -->
+      <div class="paper-abstract" id="sec-abstract">
+        <strong>Abstract —</strong> This report presents the design, verification, and physical sign-off of <code>tt_um_arcadia1_vco_adc</code>, a 1.8-V pseudo-differential second-order continuous-time closed-loop VCO \(\Delta\Sigma\) ADC in <code>sky130A</code> (\(161.0\times225.76\,\mu\text{m}^2\) Tiny Tapeout \(1\times2\) tile, \(f_s=10\text{ MHz}\), \(\text{BW}=50\text{ kHz}\), \(\text{OSR}=100\), \(\pm0.60\text{ V}\) diff. full scale around \(0.90\text{ V}\)). Each half cascades a common-centroid 5T OTA-C integrator with a 7-stage current-starved ring VCO, two-rank XOR phase differentiator, and intrinsically barrel-shifted 7-element NRZ RDAC. Three upgrades over S13 eliminate key silicon risks: (1) upsizing the OTA (\(48/3\,\mu\text{m}\) NMOS, \(16/2\,\mu\text{m}\) PMOS, \(23\,\mu\text{A}\) tail) lowers BSIM4 \(1/f+\text{thermal}\) noise by \(+10.2\text{ dB}\) (\(74.6\to22.9\,\mu\text{V}_{\text{rms}}\), \(79.3\text{ dB}\) ceiling, \(85.3\text{ dB}\) FS DR, Tian \(\text{PM}=72.2^\circ\)); (2) a zero-static-power 5-FET Miller-compensated active clamp (<code>CLAMP_A5</code>, \(14.3\text{--}48.9\text{ nA}\) @ \(1.15\text{ V}\), \(0.00\text{ dB}\) noise/HD3 penalty) hard-limits \(f_{\text{VCO}}\le6.66\text{ MHz}\) below \(7.5\text{ MHz}\) aliasing latch-up; and (3) dedicated <code>buf_4</code> pin buffers cut BSIM4 XOR glitch charge theft \(19\times\text{--}90\times\) and rise/fall asymmetry \(20\times\text{--}215\times\) over \(C_{\text{load}}=1\text{--}5\text{ pF}\). True in-band \(14.65\text{ kHz}\) (\(\text{HD3}=43.95\text{ kHz}\) in-band) sign-off achieves \(71.8\text{ dB}\) TT schematic SNDR (\(68.5\text{--}73.4\text{ dB}\) across 17 \(1.80/1.98\text{ V}\) PVT+R/C corners; \(71.1\text{ dB}\) median across 16 <code>tt_mm</code> MC seeds) and <strong>69.0–70.6 dB SNDR</strong> (\(77.7\text{--}81.9\text{ dB}\) SNR, \(\text{HD3}=-70.4\) to \(-72.5\text{ dBc}\)) across all 6 full-transistor flat-PEX corners (\(173.4\,\mu\text{W}\) core / \(312\,\mu\text{W}\) PEX w/ \(16\times1\text{ pF}\)), with 0 DRC, unique LVS (\(54/54\) pins), 16/16 TT precheck, and 4/4 flat-PEX latch-up stress passes.
+      </div>
+
+      <!-- Section I -->
+      <h2 id="sec-intro">I. Introduction</h2>
+      <p>Voltage-controlled oscillator (VCO)-based analog-to-digital converters replace power-hungry comparators and precision multibit DACs with compact, time-domain phase quantizers that naturally scale with CMOS technology [1, 2]. Operated open-loop, however, a ring oscillator exhibits severe static \(f_{\text{VCO}}(V_{\text{ctrl}})\) nonlinearity that limits distortion to 40–50 dB. Embedding the ring VCO inside a continuous-time negative-feedback loop preceded by an active OTA-C integrator solves both problems: loop gain suppresses VCO nonlinearity in-band, the cascade of integrator and VCO phase integration yields true second-order (40 dB/dec) noise shaping, and sampling all \(M=7\) ring phases provides a 7-level quantizer whose phase rotation implements first-order intrinsic dynamic element matching (DEM) across the resistor DAC [1, 3].</p>
+      <p>Deep verification of the initial baseline layout (<code>Base_S13</code>) revealed three latent silicon risks masked by nominal noiseless transient simulations:</p>
+      <ol>
+        <li><strong>OTA \(1/f\) Noise Ceiling:</strong> A compact \(8/1\,\mu\text{m}\) input pair produced \(74.6\,\mu\text{V}_{\text{rms}}\) BSIM4 noise (\(100\text{ Hz}\text{--}50\text{ kHz}\)), capping real silicon SNR at \(69.1\text{ dB}\) despite 75–81 dB noiseless FFTs.</li>
+        <li><strong>Phase-Aliasing Latch-Up (\(f_{\text{VCO}} > 0.75 f_s\)):</strong> During unreset startup or rail overload at fast-NMOS/low-\(R\) high-\(V_{DD}\) corners (<code>fs_ll</code>/1.98 V, <code>ss_ll</code>/85°C/1.98 V), \(v_{\text{ctrl}}\) saturated toward \(V_{DD}\), driving \(f_{\text{VCO}}\) to 7.85–9.33 MHz. Above \(0.75 f_s = 7.5\text{ MHz}\), XOR differentiation aliases backward and inverts feedback polarity, permanently latching the ring near 8.5 MHz.</li>
+        <li><strong>External Load Coupling into Feedback DAC:</strong> Driving external 1–5 pF pad/mux capacitance directly from first-rank <code>dfxtp_4</code> skewed <code>Q1</code> vs. <code>Q2</code> at <code>xor2_1</code>, causing full-rail glitches that stole up to 14.8 ns of DAC charge and injected 6.0 ns rise/fall asymmetry.</li>
+      </ol>
+
+      <!-- Table I -->
+      <h3>Table I — Specification Summary &amp; Verification Progression (Base_S13 vs. V2_A5)</h3>
+      <div class="table-wrap">
+        <table class="eng-table">
+          <thead>
+            <tr><th>Metric / Parameter</th><th>Target / Constraint</th><th>Baseline (Base_S13)</th><th>Final Design (V2_A5)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Process / Tile Footprint</td><td><code>sky130A</code>, 1×2 TT tile</td><td>161.0 × 225.76 µm²</td><td><strong>161.0 × 225.76 µm²</strong> (699× <code>decap_12</code>)</td></tr>
+            <tr><td>Supply / Clock / BW / OSR</td><td>1.8 V ± 10%, 10 MHz, 50 kHz, 100</td><td>1.8 V, 10 MHz, 50 kHz, 100</td><td>1.8 V ± 10%, 10 MHz, 50 kHz, 100</td></tr>
+            <tr><td>Full-Scale Input (Diff. / Side)</td><td>±0.60 V diff (±0.30 V/side @ 0.9 V)</td><td>±0.60 V diff</td><td>±0.60 V diff (\(R_{\text{in}}=49.7\,\text{k}\Omega\))</td></tr>
+            <tr><td>OTA DC Gain \(A_0\) / GBW (TT)</td><td>&gt; 45 dB / &gt; 10 MHz</td><td>43.0 dB / 7.9 MHz</td><td><strong>47.8 dB / 14.7 MHz</strong></td></tr>
+            <tr><td>Tian Loop PM / GM (PVT)</td><td>&gt; 60° / &gt; 6 dB</td><td>Unclamped (\(v_g\) step 51.5 mV)</td><td><strong>72.2° [67.7°–79.8°] / 6.5 dB [6.5–7.2]</strong></td></tr>
+            <tr><td>BSIM4 Diff. Noise (0.1–50 kHz)</td><td>&lt; 30 µVrms (&gt; 77 dB @ 0.15 V/s)</td><td>74.6 µVrms (69.1 dB; 75.1 dB FS)</td><td><strong>22.9 µVrms (79.3 dB; 85.3 dB FS, +10.2 dB)</strong></td></tr>
+            <tr><td>Clamp Noise / HD3 Penalty</td><td>0.0 dB</td><td>N/A (no clamp)</td><td><strong>0.00 dB</strong> (14.3–48.9 nA @ 1.15 V)</td></tr>
+            <tr><td>Anti-Latchup Stress (Sch. / PEX)</td><td>\(f_{\max}&lt;7.5\text{ MHz}\), 100% recovery</td><td><span class="badge-fail">FAIL</span> (latched 7.85–8.49 MHz)</td><td><span class="badge-pass">PASS</span> (10/10 sch., 4/4 PEX; \(f_{\text{cl}}\le6.66\text{ MHz}\))</td></tr>
+            <tr><td>Dig. Isolation Glitch / Asym.</td><td>Invariant over \(C_{\text{load}}=1\text{--}5\text{ pF}\)</td><td>1.92–14.82 ns / 0.58–6.01 ns</td><td><strong>0.10–0.16 ns (19–90×) / 0.029 ns (20–215×)</strong></td></tr>
+            <tr><td>In-Band 14.65 kHz SNDR (Sch./PEX)</td><td>&gt; 69 dB (HD3 = 43.95 kHz in-band)</td><td>PEX <code>sf</code> HD3 −59.0 dBc; latch risk</td><td><strong>71.8 dB sch. / 69.0–70.6 dB flat-PEX (6/6)</strong></td></tr>
+            <tr><td>21-Corner PVT+R/C (1.8/1.98 V)</td><td>&gt; 68 dB nominal/high-\(V_{DD}\)</td><td>Untested across R/C+\(V_{DD}\)</td><td><strong>68.5–73.4 dB</strong> (med. 71.2 dB, 21/21 lock)</td></tr>
+            <tr><td>16-Seed <code>tt_mm</code> Mismatch MC</td><td>Median &gt; 70 dB, tight offset</td><td>Untested</td><td><strong>68.1–71.7 dB</strong> (med. <strong>71.1 dB</strong>, \(\sigma=1.17\text{ dB}\))</td></tr>
+            <tr><td>Core Power / PEX (16×1 pF)</td><td>&lt; 350 µW @ 1.8 V</td><td>~260 µW (w/ 1 pF loads)</td><td><strong>173.4 µW core (312.3 µW flat-PEX TT)</strong></td></tr>
+            <tr><td>Physical Sign-Off (DRC/LVS/TT)</td><td>0 DRC, Clean LVS, 16/16 Precheck</td><td>0 DRC, <code>uio_oe</code> LVS warn</td><td><span class="badge-pass">0 DRC · Unique LVS (54/54) · 16/16 TT</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Section II -->
+      <h2 id="sec-arch">II. Circuit Architecture and Design Choices</h2>
+      <p>Fig. 1 depicts the complete hierarchy of <code>tt_um_arcadia1_vco_adc</code> (also inspectable live on <a href="https://analog-canvas.tokenzhang.com/g/xjr6hy5ce5" target="_blank" rel="noopener">Analog Canvas ↗</a>). Two mirror-image halves (<code>XHP</code>, <code>XHN</code>) process complementary inputs <code>VINP (ua[0])</code> and <code>VINN (ua[1])</code> around \(V_{\text{ref}}=V_{DD}/2=0.90\text{ V}\) while sharing a resistive \(V_{\text{ref}}\) divider (\(R_t=R_{bt}=200.4\,\text{k}\Omega\) decoupled by \(10\times10\,\mu\text{m}^2\) NMOS cap \(X_{Mc}\)), an OTA tail bias mirror (\(R_b=42.3\,\text{k}\Omega\) into \(8/2\,\mu\text{m}\) diode \(X_{Mb}\)), a common-centroid VCO degeneration resistor array (\(D\,N_1\,P_1\,P_2\,N_2\,D\), \(R_{\text{vco}}=229.7\,\text{k}\Omega\)/half), an active-low reset inverter, and eight dedicated <code>conb_1</code> tie-high cells for <code>uio_oe[7:0]</code>.</p>
+
+      <figure class="paper-figure">
+        <div style="display:grid;grid-template-columns:1fr 1.35fr;gap:14px;align-items:center;">
+          <img src="assets/sch_top.png" alt="Top-level schematic" data-zoom="true">
+          <img src="assets/sch_half.png" alt="Half-channel schematic" data-zoom="true">
+          <img src="assets/sch_loop.png" alt="OTA-C integrator and RDAC schematic" data-zoom="true">
+          <img src="assets/sch_ota5t.png" alt="5T OTA and CLAMP_A5 schematic" data-zoom="true">
+        </div>
+        <figcaption><strong>Fig. 1. Complete schematics of <code>tt_um_arcadia1_vco_adc</code> (<code>V2_A5</code>):</strong> (top-left) mirrored P/N halves sharing \(V_{\text{ref}}\), OTA bias, and CC VCO bias resistors; (top-right) half-channel loop with <code>buf_4</code>-isolated external outputs; (bottom-left) continuous-time integrator (\(R_{\text{in}}=49.7\,\text{k}\Omega\), \(7\times R_d=1.04\,\text{M}\Omega\), \(C_{\text{int}}=2.43\text{ pF}\)); (bottom-right) low-noise common-centroid 5T OTA with 5-FET Miller-compensated brick-wall active clamp <code>CLAMP_A5</code>. <em>Click any panel to zoom.</em></figcaption>
+      </figure>
+
+      <h3>A. Low-Noise Common-Centroid 5T OTA</h3>
+      <p>Front-end OTA input-referred noise adds directly to \(V_{\text{in}}\) multiplied by noise gain \((1+R_{\text{in}}/R_{d,\text{eq}})=1.335\). In <code>V2_A5</code>, \(XM_{1,2}\) are enlarged \(18\times\) in gate area to \(48/3\,\mu\text{m}\) (\(4\times12/3\,\mu\text{m}\) common-centroid <code>A A B B B B A A</code>), \(XM_{3,4}\) are enlarged \(4\times\) to \(16/2\,\mu\text{m}\) (\(4\times4/2\,\mu\text{m}\)), and \(XM_5/X_{Mb}\) are doubled to \(8/2\,\mu\text{m}\) (\(I_{\text{tail}}=23.0\,\mu\text{A}\)). This cuts \(1/f\) noise variance by \(14.4\times\) (\(+10.2\text{ dB}\) SNR ceiling to \(79.3\text{ dB}\)), boosts DC gain \(43.0\to47.8\text{ dB}\) and GBW \(7.9\to14.7\text{ MHz}\), and reduces 1-LSB virtual-ground kickback from \(51.5\) to \(32.2\text{ mV}\). <a href="index.html#block=ota">Inspect OTA in 3D Layout →</a></p>
+
+      <h3>B. Phase-Aliasing Latch-Up &amp; Brick-Wall Active Clamp (CLAMP_A5)</h3>
+      <p>For an \(M=7\)-stage ring sampled at \(f_s=10\text{ MHz}\), monotonic XOR phase differentiation spans \(f_{\text{VCO}}\in(0, 5\text{ MHz})\). Above \(0.75 f_s=7.5\text{ MHz}\) the mean feedback code drops below 3.5, inverting loop polarity into positive-feedback latch-up near \(8.5\text{ MHz}\). Unlike a leaky 1-FET PMOS diode (\(3.1\,\mu\text{A}\) @ \(1.15\text{ V}\), degrading <code>ff_hh</code>/\(-20^\circ\text{C}\) HD3 to \(-46\text{ dBc}\)), <code>CLAMP_A5</code> uses a grounded-gate PMOS sense FET \(M_{\text{sns}}\) (\(0.42/8\,\mu\text{m}\)), two series NMOS loads \(M_{\text{ld1,2}}\) (\(2\times0.42/8\,\mu\text{m}\)), pull-down NMOS \(M_{\text{pd}}\) (\(6/0.5\,\mu\text{m}\)), and Miller compensation NMOS cap \(M_c\) (\(4/3\,\mu\text{m}\)). It leaks only \(14.3\text{--}48.9\text{ nA}\) at \(1.15\text{ V}\) (\(0.00\text{ dB}\) noise/HD3 penalty), hard-caps \(f_{\text{VCO}}\le6.66\text{ MHz}\) across all 9 extreme corners, and cuts overload ringing from \(1081\text{ mV}\) to \(\le0.32\text{ mV}\). <a href="index.html#block=clamp">Inspect CLAMP_A5 in 3D Layout →</a></p>
+
+      <h3>C. Full-Transistor Digital Output Isolation</h3>
+      <p>In <code>V2_A5</code>, first-rank <code>dfxtp_1</code> cells drive only internal <code>dfxtp_1 + xor2_1</code> plus an abutted <code>buf_4</code> pin buffer, keeping DAC pulse integrity invariant over \(C_{\text{load}}\in[0.05, 5.0]\text{ pF}\). <a href="index.html#block=digital">Inspect Digital Banks in 3D Layout →</a></p>
+
+      <!-- Section III -->
+      <h2 id="sec-hand">III. Hand Analysis, Operating Point &amp; Budgets</h2>
+      <p>Cascading the OTA-C integrator and 7-stage VCO phase quantizer yields integrator unity-gain frequency:</p>
+      <div class="paper-eq">
+        <span>$$f_{\text{int}} = \frac{1}{2\pi R_{\text{in}} C_{\text{int}}} = \frac{1}{2\pi (49.72\,\text{k}\Omega)(2.432\text{ pF})} = 1.316\text{ MHz}$$</span>
+        <span class="paper-eq-num">(1)</span>
+      </div>
+      <p>and VCO sensitivity \(2M K_{\text{VCO}}/f_s = 14(8.48\text{ MHz/V})/10\text{ MHz} = 11.87\text{ LSB/V}\) at TT (\(V_{\text{ctrl,lock}}=0.855\text{ V}\)). Balancing peak input current against 7 DAC resistors fixes single-ended full scale:</p>
+      <div class="paper-eq">
+        <span>$$V_{\text{FS,side}} = \frac{7 R_{\text{in}}}{R_d}\,\frac{V_{DD}}{2} = \frac{7\times49.72\,\text{k}\Omega}{1.0385\,\text{M}\Omega}(0.90\text{ V}) = 0.302\text{ V} \quad (\pm0.604\text{ V diff.})$$</span>
+        <span class="paper-eq-num">(2)</span>
+      </div>
+      <p>Referred to the differential input, the front-end noise PSD (with \(R_{d,\text{eq}}=R_d/7=148.4\,\text{k}\Omega\), OTA noise gain \(1.335\)) is:</p>
+      <div class="paper-eq">
+        <span>$$S_{v,\text{in}}(f) = 2\left[4kT R_{\text{in}}\!\left(1+\frac{R_{\text{in}}}{R_{d,\text{eq}}}\right) + \left(1+\frac{R_{\text{in}}}{R_{d,\text{eq}}}\right)^{\!2} S_{v,\text{OTA}}(f)\right]$$</span>
+        <span class="paper-eq-num">(3)</span>
+      </div>
+
+      <h3>Table II — Exact BSIM4 Transistor Operating Points (TT, 27°C, 1.80 V)</h3>
+      <div class="table-wrap">
+        <table class="eng-table compact">
+          <thead>
+            <tr><th>Block</th><th>Device</th><th class="num">W/L (µm)</th><th class="num">|ID| (µA)</th><th class="num">|VGS| (V)</th><th class="num">|VDS| (V)</th><th class="num">gm (µS)</th><th class="num">gm/ID</th><th class="num">ro (kΩ)</th><th>Region</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>so_bias</code></td><td>\(X_{Mb}\) (4×2/2)</td><td class="num">8/2</td><td class="num">24.42</td><td class="num">0.767</td><td class="num">0.767</td><td class="num">219.7</td><td class="num">9.0</td><td class="num">737</td><td>Sat. (diode)</td></tr>
+            <tr><td><code>ota5t</code></td><td>\(XM_{1,2}\) (4×12/3)</td><td class="num">48/3</td><td class="num">11.52</td><td class="num">0.652</td><td class="num">0.33–0.66</td><td class="num">219.2</td><td class="num">19.0</td><td class="num">1031–1386</td><td>Weak/Mod Sat</td></tr>
+            <tr><td><code>ota5t</code></td><td>\(XM_{3,4}\) (4×4/2)</td><td class="num">16/2</td><td class="num">11.52</td><td class="num">1.228</td><td class="num">0.90–1.23</td><td class="num">105.2</td><td class="num">9.1</td><td class="num">6222–8275</td><td>Strong Sat</td></tr>
+            <tr><td><code>ota5t</code></td><td>\(XM_5\) (4×2/2)</td><td class="num">8/2</td><td class="num">23.04</td><td class="num">0.767</td><td class="num">0.248</td><td class="num">202.4</td><td class="num">8.8</td><td class="num">98.3</td><td>Sat (0.20 V)</td></tr>
+            <tr><td><code>CLAMP</code></td><td>\(M_{\text{sns}}\) norm/clmp</td><td class="num">0.42/8</td><td class="num">3e-4/0.13</td><td class="num">0.90/1.28</td><td class="num">0.90/0.29</td><td class="num">0.005/0.89</td><td class="num">—/6.7</td><td class="num">&gt;10⁸/26M</td><td>Cutoff/Sat</td></tr>
+            <tr><td><code>CLAMP</code></td><td>\(M_{\text{ld1,2}}\) norm/clmp</td><td class="num">0.42/8</td><td class="num">3e-4/0.13</td><td class="num">0.77/0.71</td><td class="num">1e-4/0.93</td><td class="num">0.001/1.53</td><td class="num">—/11.6</td><td class="num">401/281M</td><td>Triode/Sat</td></tr>
+            <tr><td><code>CLAMP</code></td><td>\(M_{\text{pd}}\) (2×3/0.5)</td><td class="num">6/0.5</td><td class="num">&lt;1e-6/208</td><td class="num">2e-4/0.99</td><td class="num">0.90/1.28</td><td class="num">1e-5/1013</td><td class="num">—/4.9</td><td class="num">&gt;10⁹/81.8</td><td>Off/Sat</td></tr>
+            <tr><td><code>CLAMP</code></td><td>\(M_c\) (Miller cap)</td><td class="num">4/3</td><td class="num">0</td><td class="num">0.90/0.29</td><td class="num">0</td><td class="num">0</td><td class="num">—</td><td class="num">88.6 fF</td><td>MOS Cap</td></tr>
+            <tr><td><code>vco</code></td><td>\(XM_1\) (V-to-I)</td><td class="num">4/1</td><td class="num">1.12</td><td class="num">0.648</td><td class="num">0.434</td><td class="num">23.8</td><td class="num">21.2</td><td class="num">5252</td><td>Weak/Mod Sat</td></tr>
+            <tr><td><code>vco</code></td><td>\(XM_{\text{pd,p2}}\) (PMOS)</td><td class="num">1/1</td><td class="num">1.12</td><td class="num">1.109</td><td class="num">1.08–1.11</td><td class="num">11.3</td><td class="num">10.0</td><td class="num">50.8M</td><td>Sat</td></tr>
+            <tr><td><code>vco</code></td><td>\(XM_{\text{nd}}\) (NMOS)</td><td class="num">0.5/1</td><td class="num">1.12</td><td class="num">0.721</td><td class="num">0.721</td><td class="num">13.9</td><td class="num">12.4</td><td class="num">8183</td><td>Sat</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:22px;margin-top:24px;">
+        <div>
+          <h3>Table III — TT Power Breakdown (1.80 V, Mid-Scale)</h3>
+          <div class="table-wrap">
+            <table class="eng-table">
+              <thead><tr><th>Sub-Block</th><th class="num">IDD (µA)</th><th class="num">Power (µW)</th><th class="num">Share</th></tr></thead>
+              <tbody>
+                <tr><td>Shared OTA Bias (\(R_b, X_{Mb}\))</td><td class="num">24.42</td><td class="num">43.95</td><td class="num">14.7%</td></tr>
+                <tr><td>Shared \(V_{\text{ref}}\) Divider (\(R_t, R_{bt}\))</td><td class="num">4.49</td><td class="num">8.08</td><td class="num">2.7%</td></tr>
+                <tr><td>2× 5T OTA (\(XM_{1\dots5}\))</td><td class="num">46.09</td><td class="num">82.96</td><td class="num">27.8%</td></tr>
+                <tr><td>2× Active Clamp (<code>CLAMP_A5</code>)</td><td class="num">5.5×10⁻⁶</td><td class="num">≈ 0.00</td><td class="num"><strong>0.0%</strong></td></tr>
+                <tr><td>2× VCO V-to-I &amp; Mirror</td><td class="num">3.87</td><td class="num">6.97</td><td class="num">2.3%</td></tr>
+                <tr><td>2× 7-Stage Ring VCO</td><td class="num">2.55</td><td class="num">4.60</td><td class="num">1.5%</td></tr>
+                <tr><td>2× Int. Dig. (<code>dfxtp_1</code>, <code>xor2_1</code>) + RDAC</td><td class="num">14.93</td><td class="num">26.88</td><td class="num">9.0%</td></tr>
+                <tr><td><strong>ADC Core Subtotal</strong></td><td class="num"><strong>96.36</strong></td><td class="num"><strong>173.44</strong></td><td class="num"><strong>58.0%</strong></td></tr>
+                <tr><td>2× Ext. Buffers (16× <code>buf_4</code> @ 1 pF)</td><td class="num">69.64</td><td class="num">125.36</td><td class="num">42.0%</td></tr>
+                <tr><td><strong>Total Tile (Incl. 16×1 pF)</strong></td><td class="num"><strong>166.00</strong></td><td class="num"><strong>298.80</strong></td><td class="num"><strong>100.0%</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <h3>Table IV — BSIM4 Diff. Noise Breakdown (0.1–50 kHz)</h3>
+          <div class="table-wrap">
+            <table class="eng-table">
+              <thead><tr><th>Noise Source</th><th class="num">Base Var.</th><th class="num">Base µV</th><th class="num">V2 Var.</th><th class="num">V2 µV</th></tr></thead>
+              <tbody>
+                <tr><td>\(XM_{1,2}\) Flicker (1/f)</td><td class="num">90.50%</td><td class="num">71.34</td><td class="num">65.94%</td><td class="num">18.78</td></tr>
+                <tr><td>\(XM_{1,2}\) Thermal</td><td class="num">0.83%</td><td class="num">6.84</td><td class="num">4.31%</td><td class="num">4.80</td></tr>
+                <tr><td>\(XM_{3,4}\) Flicker (1/f)</td><td class="num">7.49%</td><td class="num">20.52</td><td class="num">19.43%</td><td class="num">10.19</td></tr>
+                <tr><td>\(XM_{3,4}\) Thermal</td><td class="num">0.26%</td><td class="num">3.83</td><td class="num">1.05%</td><td class="num">2.37</td></tr>
+                <tr><td>\(XM_5, X_{Mb}\) (Tail Bias)</td><td class="num">&lt;0.01%</td><td class="num">0.39</td><td class="num">0.01%</td><td class="num">0.27</td></tr>
+                <tr><td><strong><code>CLAMP_A5</code> (All 5 FETs)</strong></td><td class="num">—</td><td class="num">—</td><td class="num"><strong>0.00%</strong></td><td class="num"><strong>0.00</strong></td></tr>
+                <tr><td>\(R_{\text{in}}\) (49.7 kΩ) Thermal</td><td class="num">0.69%</td><td class="num">6.22</td><td class="num">6.92%</td><td class="num">6.08</td></tr>
+                <tr><td>\(7\times R_d\) (1.04 MΩ) Thermal</td><td class="num">0.23%</td><td class="num">3.60</td><td class="num">2.32%</td><td class="num">3.52</td></tr>
+                <tr><td><strong>Total (100 Hz–50 kHz)</strong></td><td class="num"><strong>100%</strong></td><td class="num"><strong>74.6</strong></td><td class="num"><strong>100%</strong></td><td class="num"><strong>22.9</strong></td></tr>
+                <tr><td><strong>SNR (@ 0.15V/s) / FS DR</strong></td><td class="num" colspan="2">69.1 / 75.1 dB</td><td class="num" colspan="2"><strong>79.3 / 85.3 dB (+10.2)</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section IV -->
+      <h2 id="sec-sim">IV. Simulation Results</h2>
+      <p>All simulations ran in <code>ngspice-47</code> with the tapeout-locked SkyWater <code>sky130A</code> BSIM4v5 PDK (<code>open_pdks 0536d02d</code>). AC stability and <code>.noise</code> runs disable <code>option klu</code>, while transient tone sign-off enforces \(\Delta t_{\max}=0.5\text{ ns}\), \(\text{reltol}=10^{-4}\), Gear integration, and \(500\,\Omega\) Tiny Tapeout analog mux series resistance on <code>ua[0:1]</code>.</p>
+
+      <figure class="paper-figure">
+        <img src="assets/fig2_stb_noise.png" alt="Tian stability and BSIM4 noise PSD" data-zoom="true">
+        <figcaption><strong>Fig. 2.</strong> (a) Exact Tian closed-loop integrator stability \(|T(f)|\) and \(\angle T(f)\) across extreme PVT corners vs. <code>Base_S13</code>, confirming \(\text{PM}=72.2^\circ\,[67.7^\circ\text{--}79.8^\circ]\) and \(\text{GM}=6.5\text{ dB}\,[6.5\text{--}7.2]\); (b) BSIM4 differential input-referred noise PSD (10 Hz–500 kHz), demonstrating +10.2 dB noise-floor reduction (\(74.6\to22.9\,\mu\text{V}_{\text{rms}}\)), worst-case <code>ss_hh</code>/85°C/1.62 V ceiling of 78.3 dB, and 0.00 dB penalty from <code>CLAMP_A5</code>.</figcaption>
+      </figure>
+
+      <figure class="paper-figure">
+        <img src="assets/fig3_clamp_iso.png" alt="Active clamp tuning, overload recovery, and digital isolation" data-zoom="true">
+        <figcaption><strong>Fig. 3.</strong> (a) VCO tuning \(f_{\text{VCO}}(V_{\text{ctrl}})\) showing unclamped runaway (&gt;9 MHz) into the \(&gt;0.75 f_s\) latch-up zone vs. <code>CLAMP_A5</code> brick-wall ceilings (\(\le6.66\text{ MHz}\) closed-loop; inset compares \(I_{\text{clamp}}\) vs. leaky 1-FET diode); (b) forced \(v_{\text{ctrl}}=V_{DD}\) no-reset startup and 10–25 µs rail overload at <code>fs_ll</code>/1.98 V, where <code>Base_S13</code> latches at 8.49 MHz while <code>V2_A5</code> locks at 2.50 MHz; (c) full-transistor (<code>dig=0</code>) BSIM4 isolation sweep over \(C_{\text{load}}=0.05\text{--}5.0\text{ pF}\), cutting XOR glitch charge theft 19×–90× and rise/fall asymmetry 20×–215× across 1–5 pF.</figcaption>
+      </figure>
+
+      <figure class="paper-figure">
+        <img src="assets/fig4_spectra_mc.png" alt="14.65 kHz output spectra, 16-seed MC, and 21-corner PVT" data-zoom="true">
+        <figcaption><strong>Fig. 4.</strong> (a) True in-band 14.65 kHz (\(N=2048\), bin 3, Hann) differential output spectra for <code>V2_A5</code> schematic overlaid with full-transistor flat-PEX <code>tt</code> (70.1 dB SNDR, HD3 = −71.9 dBc, 16×1 pF loads), showing HD2 = 29.3 kHz and HD3 = 43.95 kHz strictly in-band with +40 dB/dec shaping; (b) 16-seed <code>tt_mm</code> mismatch MC histogram (68.1–71.7 dB, med. 71.1 dB, \(\sigma=1.17\text{ dB}\)) and 21-corner PVT + R/C + \(V_{DD}\pm10\%\) distribution.</figcaption>
+      </figure>
+
+      <!-- Section V -->
+      <h2 id="sec-pvt">V. PVT, Mismatch, and Physical Sign-Off</h2>
+      <p>Every corner across the 21-corner PVT+R/C+\(V_{DD}\pm10\%\) matrix locks cleanly to \(f_s/4\). All 17 nominal/high-\(V_{DD}\) corners (1.80/1.98 V) achieve 68.5–73.4 dB SNDR (median 71.2 dB) with HD3 = −70.5 to −80.6 dBc. Across 16 <code>tt_mm</code> mismatch MC seeds, SNDR spans 68.1–71.7 dB (median 71.1 dB, \(\sigma=1.17\text{ dB}\)), worst HD2/HD3 remain below −72.6/−72.5 dBc, and differential DC offset has \(\sigma=0.016\text{ LSB}\).</p>
+
+      <div style="display:flex;flex-direction:column;gap:22px;margin-top:20px;">
+        <div>
+          <h3>Table V — 21-Corner PVT+R/C+VDD &amp; 16-Seed MC</h3>
+          <div class="table-wrap">
+            <table class="eng-table">
+              <thead><tr><th>Corner (T, VDD)</th><th class="num">SNDR</th><th class="num">SNR</th><th class="num">HD2</th><th class="num">HD3</th></tr></thead>
+              <tbody>
+                <tr><td><code>tt</code> (27°C, 1.80/1.98 V)</td><td class="num">71.6/73.2</td><td class="num">77.7/78.8</td><td class="num">−77.6/−76.0</td><td class="num">−74.6/−80.6</td></tr>
+                <tr><td><code>tt</code> (27°C, 1.62 V)</td><td class="num">71.2</td><td class="num">78.2</td><td class="num">−76.9</td><td class="num">−73.9</td></tr>
+                <tr><td><code>lh/ll/hh/hl</code> (27°C, 1.8 V)</td><td class="num">70.2–73.4</td><td class="num">78.5–80.4</td><td class="num">−76.2–−76.5</td><td class="num">−72.3–−80.1</td></tr>
+                <tr><td><code>ss_hh</code> (85°C, 1.80/1.62 V)</td><td class="num">68.5/68.7</td><td class="num">73.4/78.5</td><td class="num">−76.3/−75.3</td><td class="num">−71.5/−70.4</td></tr>
+                <tr><td><code>ss_ll</code> (85°C, 1.80/1.98 V)</td><td class="num">73.0/73.3</td><td class="num">77.9/78.1</td><td class="num">−76.3/−77.6</td><td class="num">−79.8/−78.5</td></tr>
+                <tr><td><code>ff_hh</code> (−20°C, 1.80/1.62 V)</td><td class="num">70.5/66.9</td><td class="num">80.0/78.7</td><td class="num">−76.7/−76.6</td><td class="num">−72.4/−67.7</td></tr>
+                <tr><td><code>ff_ll</code> (−20°C, 1.80/1.98 V)</td><td class="num">70.4/71.1</td><td class="num">78.1/78.4</td><td class="num">−76.0/−76.1</td><td class="num">−73.1/−74.2</td></tr>
+                <tr><td><code>fs_hh/ll</code> (27°C, 1.80 V)</td><td class="num">69.2/71.2</td><td class="num">78.9/77.9</td><td class="num">−77.6/−78.0</td><td class="num">−70.5/−73.5</td></tr>
+                <tr><td><code>fs_ll</code> (27°C, 1.98 V)</td><td class="num">71.0</td><td class="num">79.6</td><td class="num">−76.2</td><td class="num">−73.5</td></tr>
+                <tr><td><code>sf_hh/ll</code> (27°C, 1.80 V)</td><td class="num">71.3/72.6</td><td class="num">78.3/80.3</td><td class="num">−77.1/−76.2</td><td class="num">−74.1/−76.5</td></tr>
+                <tr><td><code>sf_hh</code> (27°C, 1.62 V, min)</td><td class="num">63.4</td><td class="num">78.1</td><td class="num">−76.6</td><td class="num">−63.7</td></tr>
+                <tr><td><strong>17 (1.8/1.98 V) Range</strong></td><td class="num"><strong>68.5–73.4</strong></td><td class="num"><strong>73.4–80.4</strong></td><td class="num"><strong>−76.0–−78.0</strong></td><td class="num"><strong>−70.5–−80.6</strong></td></tr>
+                <tr><td><strong>16 MC (Min/Med/Max)</strong></td><td class="num"><strong>68.1/71.1/71.7</strong></td><td class="num"><strong>71.4–80.8</strong></td><td class="num"><strong>≤ −72.6</strong></td><td class="num"><strong>≤ −72.5</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <h3>Table VI — Physical Sign-Off &amp; Full-Transistor Flat PEX</h3>
+          <div class="table-wrap">
+            <table class="eng-table">
+              <thead><tr><th>Sign-Off Check / Corner</th><th class="num">Result / SNDR · HD2 · HD3</th><th class="num">IDD / Status</th></tr></thead>
+              <tbody>
+                <tr><td>Magic DRC (Precheck GDS)</td><td class="num" colspan="2"><span class="badge-pass">0 errors</span></td></tr>
+                <tr><td>Netgen 1.5.324 LVS</td><td class="num" colspan="2"><span class="badge-pass">Unique (195 dev, 144 net, 54/54 pin)</span></td></tr>
+                <tr><td>Tiny Tapeout Precheck</td><td class="num" colspan="2"><span class="badge-pass">16/16 PASS (0 met5 OBS, 0 out ant.)</span></td></tr>
+                <tr><td>Flat-PEX Latch-Up Stress (4/4)</td><td class="num">2.50–2.53 MHz lock</td><td class="num"><span class="badge-pass">4/4 PASS</span></td></tr>
+                <tr><td><code>tt</code> (27°C, 1.80 V, 16×1 pF)</td><td class="num"><strong>70.1</strong> / −77.8 / −71.9</td><td class="num">173.5 µA</td></tr>
+                <tr><td><code>ss</code> (85°C, 1.80 V, 16×1 pF)</td><td class="num"><strong>69.0</strong> / −77.4 / −70.4</td><td class="num">176.1 µA</td></tr>
+                <tr><td><code>ff</code> (−20°C, 1.80 V, 16×1 pF)</td><td class="num"><strong>69.3</strong> / −76.8 / −70.7</td><td class="num">173.2 µA</td></tr>
+                <tr><td><code>sf</code> (27°C, 1.80 V, 16×1 pF)</td><td class="num"><strong>69.3</strong> / −76.8 / −70.5</td><td class="num">177.1 µA</td></tr>
+                <tr><td><code>fs</code> (27°C, 1.80 V, 16×1 pF)</td><td class="num"><strong>70.6</strong> / −76.9 / −72.5</td><td class="num">170.9 µA</td></tr>
+                <tr><td><code>fs_ll</code> (27°C, 1.80 V, 16×1 pF)</td><td class="num"><strong>70.4</strong> / −76.9 / −72.5</td><td class="num">175.4 µA</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <figure class="paper-figure" style="max-width:520px;margin:28px auto;">
+        <img src="assets/fig5_layout.png" alt="Annotated core layout of tt_um_arcadia1_vco_adc" data-zoom="true">
+        <figcaption><strong>Fig. 5. Annotated layout of <code>tt_um_arcadia1_vco_adc</code></strong> (161.0 × 225.76 µm², <code>sky130A</code> 1×2 tile) highlighting mirrored digital banks, 7-stage VCOs, CC bias resistor array, RDACs, CC OTAs with <code>CLAMP_A5</code>, MIM caps, and 699× <code>decap_12</code>. <a href="index.html#layout">Launch Interactive 3D / 2D GDS Explorer →</a></figcaption>
+      </figure>
+
+      <!-- Section VI -->
+      <h2 id="sec-disc">VI. Discussion and Architectural Trade-Offs</h2>
+      <ol>
+        <li><strong>1-FET Diode vs. Two-Stage Active Clamp:</strong> A single grounded-gate PMOS diode (\(8/0.5\,\mu\text{m}\)) leaked \(3.1\,\mu\text{A}\) at \(1.15\text{ V}\), degrading <code>ff_hh</code>/\(-20^\circ\text{C}\) HD3 to \(-46\text{ dBc}\). The Miller-compensated two-stage <code>CLAMP_A5</code> sharpens the turn-on knee by \(61\times\text{--}215\times\) (\(14\text{--}49\text{ nA}\) @ \(1.15\text{ V}\)), restoring \(\text{HD3}=-70.3\text{ dBc}\) (\(+24\text{ dB}\)). Splitting the load into two series \(0.42/8\,\mu\text{m}\) FETs (\(M_{\text{ld1,2}}\)) keeps all devices inside well-calibrated \(L\le8\,\mu\text{m}\) BSIM4 bins.</li>
+        <li><strong>Half-Cycle DAC Resampling:</strong> Step-size ablations proved earlier observed noise degradation came from a 2 ns transient step artifact; since extra loop delay erodes stability margin without improving real quantization noise, resampling was removed.</li>
+        <li><strong>Low-\(V_{DD}\) Headroom Bound:</strong> At \(-10\%\) supply (\(1.62\text{ V}\)) with slow-NMOS/fast-PMOS and high-\(R\) (<code>sf_hh</code>), losing 180 mV of swing headroom pulls HD3 to \(-63.7\text{ dBc}\) (\(63.4\text{ dB}\) SNDR) while remaining completely latch-up-free; backing off amplitude by 2 dB or holding \(V_{DD}\ge1.75\text{ V}\) restores \(&gt;70\text{ dB}\) SNDR across all corners.</li>
+        <li><strong>Silicon Characterization Plan:</strong> On fabricated SKY26e silicon, <code>test/capture_vco_adc.py</code> drives the 10 MHz clock, pulses <code>rst_n</code> low, waits 50 µs for lock, and streams all 16 outputs via RP2350 PIO+DMA into <code>test/decode_vco_adc.py</code>.</li>
+      </ol>
+
+      <!-- Section VII -->
+      <h2 id="sec-conc">VII. Conclusion</h2>
+      <p>A 1.8-V pseudo-differential second-order closed-loop VCO \(\Delta\Sigma\) ADC (<code>tt_um_arcadia1_vco_adc</code>) has been designed, verified, and signed off in <code>sky130A</code> inside a \(161.0\times225.76\,\mu\text{m}^2\) Tiny Tapeout \(1\times2\) tile. Three targeted upgrades — a \(+10.2\text{ dB}\) lower-noise common-centroid 5T OTA (\(22.9\,\mu\text{V}_{\text{rms}}\), \(79.3\text{ dB}\) ceiling, \(\text{PM}=72.2^\circ\)), a zero-static-power 5-FET Miller active clamp eliminating \(&gt;7.5\text{ MHz}\) latch-up (\(0.00\text{ dB}\) noise/HD3 penalty), and <code>dfxtp_1 + buf_4</code> pin isolation cutting BSIM4 DAC glitch/asymmetry \(19\times\text{--}215\times\) — yield \(71.8\text{ dB}\) TT schematic SNDR at \(14.65\text{ kHz}\) (\(68.5\text{--}73.4\text{ dB}\) across 17 \(1.80/1.98\text{ V}\) PVT+R/C corners, \(71.1\text{ dB}\) MC median) and \(69.0\text{--}70.6\text{ dB}\) SNDR (\(77.7\text{--}81.9\text{ dB}\) SNR, \(\text{HD3}=-70.4\) to \(-72.5\text{ dBc}\)) across all 6 full-transistor flat-PEX corners at \(173.4\,\mu\text{W}\) core power (\(312\,\mu\text{W}\) PEX w/ \(16\times1\text{ pF}\)), with 0 DRC, unique LVS (\(54/54\) pins), 16/16 precheck, and 4/4 flat-PEX latch-up passes.</p>
+
+      <!-- References -->
+      <h2 id="sec-refs">References</h2>
+      <ol style="font-size:13.5px;color:var(--muted);">
+        <li>M. Z. Straayer and M. H. Perrott, "A 12-bit, 10-MHz bandwidth, continuous-time \(\Sigma\Delta\) ADC with a 5-bit, 950-MS/s VCO-based quantizer," <em>IEEE J. Solid-State Circuits</em>, vol. 43, no. 4, pp. 805–814, Apr. 2008.</li>
+        <li>G. Taylor and I. Galton, "A mostly-digital variable-rate continuous-time delta-sigma modulator ADC," <em>IEEE J. Solid-State Circuits</em>, vol. 45, no. 12, pp. 2634–2646, Dec. 2010.</li>
+        <li>X. Xing and G. G. E. Gielen, "A 42-fJ/step-FoM two-step VCO-based delta-sigma ADC in 40-nm CMOS," <em>IEEE J. Solid-State Circuits</em>, vol. 50, no. 3, pp. 714–723, Mar. 2015.</li>
+        <li>M. Tian, V. Visvanathan, J. Hantgan, and K. Kundert, "Striving for small-signal stability," <em>IEEE Circuits Devices Mag.</em>, vol. 17, no. 1, pp. 31–41, Jan. 2001.</li>
+        <li>SkyWater Technology Foundry, "SKY130 Open-Source Process Design Kit (<code>sky130A</code>, <code>open_pdks 0536d02d</code>)," Tiny Tapeout SKY26e Analog Shuttle Documentation, 2026.</li>
+      </ol>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span><strong>tt_um_arcadia1_vco_adc</strong> · Zhishuai Zhang · Tiny Tapeout SKY26e</span>
+      <span class="mono" style="font-size:12px;">
+        <a href="index.html">3D Showcase</a> ·
+        <a href="assets/vco_adc_report.pdf" target="_blank" rel="noopener">Download IEEE PDF</a> ·
+        <a href="https://github.com/Arcadia-1/tt-vco-adc" target="_blank" rel="noopener">GitHub</a>
+      </span>
+    </div>
+  </footer>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <img id="lightbox-img" src="" alt="Zoomed figure">
+  </div>
+
+  <script>
+    // Scroll-spy for left TOC
+    const tocLinks = [...document.querySelectorAll('.report-toc a[href^="#"]')];
+    const sections = tocLinks.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const onScroll = () => {
+      let cur = sections[0]?.id;
+      for (const s of sections) {
+        if (s.getBoundingClientRect().top <= 110) cur = s.id;
+      }
+      tocLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // Lightbox zoom
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lightbox-img');
+    document.querySelectorAll('img[data-zoom="true"]').forEach((im) => {
+      im.addEventListener('click', () => { lbImg.src = im.src; lb.classList.add('open'); });
+    });
+    lb.addEventListener('click', () => lb.classList.remove('open'));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') lb.classList.remove('open'); });
+  </script>
+</body>
+</html>

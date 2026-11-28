@@ -41,4 +41,40 @@ jobs:
       pages: write      # to deploy to Pages
       id-token: write   # to verify the deployment originates from an appropriate source
     steps:
-      - uses: TinyTapeout/tt-gds-action/viewer@ttsky26e
+      - name: Checkout showcase site
+        uses: actions/checkout@v4
+
+      - name: Download GDS artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: tt_submission
+          path: tt_submission
+
+      - name: Download gds_render artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: gds_render
+          path: gh-pages
+
+      - name: Assemble static site with Tiny Tapeout OASIS & GDS
+        run: |
+          mkdir -p gh-pages
+          cp -r site/. gh-pages/
+          find tt_submission -maxdepth 3 -name "*.gds" -exec cp {} gh-pages/tinytapeout.gds \;
+          find tt_submission -maxdepth 3 -name "*.oas" -exec cp {} gh-pages/tinytapeout.oas \;
+          ls -la gh-pages/
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: gh-pages
+          name: github-pages-${{ github.run_attempt }}
+
+      - name: Wait for artifact indexing
+        run: sleep 5
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
