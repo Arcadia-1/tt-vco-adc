@@ -14,7 +14,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-const BG = 0x06071a;
+const BG = 0xf7f8fb;
 
 export const BLOCKS = [
   {
@@ -248,7 +248,7 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(BG);
-  scene.fog = new THREE.FogExp2(BG, 0.00105);
+  scene.fog = new THREE.FogExp2(BG, 0.0011);
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   scene.environmentIntensity = 0.75;
@@ -271,13 +271,13 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
   const rim = new THREE.DirectionalLight(0x7aa2ff, 1.3);
   rim.position.set(-200, 120, -220);
   scene.add(rim);
-  scene.add(new THREE.AmbientLight(0x8090ff, 0.25));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.45));
 
   // The die: a polished slab with thin-film interference, like a wafer under white light.
   const slab = new THREE.Mesh(
     new THREE.BoxGeometry(W + 3, 2.4, H + 3),
     new THREE.MeshPhysicalMaterial({
-      color: 0x070818, metalness: 0.85, roughness: 0.3, envMapIntensity: 0.55,
+      color: 0x3a3f52, metalness: 0.7, roughness: 0.32, envMapIntensity: 0.7,
       iridescence: 0.7, iridescenceIOR: 1.6, iridescenceThicknessRange: [240, 520],
     })
   );
@@ -297,12 +297,12 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-    const grid = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0x2a3270, transparent: true, opacity: 0.7 }));
+    const grid = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xc3cad8, transparent: true, opacity: 0.9 }));
     grid.position.y = -2.4;
     scene.add(grid);
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(9000, 9000),
-      new THREE.MeshStandardMaterial({ color: 0x05061a, metalness: 0.9, roughness: 0.45 })
+      new THREE.MeshStandardMaterial({ color: 0xeef1f6, metalness: 0.0, roughness: 0.95 })
     );
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -2.5;
@@ -466,7 +466,7 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
   const hiGroup = new THREE.Group();
   scene.add(hiGroup);
   const unitEdges = new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 1));
-  const cA = new THREE.Color(), cB = new THREE.Color(), cBg = new THREE.Color(0x0b0e2a);
+  const cA = new THREE.Color(), cB = new THREE.Color(), cBg = new THREE.Color(0xdfe3ec);
 
   function selectBlock(id) {
     const blk = BLOCKS.find((b) => b.id === id) || BLOCKS[0];
@@ -476,7 +476,7 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
     for (const L of paintList) {
       for (const o of L.objs) {
         cA.copy(o.base).lerp(new THREE.Color(0xffffff), 0.12);
-        cB.copy(o.base).multiplyScalar(0.13).lerp(cBg, 0.5);
+        cB.copy(o.base).lerp(cBg, 0.82);
         for (let i = 0; i < o.count; i++) {
           let c = o.base;
           if (filter) {

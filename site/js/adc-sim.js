@@ -253,7 +253,7 @@ export function initAdcSim() {
     const { g, w, h } = fitCanvas(cSpec);
     g.clearRect(0, 0, w, h);
     const pl = 44, pr = 12, pt = 14, pb = 28;
-    const f0 = 1e3, f1 = FS / 2, d0 = -170, d1 = 0;
+    const f0 = 1e3, f1 = FS / 2, d0 = -120, d1 = 0;
     const X = (f) => pl + (Math.log10(f / f0) / Math.log10(f1 / f0)) * (w - pl - pr);
     const Y = (d) => pt + ((d1 - d) / (d1 - d0)) * (h - pt - pb);
     g.fillStyle = 'rgba(217,119,6,0.08)';
@@ -261,7 +261,7 @@ export function initAdcSim() {
     g.font = '11px "Geist Mono", ui-monospace, monospace'; g.textBaseline = 'middle';
     g.strokeStyle = LINE; g.lineWidth = 1; g.fillStyle = DIM;
     g.beginPath();
-    for (let d = -160; d <= 0; d += 40) { g.moveTo(pl, Y(d)); g.lineTo(w - pr, Y(d)); g.textAlign = 'right'; g.fillText(`${d}`, pl - 8, Y(d)); }
+    for (let d = -120; d <= 0; d += 20) { g.moveTo(pl, Y(d)); g.lineTo(w - pr, Y(d)); g.textAlign = 'right'; g.fillText(`${d}`, pl - 8, Y(d)); }
     g.textAlign = 'center';
     for (const [f, t] of [[1e3, '1 k'], [1e4, '10 k'], [1e5, '100 k'], [1e6, '1 M'], [5e6, '5 MHz']]) { g.moveTo(X(f), pt); g.lineTo(X(f), h - pb); g.fillText(t, Math.min(X(f), w - pr - 18), h - pb + 14); }
     g.stroke();

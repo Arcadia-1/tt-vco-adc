@@ -397,7 +397,7 @@ def make_fig4():
                     arrowprops=dict(arrowstyle="->", color=C_CRIM, lw=0.55))
 
     ax_psd.set_xlim(4.8, 5000)
-    ax_psd.set_ylim(-115, 6)
+    ax_psd.set_ylim(-120, 6)
     ax_psd.set_xlabel("Frequency (kHz)")
     ax_psd.set_ylabel("Normalized PSD (dBc / bin)")
     ax_psd.grid(True, which="major", alpha=0.55)

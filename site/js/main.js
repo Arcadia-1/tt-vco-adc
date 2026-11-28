@@ -43,11 +43,11 @@ initMeasurementCharts('data/sim_data.json');
 
 // ---- schematics ----
 const SCH = {
-  top:  { img: 'assets/sch_top.png?v=6',   alt: 'Top-level schematic', cap: 'Two mirrored halves share a 0.90 V resistive reference, the OTA tail bias, the common-centroid VCO bias resistors and the reset inverter.' },
-  half: { img: 'assets/sch_half.png?v=6',  alt: 'Schematic of one half', cap: 'One half: the OTA-C loop, the seven-stage ring, two ranks of flip-flops with XOR gates that stay on-chip, and seven buf_4 buffers to the pins.' },
-  loop: { img: 'assets/sch_loop.png?v=6',  alt: 'Integrator and resistor DAC schematic', cap: 'Integrator and DAC: Rin = 49.7 kΩ, seven 1.04 MΩ elements, two 24 × 25 µm MIM capacitors (2.43 pF) and an NMOS reset switch.' },
-  ota:  { img: 'assets/sch_ota5t.png?v=6', alt: 'OTA and clamp schematic', cap: 'OTA and clamp: 48/3 µm NMOS pair, 16/2 µm PMOS load, 8/2 µm tail, and the five-transistor Miller-compensated clamp on the control voltage.' },
-  vco:  { img: 'assets/sch_vco.png?v=6',   alt: 'Ring VCO schematic', cap: 'Ring VCO: a 4/1 µm V-to-I NMOS over the shared 229.7 kΩ array, 1:1 mirrors, and seven current-starved stages with MOS load capacitors.' },
+  top:  { img: 'assets/sch_top.png?v=8',   alt: 'Top-level schematic', cap: 'Two mirrored halves share a 0.90 V resistive reference, the OTA tail bias, the common-centroid VCO bias resistors and the reset inverter.' },
+  half: { img: 'assets/sch_half.png?v=8',  alt: 'Schematic of one half', cap: 'One half: the OTA-C loop, the seven-stage ring, two ranks of flip-flops with XOR gates that stay on-chip, and seven buf_4 buffers to the pins.' },
+  loop: { img: 'assets/sch_loop.png?v=8',  alt: 'Integrator and resistor DAC schematic', cap: 'Integrator and DAC: Rin = 49.7 kΩ, seven 1.04 MΩ elements, two 24 × 25 µm MIM capacitors (2.43 pF) and an NMOS reset switch.' },
+  ota:  { img: 'assets/sch_ota5t.png?v=8', alt: 'OTA and clamp schematic', cap: 'OTA and clamp: 48/3 µm NMOS pair, 16/2 µm PMOS load, 8/2 µm tail, and the five-transistor Miller-compensated clamp on the control voltage.' },
+  vco:  { img: 'assets/sch_vco.png?v=8',   alt: 'Ring VCO schematic', cap: 'Ring VCO: a 4/1 µm V-to-I NMOS over the shared 229.7 kΩ array, 1:1 mirrors, and seven current-starved stages with MOS load capacitors.' },
 };
 const schImg = document.getElementById('sch-img');
 const schCap = document.getElementById('sch-cap');

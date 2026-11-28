@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Technical Report — tt_um_arcadia1_vco_adc (Zhishuai Zhang)</title>
   <meta name="description" content="Web edition of the 6-page IEEE technical sign-off report for tt_um_arcadia1_vco_adc: a 1.8-V pseudo-differential second-order closed-loop VCO delta-sigma ADC in SkyWater 130 nm CMOS.">
-  <meta name="theme-color" content="#06071a">
+  <meta name="theme-color" content="#f7f8fb">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
           onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}]});"></script>
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
   <header class="topbar">
@@ -23,7 +23,7 @@
       <nav class="nav-links" aria-label="Report Navigation">
         <a href="index.html">3D layout and live model</a>
         <a href="report.html" class="active">HTML Report</a>
-        <a href="assets/vco_adc_report.pdf?v=6" class="nav-pill" target="_blank" rel="noopener">PDF</a>
+        <a href="assets/vco_adc_report.pdf?v=8" class="nav-pill" target="_blank" rel="noopener">PDF</a>
         <a href="javascript:window.print()" class="nav-pill no-print">Print</a>
         <a href="https://github.com/Arcadia-1/tt-vco-adc" class="nav-pill" target="_blank" rel="noopener">GitHub</a>
       </nav>
@@ -45,7 +45,7 @@
       <a href="#sec-refs">References</a>
       <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;">
         <a href="index.html#layout" style="border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--accent);font-weight:600;text-align:center;">Open 3D GDS Viewer →</a>
-        <a href="assets/vco_adc_report.pdf?v=6" target="_blank" rel="noopener" style="border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--ink-2);text-align:center;">IEEE PDF (6 Pages)</a>
+        <a href="assets/vco_adc_report.pdf?v=8" target="_blank" rel="noopener" style="border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--ink-2);text-align:center;">IEEE PDF (6 Pages)</a>
       </div>
     </aside>
 
@@ -105,10 +105,10 @@
 
       <figure class="paper-figure">
         <div style="display:grid;grid-template-columns:1fr 1.35fr;gap:14px;align-items:center;">
-          <img src="assets/sch_top.png?v=6" alt="Top-level schematic" data-zoom="true">
-          <img src="assets/sch_half.png?v=6" alt="Half-channel schematic" data-zoom="true">
-          <img src="assets/sch_loop.png?v=6" alt="OTA-C integrator and RDAC schematic" data-zoom="true">
-          <img src="assets/sch_ota5t.png?v=6" alt="5T OTA and active clamp schematic" data-zoom="true">
+          <img src="assets/sch_top.png?v=8" alt="Top-level schematic" data-zoom="true">
+          <img src="assets/sch_half.png?v=8" alt="Half-channel schematic" data-zoom="true">
+          <img src="assets/sch_loop.png?v=8" alt="OTA-C integrator and RDAC schematic" data-zoom="true">
+          <img src="assets/sch_ota5t.png?v=8" alt="5T OTA and active clamp schematic" data-zoom="true">
         </div>
         <figcaption><strong>Fig. 1. Complete schematics of <code>tt_um_arcadia1_vco_adc</code>:</strong> (top-left) mirrored P/N halves sharing \(V_{\text{ref}}\), OTA bias, and CC VCO bias resistors; (top-right) half-channel loop with <code>buf_4</code>-isolated external outputs; (bottom-left) continuous-time integrator (\(R_{\text{in}}=49.7\,\text{k}\Omega\), \(7\times R_d=1.04\,\text{M}\Omega\), \(C_{\text{int}}=2.43\text{ pF}\)); (bottom-right) low-noise common-centroid 5T OTA with 5-FET Miller-compensated brick-wall active clamp. <em>Click any panel to zoom.</em></figcaption>
       </figure>
@@ -210,17 +210,17 @@
       <p>All simulations ran in <code>ngspice-47</code> with the tapeout-locked SkyWater <code>sky130A</code> BSIM4v5 PDK (<code>open_pdks 0536d02d</code>). AC stability and <code>.noise</code> runs disable <code>option klu</code>, while transient tone sign-off enforces \(\Delta t_{\max}=0.5\text{ ns}\), \(\text{reltol}=10^{-4}\), Gear integration, and \(500\,\Omega\) Tiny Tapeout analog mux series resistance on <code>ua[0:1]</code>.</p>
 
       <figure class="paper-figure">
-        <img src="assets/fig2_stb_noise.png?v=6" alt="Tian stability and BSIM4 noise PSD" data-zoom="true">
+        <img src="assets/fig2_stb_noise.png?v=8" alt="Tian stability and BSIM4 noise PSD" data-zoom="true">
         <figcaption><strong>Fig. 2.</strong> (a) Exact Tian closed-loop integrator stability \(|T(f)|\) and \(\angle T(f)\) across extreme PVT corners (<code>tt</code>/27°C/1.80 V, <code>ss_hh</code>/85°C/1.62 V, <code>ff_ll</code>/−20°C/1.98 V), confirming \(\text{PM}=72.2^\circ\,[67.7^\circ\text{--}79.8^\circ]\) and \(\text{GM}=6.5\text{ dB}\,[6.5\text{--}7.2]\); (b) BSIM4 differential input-referred noise PSD (10 Hz–500 kHz): \(22.9\,\mu\text{V}_{\text{rms}}\) at <code>tt</code>, a worst-case <code>ss_hh</code>/85°C/1.62 V ceiling of 78.3 dB, and 0.00 dB penalty from the active clamp.</figcaption>
       </figure>
 
       <figure class="paper-figure">
-        <img src="assets/fig3_clamp_iso.png?v=6" alt="Active clamp tuning, overload recovery, and digital isolation" data-zoom="true">
+        <img src="assets/fig3_clamp_iso.png?v=8" alt="Active clamp tuning, overload recovery, and digital isolation" data-zoom="true">
         <figcaption><strong>Fig. 3.</strong> (a) VCO tuning \(f_{\text{VCO}}(V_{\text{ctrl}})\): without a clamp the ring would run above 9 MHz into the \(&gt;0.75 f_s\) latch-up zone; the clamp ceilings (\(\le6.66\text{ MHz}\) closed-loop) are marked, inset \(I_{\text{clamp}}(V_{\text{ctrl}})\); (b) forced \(v_{\text{ctrl}}=V_{DD}\) no-reset startup and 10–25 µs rail overload at <code>fs_ll</code>/1.98 V, both locking at 2.50 MHz; (c) full-transistor (<code>dig=0</code>) BSIM4 sweep over \(C_{\text{load}}=0.05\text{--}5.0\text{ pF}\): XOR glitch error stays at 0.10–0.17 ns and rise/fall asymmetry at 0.029 ns.</figcaption>
       </figure>
 
       <figure class="paper-figure">
-        <img src="assets/fig4_spectra_mc.png?v=6" alt="14.65 kHz output spectra, 16-seed MC, and 21-corner PVT" data-zoom="true">
+        <img src="assets/fig4_spectra_mc.png?v=8" alt="14.65 kHz output spectra, 16-seed MC, and 21-corner PVT" data-zoom="true">
         <figcaption><strong>Fig. 4.</strong> (a) True in-band 14.65 kHz (\(N=2048\), bin 3, Hann) differential output spectra for the schematic (<code>tt</code>, <code>sf</code>, <code>ff_hh</code>/−20°C) overlaid with full-transistor flat-PEX <code>tt</code> (70.1 dB SNDR, HD3 = −71.9 dBc, 16×1 pF loads), showing HD2 = 29.3 kHz and HD3 = 43.95 kHz strictly in-band with +40 dB/dec shaping; (b) 16-seed <code>tt_mm</code> mismatch MC histogram (68.1–71.7 dB, med. 71.1 dB, \(\sigma=1.17\text{ dB}\)) and 21-corner PVT + R/C + \(V_{DD}\pm10\%\) distribution.</figcaption>
       </figure>
 
@@ -275,7 +275,7 @@
       </div>
 
       <figure class="paper-figure" style="max-width:520px;margin:28px auto;">
-        <img src="assets/fig5_layout.png?v=6" alt="Annotated core layout of tt_um_arcadia1_vco_adc" data-zoom="true">
+        <img src="assets/fig5_layout.png?v=8" alt="Annotated core layout of tt_um_arcadia1_vco_adc" data-zoom="true">
         <figcaption><strong>Fig. 5. Annotated layout of <code>tt_um_arcadia1_vco_adc</code></strong> (161.0 × 225.76 µm², <code>sky130A</code> 1×2 tile) highlighting mirrored digital banks, 7-stage VCOs, CC bias resistor array, RDACs, CC OTAs with active clamps, MIM caps, and 699× <code>decap_12</code>. <a href="index.html#layout">Launch Interactive 3D / 2D GDS Explorer →</a></figcaption>
       </figure>
 
@@ -308,7 +308,7 @@
       <span><strong>tt_um_arcadia1_vco_adc</strong> · Zhishuai Zhang · Tiny Tapeout SKY26e</span>
       <span class="mono" style="font-size:12px;">
         <a href="index.html">3D Showcase</a> ·
-        <a href="assets/vco_adc_report.pdf?v=6" target="_blank" rel="noopener">Download IEEE PDF</a> ·
+        <a href="assets/vco_adc_report.pdf?v=8" target="_blank" rel="noopener">Download IEEE PDF</a> ·
         <a href="https://github.com/Arcadia-1/tt-vco-adc" target="_blank" rel="noopener">GitHub</a>
       </span>
     </div>

@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VCO ΔΣ ADC on Sky130A: tt_um_arcadia1_vco_adc</title>
   <meta name="description" content="Open-source 1.8 V second-order closed-loop VCO delta-sigma ADC in SkyWater 130 nm for Tiny Tapeout SKY26e. Walk through the real GDS in 3D, run a live model of the converter, and read the sign-off data.">
-  <meta name="theme-color" content="#06071a">
+  <meta name="theme-color" content="#f7f8fb">
   <link rel="preload" href="assets/fonts/roboto-flex-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=8">
   <script type="importmap">
     { "imports": { "three": "./vendor/three.module.min.js", "three/addons/": "./vendor/addons/" } }
   </script>
@@ -99,7 +99,7 @@
       <div class="chip-steps">
         <div class="step step-hero" data-scene="hero"></div>
 
-        <article class="step" data-scene="rdac" style="--blk:#3fd1c1">
+        <article class="step" data-scene="rdac" style="--blk:#0F9488">
           <div class="step-body">
             <p class="step-count mono">1 of 6, following the signal</p>
             <h2>Current in, current back</h2>
@@ -108,7 +108,7 @@
           </div>
         </article>
 
-        <article class="step" data-scene="ota" style="--blk:#a98bff">
+        <article class="step" data-scene="ota" style="--blk:#7C3AED">
           <div class="step-body">
             <p class="step-count mono">2 of 6</p>
             <h2>Five transistors hold the summing node</h2>
@@ -117,7 +117,7 @@
           </div>
         </article>
 
-        <article class="step" data-scene="mim" style="--blk:#f2c14e">
+        <article class="step" data-scene="mim" style="--blk:#D97706">
           <div class="step-body">
             <p class="step-count mono">3 of 6</p>
             <h2>2.43 pF remembers the error</h2>
@@ -126,7 +126,7 @@
           </div>
         </article>
 
-        <article class="step" data-scene="clamp" style="--blk:#ff6b5e">
+        <article class="step" data-scene="clamp" style="--blk:#DC2626">
           <div class="step-body">
             <p class="step-count mono">4 of 6</p>
             <h2>A clamp that costs nothing until it is needed</h2>
@@ -135,7 +135,7 @@
           </div>
         </article>
 
-        <article class="step" data-scene="vco" style="--blk:#3ddc84">
+        <article class="step" data-scene="vco" style="--blk:#16A34A">
           <div class="step-body">
             <p class="step-count mono">5 of 6</p>
             <h2>The quantizer is a ring oscillator</h2>
@@ -144,7 +144,7 @@
           </div>
         </article>
 
-        <article class="step" data-scene="digital" style="--blk:#5b8cff">
+        <article class="step" data-scene="digital" style="--blk:#2563EB">
           <div class="step-body">
             <p class="step-count mono">6 of 6</p>
             <h2>Sample, XOR, count</h2>
@@ -153,7 +153,7 @@
           </div>
         </article>
 
-        <article class="step" data-scene="outro" style="--blk:#8fb4ff">
+        <article class="step" data-scene="outro" style="--blk:#475569">
           <div class="step-body">
             <h2>That is the whole converter</h2>
             <p>161 by 226 µm, 14,954 rectangles on nine layers, 48,126 contacts and vias between them, and 699 decoupling cells filling the rest of the tile. Take the camera and look around: every block and layer can be isolated.</p>
@@ -277,17 +277,17 @@
         </div>
 
         <div class="changes">
-          <article style="--blk:#a98bff">
+          <article style="--blk:#7C3AED">
             <h3>A quieter input pair</h3>
             <p>A 48/3 µm NMOS pair in a common-centroid layout over a 16/2 µm PMOS load keeps flicker noise low. Gain is 47.8 dB and phase margin stays at 72° over corners.</p>
             <p class="stat mono">22.9 µVrms input noise</p>
           </article>
-          <article style="--blk:#ff6b5e">
+          <article style="--blk:#DC2626">
             <h3>A clamp against false lock</h3>
             <p>Above three quarters of the clock rate, the XOR differentiator aliases backward and the loop latches. A two-stage active clamp with no static current caps the ring at 6.66 MHz and rings by 0.32 mV at most when it engages.</p>
             <p class="stat mono">0.00 dB noise and HD3 penalty</p>
           </article>
-          <article style="--blk:#5b8cff">
+          <article style="--blk:#2563EB">
             <h3>Pads kept off the feedback path</h3>
             <p>Dedicated <code>buf_4</code> buffers separate the 1 to 5 pF pad and mux load from the flip-flops and XOR gates that drive the DAC. Glitch charge and rise-fall asymmetry do not depend on what is connected outside.</p>
             <p class="stat mono">0.10 to 0.16 ns glitch at 1 to 5 pF</p>
@@ -302,7 +302,7 @@
           <button class="tab-btn" data-sch="vco">Ring VCO</button>
         </div>
         <figure class="sch-frame">
-          <img id="sch-img" src="assets/sch_top.png?v=6" alt="Top-level schematic" data-zoom="true">
+          <img id="sch-img" src="assets/sch_top.png?v=8" alt="Top-level schematic" data-zoom="true">
           <figcaption>
             <span id="sch-cap"></span>
             <a href="https://analog-canvas.tokenzhang.com/g/xjr6hy5ce5" target="_blank" rel="noopener">Open the live schematic in Analog Canvas</a>
@@ -364,7 +364,7 @@ y[n]  = yN[n] - yP[n]                 <span class="c"># differential output</spa
               <p>The report has the equations, transistor operating points, the power and noise budgets, and the layout sign-off details.</p>
               <div class="step-actions">
                 <a href="report.html" class="btn btn-primary">Read the report</a>
-                <a href="assets/vco_adc_report.pdf?v=6" class="btn" target="_blank" rel="noopener">Download the PDF, 6 pages</a>
+                <a href="assets/vco_adc_report.pdf?v=8" class="btn" target="_blank" rel="noopener">Download the PDF, 6 pages</a>
               </div>
             </div>
           </div>
@@ -378,7 +378,7 @@ y[n]  = yN[n] - yP[n]                 <span class="c"># differential output</spa
       <span><span class="mono">tt_um_arcadia1_vco_adc</span>, designed by Zhishuai Zhang for Tiny Tapeout SKY26e.</span>
       <span class="footer-links">
         <a href="report.html">Report</a>
-        <a href="assets/vco_adc_report.pdf?v=6" target="_blank" rel="noopener">PDF</a>
+        <a href="assets/vco_adc_report.pdf?v=8" target="_blank" rel="noopener">PDF</a>
         <a href="https://analog-canvas.tokenzhang.com/g/xjr6hy5ce5" target="_blank" rel="noopener">Schematic</a>
         <a href="https://github.com/Arcadia-1/tt-vco-adc" target="_blank" rel="noopener">GitHub</a>
       </span>
@@ -387,6 +387,6 @@ y[n]  = yN[n] - yP[n]                 <span class="c"># differential output</spa
 
   <div class="lightbox" id="lightbox" aria-hidden="true"><img id="lightbox-img" src="" alt="Enlarged schematic"></div>
 
-  <script type="module" src="js/main.js?v=6"></script>
+  <script type="module" src="js/main.js?v=8"></script>
 </body>
 </html>

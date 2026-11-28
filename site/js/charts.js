@@ -269,12 +269,12 @@ export async function initMeasurementCharts(dataUrl = 'data/sim_data.json') {
         width: 960, height: 340,
         title: 'True In-Band 14.65 kHz Output PSD (Full-Transistor Flat PEX vs. Schematic)',
         xLabel: 'Frequency (kHz)', yLabel: 'Normalized PSD (dBc / bin)',
-        logX: true, xMin: 4.8, xMax: 5000, yMin: -115, yMax: 6,
+        logX: true, xMin: 4.8, xMax: 5000, yMin: -120, yMax: 6,
         xTicks: [
           { v: 5, l: '5' }, { v: 10, l: '10' }, { v: 20, l: '20' }, { v: 50, l: '50' },
           { v: 100, l: '100' }, { v: 500, l: '500' }, { v: 1000, l: '1M' }, { v: 5000, l: '5M' },
         ],
-        yTicks: [-100, -80, -60, -40, -20, 0].map((v) => ({ v, l: String(v) })),
+        yTicks: [-120, -100, -80, -60, -40, -20, 0].map((v) => ({ v, l: String(v) })),
         bands: [{ x0: 4.8, x1: 50, fill: C.band, opacity: 0.45, label: '50 kHz Signal Band', labelColor: C.navy }],
         vLines: [
           { x: 50, color: C.navy, dash: '5 3', label: 'BW=50k', align: 'start', dy: 13 },
