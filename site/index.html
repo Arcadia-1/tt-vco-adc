@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#f7f8fb">
   <link rel="preload" href="assets/fonts/roboto-flex-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=10">
   <script type="importmap">
     { "imports": { "three": "./vendor/three.module.min.js", "three/addons/": "./vendor/addons/" } }
   </script>
@@ -42,7 +42,7 @@
 
           <div class="hero-copy">
             <p class="hero-kicker">Tiny Tapeout SKY26e, SkyWater 130 nm, one 1×2 analog tile</p>
-            <h1 class="hero-title" id="hero-title">VCO ΔΣ ADC</h1>
+            <h1 class="hero-title" id="hero-title">VCO ΔΣ<br>ADC</h1>
             <div class="hero-row">
               <p class="hero-lead">A second-order, closed-loop delta-sigma converter whose quantizer is a pair of ring oscillators. Open source from schematic to GDS.</p>
               <dl class="hero-specs">
@@ -63,16 +63,11 @@
           <aside class="rail" aria-label="Layout controls">
             <div class="rail-group">
               <div class="rail-head"><span>View</span></div>
-              <div class="seg" role="group" aria-label="View mode">
-                <button id="btn-mode-3d" aria-pressed="true">Orbit</button>
-                <button id="btn-mode-3d-pan" aria-pressed="false">Pan</button>
-                <button id="btn-mode-2d" aria-pressed="false">Top-down</button>
-              </div>
               <label class="slider-row"><span>Separate layers</span><output id="explode-val" class="mono">1.6×</output>
                 <input id="slider-explode" type="range" min="0.6" max="8" step="0.1" value="1.6">
               </label>
               <div class="chips">
-                <button id="btn-reset" class="chip-btn">Reset view</button>
+                <button id="btn-reset" class="chip-btn" title="Fit the whole tile (F)">Fit view <kbd>F</kbd></button>
                 <button id="btn-toggle-decap" class="chip-btn" aria-pressed="true">Decap cells</button>
                 <button id="btn-toggle-labels" class="chip-btn" aria-pressed="true">Labels</button>
                 <button id="btn-toggle-vias" class="chip-btn" aria-pressed="true">Vias</button>
@@ -92,6 +87,7 @@
           <div class="explore-hud mono"><span id="hud-coords">161.0 × 225.8 µm</span></div>
           <div class="info-card" id="info-card"></div>
           <p class="stage-hint" id="stage-hint"></p>
+          <canvas class="view-gizmo" id="view-gizmo" width="112" height="112" aria-label="View orientation: drag to rotate, click an axis to look along it"></canvas>
           <button class="explore-close btn" id="explore-close">Close <kbd>Esc</kbd></button>
         </div>
       </div>
@@ -99,64 +95,48 @@
       <div class="chip-steps">
         <div class="step step-hero" data-scene="hero"></div>
 
-        <article class="step" data-scene="rdac" style="--blk:#0F9488">
+        <article class="step step-tour" data-scene="rdac" id="tour">
           <div class="step-body">
-            <p class="step-count mono">1 of 6, following the signal</p>
-            <h2>Current in, current back</h2>
-            <p>Each input meets the feedback as a current. A 49.7 kΩ resistor brings the signal in; seven 1.04 MΩ resistors, switched by the output bits, pull it back out. Both are cut from the same poly strips, so sheet-resistance drift cancels out of the gain.</p>
+            <p class="step-count mono" style="--blk:#475569">Following the signal through the tile</p>
+            <div class="tour-tabs" role="tablist" aria-label="Blocks">
+              <button class="tour-tab" role="tab" data-scene="rdac" style="--blk:#0F9488" aria-selected="true"><span class="mono">1</span>Resistor DAC</button>
+              <button class="tour-tab" role="tab" data-scene="ota" style="--blk:#7C3AED" aria-selected="false"><span class="mono">2</span>OTA</button>
+              <button class="tour-tab" role="tab" data-scene="mim" style="--blk:#D97706" aria-selected="false"><span class="mono">3</span>MIM integrator</button>
+              <button class="tour-tab" role="tab" data-scene="clamp" style="--blk:#DC2626" aria-selected="false"><span class="mono">4</span>Clamp</button>
+              <button class="tour-tab" role="tab" data-scene="vco" style="--blk:#16A34A" aria-selected="false"><span class="mono">5</span>Ring VCO</button>
+              <button class="tour-tab" role="tab" data-scene="digital" style="--blk:#2563EB" aria-selected="false"><span class="mono">6</span>Sample and XOR</button>
+            </div>
+            <div class="tour-pane" role="tabpanel" data-scene="rdac" style="--blk:#0F9488">
+              <h2>Current in, current back</h2>
+              <p>Each input meets the feedback as a current. A 49.7 kΩ resistor brings the signal in; seven 1.04 MΩ resistors, switched by the output bits, pull it back out. Both are cut from the same poly strips, so sheet-resistance drift cancels out of the gain.</p>
             <ul class="facts mono"><li>±0.60 V differential full scale</li><li>42 matched strips plus dummies per half</li></ul>
-          </div>
-        </article>
-
-        <article class="step" data-scene="ota" style="--blk:#7C3AED">
-          <div class="step-body">
-            <p class="step-count mono">2 of 6</p>
-            <h2>Five transistors hold the summing node</h2>
-            <p>The input pair is 48/3 µm, laid out A A B B B B A A around a common centroid. The large gate area keeps flicker noise low: 22.9 µVrms referred to the input over 0.1 to 50 kHz.</p>
-            <ul class="facts mono"><li>47.8 dB gain, 14.7 MHz GBW</li><li>72° phase margin, 23 µA tail</li></ul>
-          </div>
-        </article>
-
-        <article class="step" data-scene="mim" style="--blk:#D97706">
-          <div class="step-body">
-            <p class="step-count mono">3 of 6</p>
-            <h2>2.43 pF remembers the error</h2>
-            <p>Two MIM capacitors per half sit between metal 3 and metal 4, pulled apart here so you can see them. They integrate the difference between input and feedback. The ring integrates its own phase as well, so the loop has two integrators and shapes quantization noise to second order.</p>
-            <ul class="facts mono"><li>2 × 24 × 25 µm per half</li><li>Unity gain at 1.32 MHz</li></ul>
-          </div>
-        </article>
-
-        <article class="step" data-scene="clamp" style="--blk:#DC2626">
-          <div class="step-body">
-            <p class="step-count mono">4 of 6</p>
-            <h2>A clamp that costs nothing until it is needed</h2>
-            <p>Past 7.5 MHz the phase detector aliases, and the loop would lock itself near 8.5 MHz and stay there. Five transistors beside each OTA keep the control voltage low enough that the ring never passes 6.66 MHz.</p>
-            <ul class="facts mono"><li>14 to 49 nA leakage in normal operation</li><li>0.00 dB noise and distortion penalty</li></ul>
-          </div>
-        </article>
-
-        <article class="step" data-scene="vco" style="--blk:#16A34A">
-          <div class="step-body">
-            <p class="step-count mono">5 of 6</p>
-            <h2>The quantizer is a ring oscillator</h2>
-            <p>Seven current-starved inverters. The integrator sets how fast they run, and how far the edge travels in one clock period is the measurement. At mid-scale the loop holds both rings at a quarter of the clock, 2.50 MHz.</p>
-            <ul class="facts mono"><li>8.48 MHz/V</li><li>11.5 µW for both rings</li></ul>
-          </div>
-        </article>
-
-        <article class="step" data-scene="digital" style="--blk:#2563EB">
-          <div class="step-body">
-            <p class="step-count mono">6 of 6</p>
-            <h2>Sample, XOR, count</h2>
-            <p>Flip-flops sample all seven phases at 10 MHz. XOR with the previous sample marks every stage the edge crossed, and those bits drive the resistor DAC directly. Output buffers keep pad capacitance away from that feedback path.</p>
-            <ul class="facts mono"><li>14 flip-flops and 7 XOR gates per half</li><li>Feedback glitch under 0.16 ns with 1 to 5 pF on the pins</li></ul>
-          </div>
-        </article>
-
-        <article class="step" data-scene="outro" style="--blk:#475569">
-          <div class="step-body">
-            <h2>That is the whole converter</h2>
-            <p>161 by 226 µm, 14,954 rectangles on nine layers, 48,126 contacts and vias between them, and 699 decoupling cells filling the rest of the tile. Take the camera and look around: every block and layer can be isolated.</p>
+            </div>
+            <div class="tour-pane" role="tabpanel" data-scene="ota" style="--blk:#7C3AED" hidden>
+              <h2>Five transistors hold the summing node</h2>
+              <p>The input pair is 48/3 µm, laid out A A B B B B A A around a common centroid. The large gate area keeps flicker noise low: 22.9 µVrms referred to the input over 0.1 to 50 kHz.</p>
+              <ul class="facts mono"><li>47.8 dB gain, 14.7 MHz GBW</li><li>72° phase margin, 23 µA tail</li></ul>
+            </div>
+            <div class="tour-pane" role="tabpanel" data-scene="mim" style="--blk:#D97706" hidden>
+              <h2>2.43 pF remembers the error</h2>
+              <p>Two MIM capacitors per half sit between metal 3 and metal 4, pulled apart here so you can see them. They integrate the difference between input and feedback. The ring integrates its own phase as well, so the loop has two integrators and shapes quantization noise to second order.</p>
+              <ul class="facts mono"><li>2 × 24 × 25 µm per half</li><li>Unity gain at 1.32 MHz</li></ul>
+            </div>
+            <div class="tour-pane" role="tabpanel" data-scene="clamp" style="--blk:#DC2626" hidden>
+              <h2>A clamp that costs nothing until it is needed</h2>
+              <p>Past 7.5 MHz the phase detector aliases, and the loop would lock itself near 8.5 MHz and stay there. Five transistors beside each OTA keep the control voltage low enough that the ring never passes 6.66 MHz.</p>
+              <ul class="facts mono"><li>14 to 49 nA leakage in normal operation</li><li>0.00 dB noise and distortion penalty</li></ul>
+            </div>
+            <div class="tour-pane" role="tabpanel" data-scene="vco" style="--blk:#16A34A" hidden>
+              <h2>The quantizer is a ring oscillator</h2>
+              <p>Seven current-starved inverters. The integrator sets how fast they run, and how far the edge travels in one clock period is the measurement. At mid-scale the loop holds both rings at a quarter of the clock, 2.50 MHz.</p>
+              <ul class="facts mono"><li>8.48 MHz/V</li><li>11.5 µW for both rings</li></ul>
+            </div>
+            <div class="tour-pane" role="tabpanel" data-scene="digital" style="--blk:#2563EB" hidden>
+              <h2>Sample, XOR, count</h2>
+              <p>Flip-flops sample all seven phases at 10 MHz. XOR with the previous sample marks every stage the edge crossed, and those bits drive the resistor DAC directly. Output buffers keep pad capacitance away from that feedback path.</p>
+              <ul class="facts mono"><li>14 flip-flops and 7 XOR gates per half</li><li>Feedback glitch under 0.16 ns with 1 to 5 pF on the pins</li></ul>
+            </div>
+            <p class="tour-total mono">161 × 226 µm, 14,954 rectangles on nine layers, 48,126 contacts and vias, 699 decap cells.</p>
             <div class="step-actions">
               <button class="btn btn-primary" id="explore-open">Explore the layout</button>
               <a class="btn" href="https://gds-viewer.tinytapeout.com/?pdk=sky130A&amp;model=https%3A%2F%2Fvco-dsm.tokenzhang.com%2Ftinytapeout.oas" target="_blank" rel="noopener">Open in the Tiny Tapeout viewer</a>
@@ -302,7 +282,7 @@
           <button class="tab-btn" data-sch="vco">Ring VCO</button>
         </div>
         <figure class="sch-frame">
-          <img id="sch-img" src="assets/sch_top.png?v=8" alt="Top-level schematic" data-zoom="true">
+          <img id="sch-img" src="assets/sch_top.png?v=10" alt="Top-level schematic" data-zoom="true">
           <figcaption>
             <span id="sch-cap"></span>
             <a href="https://analog-canvas.tokenzhang.com/g/xjr6hy5ce5" target="_blank" rel="noopener">Open the live schematic in Analog Canvas</a>
@@ -364,7 +344,7 @@ y[n]  = yN[n] - yP[n]                 <span class="c"># differential output</spa
               <p>The report has the equations, transistor operating points, the power and noise budgets, and the layout sign-off details.</p>
               <div class="step-actions">
                 <a href="report.html" class="btn btn-primary">Read the report</a>
-                <a href="assets/vco_adc_report.pdf?v=8" class="btn" target="_blank" rel="noopener">Download the PDF, 6 pages</a>
+                <a href="assets/vco_adc_report.pdf?v=10" class="btn" target="_blank" rel="noopener">Download the PDF, 6 pages</a>
               </div>
             </div>
           </div>
@@ -378,7 +358,7 @@ y[n]  = yN[n] - yP[n]                 <span class="c"># differential output</spa
       <span><span class="mono">tt_um_arcadia1_vco_adc</span>, designed by Zhishuai Zhang for Tiny Tapeout SKY26e.</span>
       <span class="footer-links">
         <a href="report.html">Report</a>
-        <a href="assets/vco_adc_report.pdf?v=8" target="_blank" rel="noopener">PDF</a>
+        <a href="assets/vco_adc_report.pdf?v=10" target="_blank" rel="noopener">PDF</a>
         <a href="https://analog-canvas.tokenzhang.com/g/xjr6hy5ce5" target="_blank" rel="noopener">Schematic</a>
         <a href="https://github.com/Arcadia-1/tt-vco-adc" target="_blank" rel="noopener">GitHub</a>
       </span>
@@ -387,6 +367,6 @@ y[n]  = yN[n] - yP[n]                 <span class="c"># differential output</spa
 
   <div class="lightbox" id="lightbox" aria-hidden="true"><img id="lightbox-img" src="" alt="Enlarged schematic"></div>
 
-  <script type="module" src="js/main.js?v=8"></script>
+  <script type="module" src="js/main.js?v=10"></script>
 </body>
 </html>

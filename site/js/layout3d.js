@@ -172,7 +172,7 @@ export const BLOCKS = [
 
 /** Scroll-tour scenes. `block` picks focus + highlight; the rest overrides the block defaults. */
 const SCENES = {
-  hero:  { block: 'all', az: -0.62, el: 0.56, dist: 390, explode: 3.4, shift: [0.15, -0.17], spin: true, y: 118 },
+  hero:  { block: 'all', az: -0.62, el: 0.56, dist: 390, explode: 3.4, shift: [0.22, -0.04], spin: true, y: 118 },
   rdac: {}, ota: {}, mim: {}, clamp: {}, vco: {}, digital: {},
   outro: { block: 'all', az: 0.0, el: 1.18, dist: 330, explode: 1.6, shift: [0.2, 0] },
 };
@@ -614,9 +614,8 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
     }
     const hint = $('stage-hint');
     if (hint) {
-      hint.textContent = viewMode === '2d' ? 'Drag to pan, scroll to zoom, click a block'
-        : dragTool === 'pan' ? 'Drag to pan, right-drag to rotate, scroll to zoom'
-        : 'Drag to rotate, right-drag or hold Space to pan, scroll to zoom';
+      hint.textContent = viewMode === '2d' ? 'Drag to pan, scroll to zoom, F to fit. Drag the ball to tilt'
+        : 'Drag to rotate, right-drag or Space to pan, scroll to zoom, F to fit';
     }
   }
 
@@ -635,9 +634,6 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
     const prev = viewMode;
     viewMode = m;
     if (m === '3d') dragTool = tool;
-    $('btn-mode-3d')?.setAttribute('aria-pressed', String(m === '3d' && dragTool === 'orbit'));
-    $('btn-mode-3d-pan')?.setAttribute('aria-pressed', String(m === '3d' && dragTool === 'pan'));
-    $('btn-mode-2d')?.setAttribute('aria-pressed', String(m === '2d'));
     applyControls();
     // looking straight down, every metal face mirrors the key light: turn the glare off
     const flat = m === '2d';
@@ -712,9 +708,6 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
       syncVisibility();
     });
   }
-  $('btn-mode-3d')?.addEventListener('click', () => setViewMode('3d', 'orbit'));
-  $('btn-mode-3d-pan')?.addEventListener('click', () => setViewMode('3d', 'pan'));
-  $('btn-mode-2d')?.addEventListener('click', () => setViewMode('2d'));
   $('btn-reset')?.addEventListener('click', () => focusBlock('all'));
   $('slider-explode')?.addEventListener('input', (e) => {
     const v = parseFloat(e.target.value);
@@ -745,6 +738,7 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
   window.addEventListener('keydown', (e) => {
     if (mode !== 'explore') return;
     if (e.key === 'Escape') setExplore(false);
+    if ((e.key === 'f' || e.key === 'F') && !e.metaKey && !e.ctrlKey && !e.altKey && !e.target.closest?.('input, textarea')) focusBlock('all');
     if (e.code === 'Space' && pointerInside && viewMode === '3d' && !spacePan) {
       e.preventDefault();
       spacePan = true;
@@ -754,6 +748,80 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
   window.addEventListener('keyup', (e) => {
     if (e.code === 'Space' && spacePan) { spacePan = false; applyControls(); }
   });
+
+
+  // ---- view gizmo: a small sphere with the tile's axes; drag it to orbit, click an axis to look along it ----
+  const giz = $('view-gizmo');
+  const gctx = giz?.getContext('2d');
+  // chip axes in world space: x east, y north (world -Z), z up (world +Y)
+  const GAXES = [
+    { l: 'X', v: new THREE.Vector3(1, 0, 0), c: '#DC2626', view: { az: Math.PI / 2, el: 0.06 } },
+    { l: 'Y', v: new THREE.Vector3(0, 0, -1), c: '#16A34A', view: { az: Math.PI, el: 0.06 } },
+    { l: 'Z', v: new THREE.Vector3(0, 1, 0), c: '#2563EB', view: 'top' },
+    { l: '', v: new THREE.Vector3(-1, 0, 0), c: '#DC2626', view: { az: -Math.PI / 2, el: 0.06 } },
+    { l: '', v: new THREE.Vector3(0, 0, 1), c: '#16A34A', view: { az: 0, el: 0.06 } },
+  ];
+  const gq = new THREE.Quaternion(), gv = new THREE.Vector3();
+  let gHits = [];
+  function drawGizmo() {
+    if (!gctx || mode !== 'explore') return;
+    const dpr = window.devicePixelRatio || 1, S = 112;
+    if (giz.width !== S * dpr) { giz.width = giz.height = S * dpr; }
+    const g = gctx; g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, S, S);
+    const cx = S / 2, cy = S / 2, R = 40;
+    gq.copy(camera.quaternion).invert();
+    const P = (v) => { gv.copy(v).applyQuaternion(gq); return { x: cx + gv.x * R, y: cy - gv.y * R, z: gv.z }; };
+    g.beginPath(); g.arc(cx, cy, R + 6, 0, Math.PI * 2);
+    g.fillStyle = 'rgba(255,255,255,0.88)'; g.fill(); g.strokeStyle = 'rgba(15,23,42,0.18)'; g.lineWidth = 1; g.stroke();
+    // equator (the tile plane) and one meridian give the ball its shape
+    for (const ring of [(t) => new THREE.Vector3(Math.cos(t), 0, Math.sin(t)), (t) => new THREE.Vector3(Math.cos(t), Math.sin(t), 0)]) {
+      g.beginPath();
+      for (let i = 0; i <= 48; i++) { const p = P(ring((i / 48) * Math.PI * 2)); i ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y); }
+      g.strokeStyle = 'rgba(15,23,42,0.13)'; g.stroke();
+    }
+    const pts = GAXES.map((a) => ({ ...a, p: P(a.v) })).sort((a, b) => a.p.z - b.p.z);
+    gHits = [];
+    for (const a of pts) {
+      const { x, y, z } = a.p, back = z < 0;
+      g.globalAlpha = back ? 0.45 : 1;
+      if (a.l) { g.beginPath(); g.moveTo(cx, cy); g.lineTo(x, y); g.strokeStyle = a.c; g.lineWidth = 2; g.stroke(); }
+      g.beginPath(); g.arc(x, y, a.l ? 9 : 5.5, 0, Math.PI * 2);
+      if (a.l) { g.fillStyle = a.c; g.fill(); g.fillStyle = '#fff'; g.font = '600 11px "Geist Mono", ui-monospace, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(a.l, x, y + 0.5); }
+      else { g.fillStyle = '#fff'; g.fill(); g.strokeStyle = a.c; g.lineWidth = 1.6; g.stroke(); }
+      g.globalAlpha = 1;
+      gHits.push({ x, y, r: a.l ? 10 : 7, a });
+    }
+  }
+  if (giz) {
+    let drag = null;
+    giz.addEventListener('pointerdown', (e) => {
+      drag = { x: e.clientX, y: e.clientY, moved: false };
+      giz.setPointerCapture(e.pointerId);
+    });
+    giz.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 3) return;
+      drag.moved = true; drag.x = e.clientX; drag.y = e.clientY;
+      if (viewMode === '2d') setViewMode('3d');
+      anim = null;
+      const p = readPose();
+      p.az -= dx * 0.012;
+      p.el = THREE.MathUtils.clamp(p.el + dy * 0.012, 0.03, Math.PI / 2 - 0.002);
+      writePose(p); controls.update(); touch();
+    });
+    giz.addEventListener('pointerup', (e) => {
+      const d = drag; drag = null;
+      if (!d || d.moved) return;
+      const r = giz.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+      const hit = [...gHits].reverse().find((h) => Math.hypot(h.x - mx, h.y - my) <= h.r);
+      if (!hit) return;
+      if (hit.a.view === 'top') { setViewMode('2d'); return; }
+      if (viewMode === '2d') setViewMode('3d');
+      const p = readPose();
+      flyTo({ ...p, az: hit.a.view.az, el: hit.a.view.el }, 0.7);
+    });
+  }
 
   // ---- projected HTML labels -----------------------------------------------------
   const labelNodes = [];
@@ -925,6 +993,7 @@ export async function initChip(dataUrl = 'data/layout3d.json') {
     controls.update();
     camera.setViewOffset(vw, vh, -shift[0] * vw, -shift[1] * vh, vw, vh);
     composer.render();
+    drawGizmo();
 
     if (labelNodes.length) {
       const zl = STACK_TOP * explode + 5;
