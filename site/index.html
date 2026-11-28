@@ -3,280 +3,384 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>tt_um_arcadia1_vco_adc — 1.8-V 2nd-Order Closed-Loop VCO ΔΣ ADC (Sky130A)</title>
-  <meta name="description" content="Open-source 1.8-V pseudo-differential second-order closed-loop VCO delta-sigma ADC in SkyWater 130 nm CMOS (Tiny Tapeout SKY26e). Interactive 3D GDS layout, schematics, sign-off measurements, and HTML technical report.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  <title>VCO ΔΣ ADC on Sky130A: tt_um_arcadia1_vco_adc</title>
+  <meta name="description" content="Open-source 1.8 V second-order closed-loop VCO delta-sigma ADC in SkyWater 130 nm for Tiny Tapeout SKY26e. Walk through the real GDS in 3D, run a live model of the converter, and read the sign-off data.">
+  <meta name="theme-color" content="#06071a">
+  <link rel="preload" href="assets/fonts/roboto-flex-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three.module.min.js", "three/addons/": "./vendor/addons/" } }
+  </script>
 </head>
-<body>
-  <!-- Sticky Topbar -->
+<body class="home">
+  <a class="skip" href="#live">Skip the 3D tour</a>
+
   <header class="topbar">
     <div class="topbar-inner">
-      <a href="#top" class="brand">
-        <span class="brand-dot"></span>
-        <span class="mono">tt_um_arcadia1_vco_adc</span>
-        <span class="brand-tag">SKY26e · 130nm</span>
-      </a>
+      <a href="#top" class="brand"><span class="brand-dot"></span><span class="mono">tt_um_arcadia1_vco_adc</span></a>
       <nav class="nav-links" aria-label="Primary">
-        <a href="#layout" class="active">3D Layout</a>
-        <a href="#architecture">Architecture</a>
-        <a href="#measurements">Measurements</a>
-        <a href="#pinout">Pinout &amp; Test</a>
-        <a href="report.html">HTML Report</a>
-        <a href="assets/vco_adc_report.pdf" class="nav-pill" target="_blank" rel="noopener">PDF</a>
-        <a href="https://github.com/Arcadia-1/tt-vco-adc" class="nav-pill" target="_blank" rel="noopener">GitHub ↗</a>
+        <a href="#chip" class="nav-sec">Layout</a>
+        <a href="#live" class="nav-sec">Live model</a>
+        <a href="#results" class="nav-sec">Results</a>
+        <a href="#circuit" class="nav-sec">Circuit</a>
+        <a href="#pinout" class="nav-sec">Pinout</a>
+        <a href="report.html" class="nav-pill">Report</a>
+        <a href="https://github.com/Arcadia-1/tt-vco-adc" class="nav-pill" target="_blank" rel="noopener">GitHub</a>
       </nav>
     </div>
   </header>
 
   <main id="top">
-    <!-- Hero -->
-    <section class="hero">
-      <div class="container">
-        <div class="eyebrow">Tiny Tapeout SKY26e · SkyWater sky130A 130 nm CMOS · 1×2 Analog Tile</div>
-        <h1>A 1.8-V Pseudo-Differential Second-Order Closed-Loop VCO ΔΣ ADC</h1>
-        <p class="hero-lead">
-          Continuous-time OTA-C integrator cascaded with a 7-stage current-starved ring VCO quantizer, intrinsic barrel-shifted resistor DAC, zero-static-power brick-wall active clamp (<code>CLAMP_A5</code>), and isolated <code>buf_4</code> digital feedback — physically signed off inside <code>161.0 × 225.76 µm²</code>.
-        </p>
-        <div class="hero-meta">
-          <span>Author: <strong>Zhishuai Zhang</strong></span>
-          <span>·</span>
-          <span>Revision: <strong>V2_A5 / V2_03</strong></span>
-          <span>·</span>
-          <span>Sign-off: <strong style="color:var(--teal)">0 DRC · Unique LVS (54/54) · 16/16 Precheck</strong></span>
-        </div>
+    <!-- One WebGL stage for hero, scroll tour and free exploration -->
+    <section class="chip at-hero" id="chip" aria-label="3D layout">
+      <div class="chip-sticky">
+        <div class="chip-stage">
+          <div id="chip-canvas" role="img" aria-label="3D rendering of the chip layout, built from the GDS file"></div>
+          <img class="chip-fallback" src="assets/core_layout.jpg" alt="Layout of the ADC tile" loading="lazy">
+          <div id="chip-labels" aria-hidden="true"></div>
 
-        <div class="btn-row">
-          <a href="#layout" class="btn btn-primary">Explore 3D Silicon Layout</a>
-          <a href="report.html" class="btn">Read Full HTML Technical Report</a>
-          <a href="assets/vco_adc_report.pdf" class="btn btn-ghost" target="_blank" rel="noopener">Download 6-Page IEEE PDF ↓</a>
-          <a href="https://analog-canvas.tokenzhang.com/g/xjr6hy5ce5" class="btn btn-ghost" target="_blank" rel="noopener">Interactive Schematic (Analog Canvas) ↗</a>
-        </div>
-
-        <!-- 6-KPI Strip -->
-        <div class="kpi-strip num">
-          <div class="kpi-cell">
-            <div class="kpi-val">70.1 dB</div>
-            <div class="kpi-label">Flat-PEX SNDR</div>
-            <div class="kpi-sub">69.0–70.6 dB (6/6 PVT)<br>HD3 in-band @ 43.95 kHz</div>
-          </div>
-          <div class="kpi-cell">
-            <div class="kpi-val">79.3 dB</div>
-            <div class="kpi-label">BSIM4 Noise Ceiling</div>
-            <div class="kpi-sub">22.9 µVrms (+10.2 dB)<br>85.3 dB FS DR · 50 kHz BW</div>
-          </div>
-          <div class="kpi-cell">
-            <div class="kpi-val">173.4 µW</div>
-            <div class="kpi-label">ADC Core Power</div>
-            <div class="kpi-sub">96.4 µA @ 1.80 V<br>0.0% clamp static power</div>
-          </div>
-          <div class="kpi-cell">
-            <div class="kpi-val">≤ 6.66 MHz</div>
-            <div class="kpi-label">Brick-Wall VCO Cap</div>
-            <div class="kpi-sub">Below 7.5 MHz latch-up<br>4/4 Flat-PEX stress PASS</div>
-          </div>
-          <div class="kpi-cell">
-            <div class="kpi-val">19–215×</div>
-            <div class="kpi-label">Less DAC Error</div>
-            <div class="kpi-sub">dfxtp_1 + buf_4 isolation<br>Invariant over 0.05–5 pF</div>
-          </div>
-          <div class="kpi-cell">
-            <div class="kpi-val ok">0 · 54 · 16</div>
-            <div class="kpi-label">Physical Sign-Off</div>
-            <div class="kpi-sub">0 DRC · 54/54 LVS<br>16/16 TT Precheck</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Interactive 3D / 2D Real-GDS Silicon Explorer -->
-    <section class="band subtle" id="layout">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <div class="eyebrow">Real Sky130A GDS Geometry · 14,954 Physical Rectangles</div>
-            <h2>Interactive 3D / 2D Silicon Layout Explorer</h2>
-            <p>Rendered directly from <code>tt_um_arcadia1_vco_adc.gds</code> across all 9 Sky130 layers. Orbit in 3D, switch to 2D drag-pan, explode the metal stack vertically, or click any functional block to isolate and inspect it.</p>
-          </div>
-          <a href="https://gds-viewer.tinytapeout.com/?pdk=sky130A&amp;model=https%3A%2F%2Fvco-dsm.tokenzhang.com%2Ftinytapeout.oas" class="btn btn-ghost" target="_blank" rel="noopener">Open in TT OASIS Viewer ↗</a>
-        </div>
-
-        <div class="explorer-shell" id="layout-explorer">
-          <!-- Inspector Rail -->
-          <aside class="explorer-rail">
-            <div class="rail-section">
-              <div class="rail-title"><span>View &amp; Stack</span><span id="explode-val" class="mono">1.6×</span></div>
-              <div class="seg-group">
-                <button id="btn-mode-3d" class="seg-btn active">3D Orbit</button>
-                <button id="btn-mode-2d" class="seg-btn">2D Drag / Pan</button>
-              </div>
-              <div class="ctrl-row">
-                <span>Explode Z</span>
-                <input id="slider-explode" type="range" min="0.5" max="8.0" step="0.1" value="1.6" aria-label="Explode Z Metal Stack">
-              </div>
-              <div class="mini-actions">
-                <button id="btn-reset" class="mini-btn">Reset View</button>
-                <button id="btn-toggle-decap" class="mini-btn active">699× decap</button>
-                <button id="btn-toggle-labels" class="mini-btn active">Labels</button>
-                <button id="btn-toggle-pins" class="mini-btn active">Pins</button>
-                <button id="btn-toggle-photo" class="mini-btn">Die Photo</button>
+          <div class="hero-copy">
+            <p class="hero-kicker">Tiny Tapeout SKY26e, SkyWater 130 nm, one 1×2 analog tile</p>
+            <h1 class="hero-title" id="hero-title">VCO ΔΣ ADC</h1>
+            <div class="hero-row">
+              <p class="hero-lead">A second-order, closed-loop delta-sigma converter whose quantizer is a pair of ring oscillators. Open source from schematic to GDS.</p>
+              <dl class="hero-specs">
+                <div><dt>SNDR</dt><dd>70.1 dB</dd></div>
+                <div><dt>Bandwidth</dt><dd>50 kHz</dd></div>
+                <div><dt>Core power</dt><dd>173 µW</dd></div>
+                <div><dt>Area</dt><dd>0.036 mm²</dd></div>
+              </dl>
+              <div class="hero-actions">
+                <button class="btn btn-primary" data-explore>Explore the layout</button>
+                <a href="report.html" class="btn">Read the report</a>
               </div>
             </div>
+          </div>
+          <p class="chip-ticker mono" id="chip-ticker" aria-live="polite">Loading 14,954 rectangles</p>
 
-            <div class="rail-section">
-              <div class="rail-title"><span>Functional Block Highlight</span><span>Click to focus</span></div>
+          <!-- Explore mode chrome -->
+          <aside class="rail" aria-label="Layout controls">
+            <div class="rail-group">
+              <div class="rail-head"><span>View</span></div>
+              <div class="seg" role="group" aria-label="View mode">
+                <button id="btn-mode-3d" aria-pressed="true">Orbit</button>
+                <button id="btn-mode-3d-pan" aria-pressed="false">Pan</button>
+                <button id="btn-mode-2d" aria-pressed="false">Top-down</button>
+              </div>
+              <label class="slider-row"><span>Separate layers</span><output id="explode-val" class="mono">1.6×</output>
+                <input id="slider-explode" type="range" min="0.6" max="8" step="0.1" value="1.6">
+              </label>
+              <div class="chips">
+                <button id="btn-reset" class="chip-btn">Reset view</button>
+                <button id="btn-toggle-decap" class="chip-btn" aria-pressed="true">Decap cells</button>
+                <button id="btn-toggle-labels" class="chip-btn" aria-pressed="true">Labels</button>
+                <button id="btn-toggle-pins" class="chip-btn" aria-pressed="true">Pins</button>
+                <button id="btn-toggle-photo" class="chip-btn" aria-pressed="false">Flat render</button>
+              </div>
+            </div>
+            <div class="rail-group">
+              <div class="rail-head"><span>Blocks</span></div>
               <div class="block-list" id="block-list"></div>
             </div>
-
-            <div class="rail-section">
-              <div class="rail-title"><span>Sky130A Layer Stack</span><span>Toggle</span></div>
+            <div class="rail-group">
+              <div class="rail-head"><span>Layers</span></div>
               <div class="layer-grid" id="layer-grid"></div>
             </div>
           </aside>
+          <div class="explore-hud mono"><span id="hud-coords">161.0 × 225.8 µm</span></div>
+          <div class="info-card" id="info-card"></div>
+          <p class="stage-hint" id="stage-hint"></p>
+          <button class="explore-close btn" id="explore-close">Close <kbd>Esc</kbd></button>
+        </div>
+      </div>
 
-          <!-- WebGL Stage -->
-          <div class="explorer-stage">
-            <div id="die-canvas-wrap"></div>
-            <div id="die-labels"></div>
-            <div class="stage-hud-top">
-              <div class="hud-pill">
-                <span id="hud-coords">161.0 × 225.8 µm</span>
-                <span id="hud-hover" style="color:#38bdf8"></span>
-              </div>
-              <div class="hud-pill">
-                <span>Axis x = 73.6 µm</span>
+      <div class="chip-steps">
+        <div class="step step-hero" data-scene="hero"></div>
+
+        <article class="step" data-scene="rdac" style="--blk:#3fd1c1">
+          <div class="step-body">
+            <p class="step-count mono">1 of 6, following the signal</p>
+            <h2>Current in, current back</h2>
+            <p>Each input meets the feedback as a current. A 49.7 kΩ resistor brings the signal in; seven 1.04 MΩ resistors, switched by the output bits, pull it back out. Both are cut from the same poly strips, so sheet-resistance drift cancels out of the gain.</p>
+            <ul class="facts mono"><li>±0.60 V differential full scale</li><li>42 matched strips plus dummies per half</li></ul>
+          </div>
+        </article>
+
+        <article class="step" data-scene="ota" style="--blk:#a98bff">
+          <div class="step-body">
+            <p class="step-count mono">2 of 6</p>
+            <h2>Five transistors hold the summing node</h2>
+            <p>The input pair is 48/3 µm, laid out A A B B B B A A around a common centroid. That is eighteen times the gate area of the first version, and it takes input noise from 74.6 down to 22.9 µVrms.</p>
+            <ul class="facts mono"><li>47.8 dB gain, 14.7 MHz GBW</li><li>72° phase margin, 23 µA tail</li></ul>
+          </div>
+        </article>
+
+        <article class="step" data-scene="mim" style="--blk:#f2c14e">
+          <div class="step-body">
+            <p class="step-count mono">3 of 6</p>
+            <h2>2.43 pF remembers the error</h2>
+            <p>Two MIM capacitors per half sit between metal 3 and metal 4, pulled apart here so you can see them. They integrate the difference between input and feedback. This integrator is what turns a first-order VCO converter into a second-order one.</p>
+            <ul class="facts mono"><li>2 × 24 × 25 µm per half</li><li>Unity gain at 1.32 MHz</li></ul>
+          </div>
+        </article>
+
+        <article class="step" data-scene="clamp" style="--blk:#ff6b5e">
+          <div class="step-body">
+            <p class="step-count mono">4 of 6</p>
+            <h2>A clamp that costs nothing until it is needed</h2>
+            <p>Past 7.5 MHz the phase detector aliases, and the loop would lock itself near 8.5 MHz and stay there. Five transistors beside each OTA keep the control voltage low enough that the ring never passes 6.66 MHz.</p>
+            <ul class="facts mono"><li>14 to 49 nA leakage in normal operation</li><li>0.00 dB noise and distortion penalty</li></ul>
+          </div>
+        </article>
+
+        <article class="step" data-scene="vco" style="--blk:#3ddc84">
+          <div class="step-body">
+            <p class="step-count mono">5 of 6</p>
+            <h2>The quantizer is a ring oscillator</h2>
+            <p>Seven current-starved inverters. The integrator sets how fast they run, and how far the edge travels in one clock period is the measurement. At mid-scale the loop holds both rings at a quarter of the clock, 2.50 MHz.</p>
+            <ul class="facts mono"><li>8.48 MHz/V</li><li>11.5 µW for both rings</li></ul>
+          </div>
+        </article>
+
+        <article class="step" data-scene="digital" style="--blk:#5b8cff">
+          <div class="step-body">
+            <p class="step-count mono">6 of 6</p>
+            <h2>Sample, XOR, count</h2>
+            <p>Flip-flops sample all seven phases at 10 MHz. XOR with the previous sample marks every stage the edge crossed, and those bits drive the resistor DAC directly. Output buffers keep pad capacitance away from that feedback path.</p>
+            <ul class="facts mono"><li>14 flip-flops and 7 XOR gates per half</li><li>19 to 90× less glitch error with buf_4</li></ul>
+          </div>
+        </article>
+
+        <article class="step" data-scene="outro" style="--blk:#8fb4ff">
+          <div class="step-body">
+            <h2>That is the whole converter</h2>
+            <p>161 by 226 µm, 14,954 rectangles on nine layers, and 699 decoupling cells filling the rest of the tile. Take the camera and look around: every block and layer can be isolated.</p>
+            <div class="step-actions">
+              <button class="btn btn-primary" id="explore-open">Explore the layout</button>
+              <a class="btn" href="https://gds-viewer.tinytapeout.com/?pdk=sky130A&amp;model=https%3A%2F%2Fvco-dsm.tokenzhang.com%2Ftinytapeout.oas" target="_blank" rel="noopener">Open in the Tiny Tapeout viewer</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Live behavioural model -->
+    <section class="band" id="live">
+      <div class="container">
+        <div class="section-head">
+          <h2>Run the converter in this tab</h2>
+          <p>A sample-by-sample model with the chip's own values: 49.7 kΩ in, seven 1.04 MΩ back, 2.43 pF, 8.48 MHz/V. Move the input, then open the loop and see what the integrator was doing.</p>
+        </div>
+
+        <div class="sim" id="sim">
+          <div class="sim-controls">
+            <label class="slider-row"><span>Input level</span><output id="sim-amp-val" class="mono">−6.0 dBFS</output>
+              <input id="sim-amp" type="range" min="-40" max="0" step="0.5" value="-6">
+            </label>
+            <label class="slider-row"><span>Input frequency</span><output id="sim-freq-val" class="mono">14.65 kHz</output>
+              <input id="sim-freq" type="range" min="3.3" max="4.65" step="0.005" value="4.1658">
+            </label>
+            <div class="ctrl">
+              <span>Loop</span>
+              <div class="seg" role="group" aria-label="Feedback loop">
+                <button data-loop="closed" aria-pressed="true">Closed</button>
+                <button data-loop="open" aria-pressed="false">Open</button>
               </div>
             </div>
-            <div class="stage-info-card" id="stage-info-card"></div>
-            <div class="stage-hint">Drag: Orbit / Pan · Scroll: Zoom · Click die: Highlight block</div>
+            <label class="check"><input type="checkbox" id="sim-noise" checked><span>Input noise, 22.9 µVrms</span></label>
+            <label class="check"><input type="checkbox" id="sim-curve" checked><span>VCO curvature</span></label>
+
+            <dl class="sim-readout">
+              <div><dt>SNDR in 50 kHz</dt><dd><span id="sim-sndr">…</span><small>dB</small></dd></div>
+              <div><dt>Effective bits</dt><dd><span id="sim-enob">…</span></dd></div>
+              <div><dt>Noise shaping</dt><dd class="word"><span id="sim-order">second</span> order</dd></div>
+            </dl>
           </div>
+
+          <figure class="sim-panel sim-scope">
+            <figcaption>
+              <span>One snapshot of the output, slowed down</span>
+              <span class="legend"><span><i class="lg-in"></i>input</span><span><i class="lg-raw"></i>raw output codes</span><span><i class="lg-avg"></i>the same codes, averaged</span></span>
+            </figcaption>
+            <canvas id="sim-scope" aria-label="Input sine wave, raw output codes and their moving average"></canvas>
+          </figure>
+          <figure class="sim-panel sim-rings">
+            <figcaption><span>Ring speed at the cursor</span></figcaption>
+            <canvas id="sim-rings" aria-label="The two ring oscillators speeding up and slowing down with the input"></canvas>
+          </figure>
+          <figure class="sim-panel sim-spec">
+            <figcaption><span>Output spectrum, 16,384-point FFT, averaged</span></figcaption>
+            <canvas id="sim-spec" aria-label="Output spectrum with noise rising away from the signal band"></canvas>
+          </figure>
+        </div>
+        <p class="footnote">This is a behavioural model, not the sign-off data below. The sampler and DAC are ideal, the VCO curvature is fitted to the first open-loop version of this chip (50 to 56 dB after layout), and the noise is white at the level BSIM4 simulation reports. Closed loop it sits near the 79 dB noise ceiling; the extracted layout reaches 70.1 dB because of third-harmonic distortion the model leaves out.</p>
+      </div>
+    </section>
+
+    <!-- Sign-off results -->
+    <section class="band" id="results">
+      <div class="container">
+        <div class="section-head">
+          <h2>Signed off on the extracted layout</h2>
+          <p>Six process and temperature corners, each simulated on the flat-extracted layout: 1,248 devices, 2,443 parasitic capacitors, 1 pF on every output pin. The 14.65 kHz test tone puts its third harmonic at 43.95 kHz, inside the band, so distortion counts against the number.</p>
+        </div>
+
+        <dl class="figures">
+          <div><dd>70.1<small>dB</small></dd><dt>SNDR at the typical corner. 69.0 to 70.6 dB across all six.</dt></div>
+          <div><dd>79.3<small>dB</small></dd><dt>Noise-limited SNR at −6 dBFS, from 22.9 µVrms of input noise.</dt></div>
+          <div><dd>173.4<small>µW</small></dd><dt>ADC core, 96.4 µA from 1.80 V. The clamp adds no static power.</dt></div>
+          <div><dd>6.66<small>MHz</small></dd><dt>Fastest the clamp lets a ring run. False lock starts at 7.5 MHz.</dt></div>
+          <div><dd>19–215<small>×</small></dd><dt>Less feedback timing error with 1 to 5 pF hanging on the pins.</dt></div>
+          <div><dd>0<small>errors</small></dd><dt>DRC clean, 54 of 54 pins unique in LVS, 16 of 16 precheck items.</dt></div>
+        </dl>
+
+        <div class="corners" role="img" aria-label="SNDR at six corners, from 69.0 to 70.6 dB">
+          <div class="corners-head"><span>SNDR by corner</span><span class="axis"><span>68 dB</span><span>69</span><span>70</span><span>71 dB</span></span><span></span></div>
+          <div class="corner"><span class="mono">tt, 27 °C</span><div class="track"><i style="--v:70.1"></i></div><b class="mono">70.1</b></div>
+          <div class="corner"><span class="mono">ss, 85 °C</span><div class="track"><i style="--v:69.0"></i></div><b class="mono">69.0</b></div>
+          <div class="corner"><span class="mono">ff, −20 °C</span><div class="track"><i style="--v:69.3"></i></div><b class="mono">69.3</b></div>
+          <div class="corner"><span class="mono">sf, 27 °C</span><div class="track"><i style="--v:69.3"></i></div><b class="mono">69.3</b></div>
+          <div class="corner"><span class="mono">fs, 27 °C</span><div class="track"><i style="--v:70.6"></i></div><b class="mono">70.6</b></div>
+          <div class="corner"><span class="mono">fs, low R</span><div class="track"><i style="--v:70.4"></i></div><b class="mono">70.4</b></div>
+        </div>
+
+        <details class="more">
+          <summary>All columns for the six corners</summary>
+          <div class="table-wrap">
+            <table class="eng-table">
+              <thead>
+                <tr><th>Corner</th><th class="num">Temp</th><th class="num">SNDR (dB)</th><th class="num">SNR (dB)</th><th class="num">HD2 (dBc)</th><th class="num">HD3 (dBc)</th><th class="num">I<sub>DD</sub> (µA)</th><th class="num">Power (µW)</th><th class="num">f<sub>P</sub> / f<sub>N</sub> (MHz)</th><th>Result</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>pex_tt_27</code></td><td class="num">27 °C</td><td class="num"><strong>70.1</strong></td><td class="num">77.7</td><td class="num">−77.8</td><td class="num">−71.9</td><td class="num">173.5</td><td class="num">312.3</td><td class="num">2.49 / 2.49</td><td><span class="badge-pass">Pass</span></td></tr>
+                <tr><td><code>pex_ss_85</code></td><td class="num">85 °C</td><td class="num"><strong>69.0</strong></td><td class="num">77.9</td><td class="num">−77.4</td><td class="num">−70.4</td><td class="num">176.1</td><td class="num">317.0</td><td class="num">2.50 / 2.50</td><td><span class="badge-pass">Pass</span></td></tr>
+                <tr><td><code>pex_ff_m20</code></td><td class="num">−20 °C</td><td class="num"><strong>69.3</strong></td><td class="num">79.6</td><td class="num">−76.8</td><td class="num">−70.7</td><td class="num">173.2</td><td class="num">311.8</td><td class="num">2.49 / 2.49</td><td><span class="badge-pass">Pass</span></td></tr>
+                <tr><td><code>pex_sf_27</code></td><td class="num">27 °C</td><td class="num"><strong>69.3</strong></td><td class="num">81.9</td><td class="num">−76.8</td><td class="num">−70.5</td><td class="num">177.1</td><td class="num">318.8</td><td class="num">2.50 / 2.50</td><td><span class="badge-pass">Pass</span></td></tr>
+                <tr><td><code>pex_fs_27</code></td><td class="num">27 °C</td><td class="num"><strong>70.6</strong></td><td class="num">79.7</td><td class="num">−76.9</td><td class="num">−72.5</td><td class="num">170.9</td><td class="num">307.6</td><td class="num">2.49 / 2.49</td><td><span class="badge-pass">Pass</span></td></tr>
+                <tr><td><code>pex_fs_ll_27</code></td><td class="num">27 °C</td><td class="num"><strong>70.4</strong></td><td class="num">78.4</td><td class="num">−76.9</td><td class="num">−72.5</td><td class="num">175.4</td><td class="num">315.7</td><td class="num">2.49 / 2.49</td><td><span class="badge-pass">Pass</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="footnote">1.80 V, f<sub>s</sub> = 10 MHz, 50 kHz bandwidth, f<sub>in</sub> = 14.65 kHz. Current and power in this table include the output buffers driving 16 × 1 pF.</p>
+        </details>
+
+        <h3 class="sub">Before and after: the first closed-loop layout (S13) and this one (V2_A5)</h3>
+        <div class="table-wrap">
+          <table class="eng-table compare">
+            <thead><tr><th></th><th>S13</th><th>V2_A5</th><th>Change</th></tr></thead>
+            <tbody>
+              <tr><th>OTA gain, GBW, phase margin</th><td>43.0 dB, 7.9 MHz</td><td>47.8 dB, 14.7 MHz, 72.2°</td><td>+4.8 dB gain</td></tr>
+              <tr><th>Input noise, 0.1 to 50 kHz</th><td>74.6 µVrms</td><td>22.9 µVrms</td><td>+10.2 dB SNR ceiling</td></tr>
+              <tr><th>Ring frequency under stress</th><td><span class="badge-fail">Latched at 7.85 to 8.49 MHz</span></td><td><span class="badge-pass">Held at or below 6.66 MHz</span></td><td>10 of 10 schematic, 4 of 4 PEX runs</td></tr>
+              <tr><th>Glitch with 1 to 5 pF on the pins</th><td>1.92 to 14.82 ns</td><td>0.10 to 0.16 ns</td><td>19 to 90× less</td></tr>
+              <tr><th>Rise and fall asymmetry</th><td>0.58 to 6.01 ns</td><td>0.029 ns</td><td>20 to 215× less</td></tr>
+              <tr><th>Corners and Monte Carlo</th><td>Not run with R, C and 1.98 V</td><td>68.5 to 73.4 dB over 17 corners, 71.1 dB median of 16 seeds</td><td>21 of 21 lock, σ = 1.17 dB</td></tr>
+              <tr><th>Core power</th><td>About 260 µW</td><td>173.4 µW</td><td>No static clamp current</td></tr>
+              <tr><th>Physical checks</th><td>0 DRC, LVS warning on uio_oe</td><td><span class="badge-pass">0 DRC, 54 of 54 LVS pins, 16 of 16 precheck</span></td><td>195 devices, 144 nets match</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
 
-    <!-- Architecture & 3 Breakthroughs -->
-    <section class="band" id="architecture">
+    <!-- Circuit -->
+    <section class="band" id="circuit">
       <div class="container">
         <div class="section-head">
-          <div>
-            <div class="eyebrow">Circuit Architecture &amp; V2 Upgrades</div>
-            <h2>Three Surgical Fixes Over Baseline S13</h2>
-            <p>Each half cascades an OTA-C integrator and 7-stage ring VCO for true second-order (+40 dB/dec) noise shaping and intrinsic first-order DEM. Deep verification eliminated three latent silicon risks.</p>
-          </div>
+          <h2>Three changes that made it tapeout-ready</h2>
+          <p>The architecture did not change: an OTA-C integrator ahead of a seven-stage ring in each half. Deeper verification found three ways the first layout could fail on silicon, and each got a small, local fix.</p>
         </div>
 
-        <div class="card-grid-3" style="margin-bottom:36px;">
-          <div class="feature-card">
-            <div class="feature-num">01 · FRONT-END NOISE</div>
-            <h3>Common-Centroid Low-1/f 5T OTA</h3>
-            <p>Upsizing the NMOS input pair 18× in gate area to <code>48/3 µm</code> (<code>A A B B B B A A</code>) and PMOS load 4× to <code>16/2 µm</code> cuts 1/f noise variance 14.4× while lifting DC gain to 47.8 dB and Tian PM to 72.2° across PVT.</p>
-            <div class="feature-stat">74.6 → 22.9 µVrms (+10.2 dB SNR ceiling)</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-num">02 · ANTI-LATCHUP</div>
-            <h3>5-FET Miller Brick-Wall Clamp (CLAMP_A5)</h3>
-            <p>Above <code>0.75 fs = 7.5 MHz</code>, XOR phase differentiation aliases backward and latches the ring near 8.5 MHz. Our zero-static-power two-stage active clamp leaks only 14–49 nA at 1.15 V yet hard-caps <code>f_VCO ≤ 6.66 MHz</code> with ≤ 0.32 mV ringing.</p>
-            <div class="feature-stat">0.00 dB noise/HD3 penalty · 4/4 PEX PASS</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-num">03 · FEEDBACK INTEGRITY</div>
-            <h3>Dedicated buf_4 Digital Pin Isolation</h3>
-            <p>Separating external 1–5 pF pad/mux loads from internal <code>dfxtp_1 + xor2_1</code> nodes via abutted <code>buf_4</code> buffers eliminates back-to-back XOR glitch charge theft and rise/fall DAC asymmetry, lifting <code>sf</code> flat-PEX HD3 by +11.5 dB.</p>
-            <div class="feature-stat">19–90× less glitch · 20–215× less asym</div>
-          </div>
+        <div class="changes">
+          <article style="--blk:#a98bff">
+            <h3>A quieter input pair</h3>
+            <p>The NMOS pair grew to 48/3 µm in a common-centroid layout and the PMOS load to 16/2 µm. Flicker noise variance falls 14.4 times, while gain rises to 47.8 dB and phase margin stays at 72° over corners.</p>
+            <p class="stat mono">74.6 to 22.9 µVrms</p>
+          </article>
+          <article style="--blk:#ff6b5e">
+            <h3>A clamp against false lock</h3>
+            <p>Above three quarters of the clock rate, the XOR differentiator aliases backward and the loop latches. A two-stage active clamp with no static current caps the ring at 6.66 MHz and rings by 0.32 mV at most when it engages.</p>
+            <p class="stat mono">0.00 dB noise and HD3 penalty</p>
+          </article>
+          <article style="--blk:#5b8cff">
+            <h3>Pads kept off the feedback path</h3>
+            <p>Dedicated <code>buf_4</code> buffers separate the 1 to 5 pF pad and mux load from the flip-flops and XOR gates that drive the DAC. Glitch charge and rise-fall asymmetry stop depending on what is connected outside.</p>
+            <p class="stat mono">HD3 at the sf corner improves 11.5 dB</p>
+          </article>
         </div>
 
-        <!-- Interactive Schematic Switcher -->
-        <div class="tab-bar" id="sch-tabs">
-          <button class="tab-btn active" data-sch="top">Top-Level Tile</button>
-          <button class="tab-btn" data-sch="half">Half-Channel + buf_4 Isolation</button>
-          <button class="tab-btn" data-sch="loop">OTA-C Integrator + 7-Elem RDAC</button>
-          <button class="tab-btn" data-sch="ota">5T OTA + CLAMP_A5</button>
-          <button class="tab-btn" data-sch="vco">7-Stage Current-Starved VCO</button>
+        <div class="tab-bar" id="sch-tabs" role="tablist" aria-label="Schematics">
+          <button class="tab-btn active" data-sch="top">Top level</button>
+          <button class="tab-btn" data-sch="half">One half</button>
+          <button class="tab-btn" data-sch="loop">Integrator and DAC</button>
+          <button class="tab-btn" data-sch="ota">OTA and clamp</button>
+          <button class="tab-btn" data-sch="vco">Ring VCO</button>
         </div>
-
-        <div class="sch-frame">
-          <img id="sch-img" src="assets/sch_top.png" alt="Top-level schematic of tt_um_arcadia1_vco_adc" data-zoom="true">
-          <div class="sch-caption">
-            <span id="sch-cap"><strong>Top-level tile:</strong> Mirrored P/N halves sharing resistive Vref = 0.90 V divider, OTA tail bias (Rb = 43.0 kΩ, XMb = 8/2 µm), common-centroid VCO bias resistors, and rst_n inverter.</span>
-            <a href="https://analog-canvas.tokenzhang.com/g/xjr6hy5ce5" target="_blank" rel="noopener" class="mono" style="font-size:12.5px;white-space:nowrap;">Inspect Live in Analog Canvas ↗</a>
-          </div>
-        </div>
+        <figure class="sch-frame">
+          <img id="sch-img" src="assets/sch_top.png" alt="Top-level schematic" data-zoom="true">
+          <figcaption>
+            <span id="sch-cap"></span>
+            <a href="https://analog-canvas.tokenzhang.com/g/xjr6hy5ce5" target="_blank" rel="noopener">Open the live schematic in Analog Canvas</a>
+          </figcaption>
+        </figure>
       </div>
     </section>
 
-    <!-- Interactive Measurements -->
-    <section class="band subtle" id="measurements">
+    <!-- Measurements -->
+    <section class="band" id="measurements">
       <div class="container">
         <div class="section-head">
-          <div>
-            <div class="eyebrow">100% Real ngspice-47 BSIM4 &amp; Flat-PEX Data</div>
-            <h2>Interactive Sign-Off Verification Explorer</h2>
-            <p>Every trace below is plotted directly from tapeout-locked <code>sky130A</code> (<code>open_pdks 0536d02d</code>) simulation outputs. Hover any chart for exact readouts.</p>
-          </div>
-          <a href="report.html#sec-sim" class="btn btn-ghost">All 6 Tables in HTML Report →</a>
+          <h2>Simulation data, plotted from the files</h2>
+          <p>Every trace is read from the ngspice outputs used for sign-off, on the PDK version locked for tapeout. Hover a chart for exact values.</p>
         </div>
-
-        <div class="tab-bar" id="meas-tabs">
-          <button class="tab-btn active" data-tab="spectra">14.65 kHz Spectra (PEX vs. Sch)</button>
-          <button class="tab-btn" data-tab="noise">BSIM4 Noise &amp; Tian Stability</button>
-          <button class="tab-btn" data-tab="clamp">Anti-Latchup &amp; Digital Isolation</button>
-          <button class="tab-btn" data-tab="pvt">6/6 Flat-PEX · 21 PVT · 16 MC</button>
+        <div class="tab-bar" id="meas-tabs" role="tablist" aria-label="Measurements">
+          <button class="tab-btn active" data-tab="spectra">Spectra</button>
+          <button class="tab-btn" data-tab="noise">Noise and stability</button>
+          <button class="tab-btn" data-tab="clamp">Clamp and isolation</button>
+          <button class="tab-btn" data-tab="pvt">Corners and Monte Carlo</button>
         </div>
-
         <div id="meas-stage"></div>
       </div>
     </section>
 
-    <!-- Pinout & Silicon Bring-Up -->
+    <!-- Pinout -->
     <section class="band" id="pinout">
       <div class="container">
         <div class="section-head">
-          <div>
-            <div class="eyebrow">Tiny Tapeout SKY26e Hardware Interface</div>
-            <h2>Pinout &amp; Off-Chip DSP Decoding</h2>
-            <p>Capture all 16 digital outputs continuously at <code>fs = 10 MHz</code> after releasing <code>rst_n</code> and waiting 30–50 µs for mid-scale lock (<code>MONP / MONN ≈ 2.50 MHz</code>).</p>
-          </div>
+          <h2>Bringing it up on the bench</h2>
+          <p>Clock at 10 MHz, hold <code>rst_n</code> low for 2 µs, release, wait 50 µs, then capture all 16 outputs on every rising edge. Both monitor pins should read about 2.50 MHz once the loop has settled.</p>
         </div>
-
         <div class="pin-grid">
           <div class="table-wrap">
             <table class="eng-table">
-              <thead>
-                <tr><th>TT Pin</th><th>Signal</th><th>Role</th></tr>
-              </thead>
+              <thead><tr><th>Pin</th><th>Signal</th><th>What it does</th></tr></thead>
               <tbody>
-                <tr><td class="mono"><strong>ua[0]</strong></td><td class="mono">VINP</td><td>Positive analog input (0.90 V ± 0.30 V, Rin ≈ 50 kΩ)</td></tr>
-                <tr><td class="mono"><strong>ua[1]</strong></td><td class="mono">VINN</td><td>Negative analog input (0.90 V ± 0.30 V, Rin ≈ 50 kΩ)</td></tr>
-                <tr><td class="mono"><strong>clk</strong></td><td class="mono">CLK</td><td>10 MHz sampling clock (rising edge)</td></tr>
-                <tr><td class="mono"><strong>rst_n</strong></td><td class="mono">RST_N</td><td>Active-low integrator reset (hold low ≥ 2 µs at startup)</td></tr>
-                <tr><td class="mono"><strong>uo_out[6:0]</strong></td><td class="mono">PHP[6..0]</td><td>P-half sampled ring phases (buffered via <code>buf_4</code>)</td></tr>
-                <tr><td class="mono"><strong>uo_out[7]</strong></td><td class="mono">MONP</td><td>Unsampled P-ring stage-0 frequency monitor (~2.50 MHz)</td></tr>
-                <tr><td class="mono"><strong>uio_out[7:1]</strong></td><td class="mono">PHN[6..0]</td><td>N-half sampled ring phases (<code>uio_oe[7:0]</code> tied high via <code>8× conb_1</code>)</td></tr>
-                <tr><td class="mono"><strong>uio_out[0]</strong></td><td class="mono">MONN</td><td>Unsampled N-ring stage-0 frequency monitor (~2.50 MHz)</td></tr>
+                <tr><td class="mono">ua[0]</td><td class="mono">VINP</td><td>Positive input, 0.90 V ± 0.30 V, about 50 kΩ</td></tr>
+                <tr><td class="mono">ua[1]</td><td class="mono">VINN</td><td>Negative input, 0.90 V ± 0.30 V, about 50 kΩ</td></tr>
+                <tr><td class="mono">clk</td><td class="mono">CLK</td><td>10 MHz sampling clock, rising edge</td></tr>
+                <tr><td class="mono">rst_n</td><td class="mono">RST_N</td><td>Active-low integrator reset</td></tr>
+                <tr><td class="mono">uo_out[6:0]</td><td class="mono">PHP[6:0]</td><td>Sampled ring phases, P half</td></tr>
+                <tr><td class="mono">uo_out[7]</td><td class="mono">MONP</td><td>Unsampled P ring, for a frequency counter</td></tr>
+                <tr><td class="mono">uio_out[7:1]</td><td class="mono">PHN[6:0]</td><td>Sampled ring phases, N half</td></tr>
+                <tr><td class="mono">uio_out[0]</td><td class="mono">MONN</td><td>Unsampled N ring, for a frequency counter</td></tr>
               </tbody>
             </table>
           </div>
+          <div class="pin-side">
+            <pre class="code-block"><code><span class="c"># test/decode_vco_adc.py</span>
+<span class="c"># Bit order within the seven phases does not matter.</span>
+yP[n] = popcount(PHP[n] ^ PHP[n-1])   <span class="c"># 0..7, 3.5 at mid-scale</span>
+yN[n] = popcount(PHN[n] ^ PHN[n-1])
+y[n]  = yN[n] - yP[n]                 <span class="c"># differential output</span>
 
-          <div style="display:flex;flex-direction:column;gap:14px;">
-            <pre class="code-block"><code># Off-chip phase-difference decoding (test/decode_vco_adc.py)
-# Bit order within the 7 sampled phases does not matter:
-yP[n] = popcount(PHP[n] ^ PHP[n - 1])   # 0..7 (mean 3.5 @ mid-scale)
-yN[n] = popcount(PHN[n] ^ PHN[n - 1])   # 0..7 (mean 3.5 @ mid-scale)
-y[n]  = yN[n] - yP[n]                   # differential 2nd-order output
-
-# Hardware capture on RP2350 demo board:
-# 1. Assert rst_n low &gt;= 2 us, release, wait 50 us settle
-# 2. Check MONP (uo_out[7]) and MONN (uio_out[0]) ≈ 2.50 MHz
-# 3. Stream GPIO 25..40 via PIO+DMA at 10 MHz (test/capture_vco_adc.py)</code></pre>
-            <div class="feature-card" style="padding:16px 18px;">
-              <div class="feature-num">FULL DOCUMENTATION</div>
-              <p style="margin:0 0 10px;">Want complete equations, exact BSIM4 transistor operating points, power &amp; noise breakdown tables, and layout sign-off details?</p>
-              <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <a href="report.html" class="btn btn-primary" style="padding:7px 13px;font-size:13px;">Open Interactive HTML Report →</a>
-                <a href="assets/vco_adc_report.pdf" class="btn" style="padding:7px 13px;font-size:13px;" target="_blank" rel="noopener">IEEE 6-Page PDF</a>
+<span class="c"># test/capture_vco_adc.py streams GPIO 25..40</span>
+<span class="c"># through PIO and DMA on the RP2350 demo board.</span></code></pre>
+            <div class="docs">
+              <p>The report has the equations, transistor operating points, the power and noise budgets, and the layout sign-off details.</p>
+              <div class="step-actions">
+                <a href="report.html" class="btn btn-primary">Read the report</a>
+                <a href="assets/vco_adc_report.pdf" class="btn" target="_blank" rel="noopener">Download the PDF, 6 pages</a>
               </div>
             </div>
           </div>
@@ -287,60 +391,18 @@ y[n]  = yN[n] - yP[n]                   # differential 2nd-order output
 
   <footer class="site-footer">
     <div class="footer-inner">
-      <span><strong>tt_um_arcadia1_vco_adc</strong> · Designed by Zhishuai Zhang · Tiny Tapeout SKY26e (sky130A)</span>
-      <span class="mono" style="font-size:12px;">
-        <a href="report.html">HTML Report</a> ·
-        <a href="assets/vco_adc_report.pdf" target="_blank" rel="noopener">PDF</a> ·
-        <a href="https://analog-canvas.tokenzhang.com/g/xjr6hy5ce5" target="_blank" rel="noopener">Analog Canvas</a> ·
+      <span><span class="mono">tt_um_arcadia1_vco_adc</span>, designed by Zhishuai Zhang for Tiny Tapeout SKY26e. Rev. V2_A5.</span>
+      <span class="footer-links">
+        <a href="report.html">Report</a>
+        <a href="assets/vco_adc_report.pdf" target="_blank" rel="noopener">PDF</a>
+        <a href="https://analog-canvas.tokenzhang.com/g/xjr6hy5ce5" target="_blank" rel="noopener">Schematic</a>
         <a href="https://github.com/Arcadia-1/tt-vco-adc" target="_blank" rel="noopener">GitHub</a>
       </span>
     </div>
   </footer>
 
-  <!-- Click-to-Zoom Lightbox -->
-  <div class="lightbox" id="lightbox" aria-hidden="true">
-    <img id="lightbox-img" src="" alt="Zoomed schematic">
-  </div>
+  <div class="lightbox" id="lightbox" aria-hidden="true"><img id="lightbox-img" src="" alt="Enlarged schematic"></div>
 
-  <script type="module">
-    import { initLayoutExplorer } from './js/layout3d.js';
-    import { initMeasurementCharts } from './js/charts.js';
-
-    // Initialize Real-GDS 3D/2D Explorer & Real-Data Charts
-    initLayoutExplorer('layout-explorer', 'data/layout3d.json');
-    initMeasurementCharts('data/sim_data.json');
-
-    // Schematic Switcher
-    const SCH = {
-      top:  { img: 'assets/sch_top.png',   cap: '<strong>Top-level tile:</strong> Mirrored P/N halves sharing resistive Vref = 0.90 V divider, OTA tail bias (Rb = 43.0 kΩ, XMb = 8/2 µm), common-centroid VCO bias resistors, and rst_n inverter.' },
-      half: { img: 'assets/sch_half.png',  cap: '<strong>Half-channel (adc_half):</strong> OTA-C loop, 7-stage ring VCO, two-rank dfxtp_1 + xor2_1 differentiator kept strictly on-chip, and 7 dedicated buf_4 output buffers isolating external pin loads.' },
-      loop: { img: 'assets/sch_loop.png',  cap: '<strong>Integrator &amp; 7-element RDAC (so_loop):</strong> Rin = 49.7 kΩ, 7 × Rd = 1.04 MΩ matched xhigh-poly strips, two 24 × 25 µm² MIM capacitors (2.43 pF total), and NMOS reset switch XMr.' },
-      ota:  { img: 'assets/sch_ota5t.png', cap: '<strong>Common-centroid 5T OTA + CLAMP_A5 (ota5t):</strong> 48/3 µm NMOS input pair, 16/2 µm PMOS load, 8/2 µm tail + 5-FET Miller-compensated brick-wall active vctrl clamp (0.00 dB noise/HD3 penalty).' },
-      vco:  { img: 'assets/sch_vco.png',   cap: '<strong>7-stage current-starved ring VCO (vco_core):</strong> 4/1 µm V-to-I NMOS over shared 229.7 kΩ CC resistor array, 1:1 PMOS/NMOS mirror, and 7 identical current-starved stages with 1.4/2.86 µm MOS load caps.' },
-    };
-    const schImg = document.getElementById('sch-img');
-    const schCap = document.getElementById('sch-cap');
-    document.querySelectorAll('#sch-tabs .tab-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const s = SCH[btn.dataset.sch];
-        if (!s) return;
-        document.querySelectorAll('#sch-tabs .tab-btn').forEach((b) => b.classList.toggle('active', b === btn));
-        schImg.src = s.img;
-        schCap.innerHTML = s.cap;
-      });
-    });
-
-    // Zoom Lightbox
-    const lb = document.getElementById('lightbox');
-    const lbImg = document.getElementById('lightbox-img');
-    document.querySelectorAll('img[data-zoom="true"]').forEach((im) => {
-      im.addEventListener('click', () => {
-        lbImg.src = im.src;
-        lb.classList.add('open');
-      });
-    });
-    lb.addEventListener('click', () => lb.classList.remove('open'));
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') lb.classList.remove('open'); });
-  </script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>

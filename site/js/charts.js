@@ -5,16 +5,16 @@
  */
 
 const C = {
-  navy: '#0b3c5d',
-  teal: '#0f766e',
-  amber: '#d97706',
-  crimson: '#b91c1c',
-  purple: '#6d28d9',
-  blue: '#2563eb',
-  slate: '#64748b',
-  grid: '#e2e8f0',
-  band: '#e0f2fe',
-  danger: '#fee2e2',
+  navy: '#eceaf6',
+  teal: '#3fd1c1',
+  amber: '#f2c14e',
+  crimson: '#ff6b5e',
+  purple: '#a98bff',
+  blue: '#5b8cff',
+  slate: '#8a8fb5',
+  grid: 'rgba(160,170,255,0.14)',
+  band: 'rgba(91,140,255,0.22)',
+  danger: 'rgba(255,107,94,0.22)',
 };
 
 function el(tag, attrs = {}, text = '') {
@@ -53,7 +53,7 @@ function drawPlot(container, cfg) {
       const y1 = b.y0 !== undefined ? Math.min(yMap(b.y0), pad.t + ph) : pad.t + ph;
       svg.appendChild(el('rect', { x: x0, y: y0, width: Math.max(0, x1 - x0), height: Math.max(0, y1 - y0), fill: b.fill, opacity: b.opacity ?? 0.5 }));
       if (b.label) {
-        svg.appendChild(el('text', { x: (x0 + x1) / 2, y: y0 + 13, 'text-anchor': 'middle', fill: b.labelColor || C.slate, 'font-size': 10.5, 'font-family': 'JetBrains Mono, monospace', 'font-weight': 600 }, b.label));
+        svg.appendChild(el('text', { x: (x0 + x1) / 2, y: y0 + 13, 'text-anchor': 'middle', fill: b.labelColor || C.slate, 'font-size': 10.5, 'font-family': 'Geist Mono, ui-monospace, monospace', 'font-weight': 600 }, b.label));
       }
     }
   }
@@ -63,13 +63,13 @@ function drawPlot(container, cfg) {
     const x = xMap(xt.v);
     if (x < pad.l - 1 || x > pad.l + pw + 1) continue;
     svg.appendChild(el('line', { x1: x, y1: pad.t, x2: x, y2: pad.t + ph, stroke: C.grid, 'stroke-width': 1 }));
-    svg.appendChild(el('text', { x, y: pad.t + ph + 16, 'text-anchor': 'middle', fill: C.slate, 'font-size': 10.5, 'font-family': 'JetBrains Mono, monospace' }, xt.l));
+    svg.appendChild(el('text', { x, y: pad.t + ph + 16, 'text-anchor': 'middle', fill: C.slate, 'font-size': 10.5, 'font-family': 'Geist Mono, ui-monospace, monospace' }, xt.l));
   }
   for (const yt of cfg.yTicks) {
     const y = yMap(yt.v);
     if (y < pad.t - 1 || y > pad.t + ph + 1) continue;
     svg.appendChild(el('line', { x1: pad.l, y1: y, x2: pad.l + pw, y2: y, stroke: C.grid, 'stroke-width': 1 }));
-    svg.appendChild(el('text', { x: pad.l - 8, y: y + 3.5, 'text-anchor': 'end', fill: C.slate, 'font-size': 10.5, 'font-family': 'JetBrains Mono, monospace' }, yt.l));
+    svg.appendChild(el('text', { x: pad.l - 8, y: y + 3.5, 'text-anchor': 'end', fill: C.slate, 'font-size': 10.5, 'font-family': 'Geist Mono, ui-monospace, monospace' }, yt.l));
   }
 
   // Reference lines
@@ -81,7 +81,7 @@ function drawPlot(container, cfg) {
         const align = vl.align || 'start';
         const dx = align === 'end' ? -4 : 4;
         const dy = vl.dy ?? 13;
-        svg.appendChild(el('text', { x: x + dx, y: pad.t + dy, 'text-anchor': align, fill: vl.color || C.slate, 'font-size': 10, 'font-family': 'JetBrains Mono, monospace', 'font-weight': 600 }, vl.label));
+        svg.appendChild(el('text', { x: x + dx, y: pad.t + dy, 'text-anchor': align, fill: vl.color || C.slate, 'font-size': 10, 'font-family': 'Geist Mono, ui-monospace, monospace', 'font-weight': 600 }, vl.label));
       }
     }
   }
@@ -93,13 +93,13 @@ function drawPlot(container, cfg) {
         const align = hl.align || 'end';
         const tx = align === 'start' ? pad.l + 6 : pad.l + pw - 6;
         const dy = hl.dy ?? -5;
-        svg.appendChild(el('text', { x: tx, y: y + dy, 'text-anchor': align, fill: hl.color || C.slate, 'font-size': 10, 'font-family': 'JetBrains Mono, monospace', 'font-weight': 600 }, hl.label));
+        svg.appendChild(el('text', { x: tx, y: y + dy, 'text-anchor': align, fill: hl.color || C.slate, 'font-size': 10, 'font-family': 'Geist Mono, ui-monospace, monospace', 'font-weight': 600 }, hl.label));
       }
     }
   }
 
   // Plot frame
-  svg.appendChild(el('rect', { x: pad.l, y: pad.t, width: pw, height: ph, fill: 'none', stroke: '#cbd5e1', 'stroke-width': 1 }));
+  svg.appendChild(el('rect', { x: pad.l, y: pad.t, width: pw, height: ph, fill: 'none', stroke: 'rgba(160,170,255,0.3)', 'stroke-width': 1 }));
 
   // Clip path for traces
   const clipId = 'clip-' + Math.random().toString(36).slice(2, 8);
@@ -135,7 +135,7 @@ function drawPlot(container, cfg) {
       for (let i = 0; i < s.x.length; i++) {
         traceGroup.appendChild(el('circle', {
           cx: xMap(s.x[i]), cy: yMap(s.y[i]), r: s.r || 3.2,
-          fill: s.color, stroke: '#ffffff', 'stroke-width': 1,
+          fill: s.color, stroke: '#06071a', 'stroke-width': 1,
         }));
       }
     }
@@ -145,21 +145,21 @@ function drawPlot(container, cfg) {
 
   // Title & Axis Labels
   if (cfg.title) {
-    svg.appendChild(el('text', { x: pad.l, y: 15, fill: '#0f172a', 'font-size': 12.5, 'font-weight': 600, 'font-family': 'Inter, sans-serif' }, cfg.title));
+    svg.appendChild(el('text', { x: pad.l, y: 15, fill: '#eceaf6', 'font-size': 12.5, 'font-weight': 600, 'font-family': 'Geist, -apple-system, sans-serif' }, cfg.title));
   }
   if (cfg.xLabel) {
-    svg.appendChild(el('text', { x: pad.l + pw / 2, y: H - 6, 'text-anchor': 'middle', fill: '#475569', 'font-size': 11, 'font-family': 'Inter, sans-serif' }, cfg.xLabel));
+    svg.appendChild(el('text', { x: pad.l + pw / 2, y: H - 6, 'text-anchor': 'middle', fill: '#8a8fb5', 'font-size': 11, 'font-family': 'Geist, -apple-system, sans-serif' }, cfg.xLabel));
   }
   if (cfg.yLabel) {
     svg.appendChild(el('text', {
       x: 14, y: pad.t + ph / 2, 'text-anchor': 'middle',
       transform: `rotate(-90 14 ${pad.t + ph / 2})`,
-      fill: '#475569', 'font-size': 11, 'font-family': 'Inter, sans-serif',
+      fill: '#8a8fb5', 'font-size': 11, 'font-family': 'Geist, -apple-system, sans-serif',
     }, cfg.yLabel));
   }
 
   // Interactive Crosshair
-  const cross = el('line', { x1: 0, y1: pad.t, x2: 0, y2: pad.t + ph, stroke: '#0f172a', 'stroke-dasharray': '3 3', 'stroke-width': 0.9, opacity: 0 });
+  const cross = el('line', { x1: 0, y1: pad.t, x2: 0, y2: pad.t + ph, stroke: '#eceaf6', 'stroke-dasharray': '3 3', 'stroke-width': 0.9, opacity: 0 });
   svg.appendChild(cross);
 
   container.innerHTML = '';
@@ -235,7 +235,7 @@ export async function initMeasurementCharts(dataUrl = 'data/sim_data.json') {
     { key: 'pex_tt_27',    short: 'Flat-PEX tt (70.1 dB)',    color: C.amber,   lw: 2.1, on: true },
     { key: 'pex_sf_27',    short: 'Flat-PEX sf (69.3 dB)',    color: C.crimson, lw: 1.7, on: true },
     { key: 'pex_fs_ll_27', short: 'Flat-PEX fs_ll (70.4 dB)', color: C.purple,  lw: 1.6, on: false },
-    { key: 'pex_ss_85',    short: 'Flat-PEX ss/85°C (69.0)',  color: '#0284c7', lw: 1.6, on: false },
+    { key: 'pex_ss_85',    short: 'Flat-PEX ss/85°C (69.0)',  color: '#7fd6ff', lw: 1.6, on: false },
     { key: 'V2A5_tt',      short: 'Sch. tt (71.8 dB)',        color: C.navy,    lw: 1.8, dash: '5 3', on: true },
     { key: 'V2A5_ffhh',    short: 'Sch. ff_hh/-20°C (68.9)',  color: C.teal,    lw: 1.5, dash: '3 2', on: false },
   ];
@@ -288,7 +288,7 @@ export async function initMeasurementCharts(dataUrl = 'data/sim_data.json') {
         extra: (g, xm, ym) => {
           // +40 dB/dec reference line + clean non-overlapping label above the noise slope
           g.appendChild(el('line', { x1: xm(25), y1: ym(-98), x2: xm(1500), y2: ym(-98 + 40 * Math.log10(1500 / 25)), stroke: C.slate, 'stroke-dasharray': '3 3', 'stroke-width': 1.2 }));
-          g.appendChild(el('text', { x: xm(190), y: ym(-16), fill: C.slate, 'font-size': 10.5, 'font-family': 'JetBrains Mono, monospace', 'font-weight': 600 }, '+40 dB/dec (2nd-order)'));
+          g.appendChild(el('text', { x: xm(190), y: ym(-16), fill: C.slate, 'font-size': 10.5, 'font-family': 'Geist Mono, ui-monospace, monospace', 'font-weight': 600 }, '+40 dB/dec (2nd-order)'));
         },
         fmtX: (v) => v >= 1000 ? `${(v / 1000).toFixed(2)} MHz` : `${v.toFixed(1)} kHz`,
         fmtY: (v) => `${v.toFixed(1)} dBc`,
@@ -357,7 +357,7 @@ export async function initMeasurementCharts(dataUrl = 'data/sim_data.json') {
       yTicks: [0, 2.5, 5, 7.5, 10].map((v) => ({ v, l: String(v) })),
       bands: [
         { y0: 7.5, y1: 10.5, fill: C.danger, opacity: 0.7, label: 'Aliasing Latch-Up Zone (> 0.75 fs)', labelColor: C.crimson },
-        { x0: 10, x1: 25, y0: 0, y1: 7.5, fill: '#fef3c7', opacity: 0.55, label: 'Rail OVL', labelColor: C.amber },
+        { x0: 10, x1: 25, y0: 0, y1: 7.5, fill: 'rgba(242,193,78,0.25)', opacity: 0.55, label: 'Rail OVL', labelColor: C.amber },
       ],
       hLines: [{ y: 2.5, color: C.slate, dash: '2 3', label: 'Lock = fs/4 (2.5 MHz)', align: 'end', dy: 14 }],
       series: [
@@ -455,7 +455,7 @@ export async function initMeasurementCharts(dataUrl = 'data/sim_data.json') {
       yTicks: [66, 68, 70, 72].map((v) => ({ v, l: `${v}` })),
       hLines: [{ y: 71.1, color: C.crimson, dash: '5 3' }],
       extra: (g, xm, ym) => {
-        g.appendChild(el('text', { x: xm(15.2), y: ym(72.65), 'text-anchor': 'end', fill: C.crimson, 'font-size': 10.5, 'font-family': 'JetBrains Mono, monospace', 'font-weight': 600 }, '--- Median 71.1 dB (min 68.1, max 71.7)'));
+        g.appendChild(el('text', { x: xm(15.2), y: ym(72.65), 'text-anchor': 'end', fill: C.crimson, 'font-size': 10.5, 'font-family': 'Geist Mono, ui-monospace, monospace', 'font-weight': 600 }, '--- Median 71.1 dB (min 68.1, max 71.7)'));
       },
       series: [{
         short: 'tt_mm MC SNDR', color: C.navy, lw: 1.5, markers: true, r: 4.0,
