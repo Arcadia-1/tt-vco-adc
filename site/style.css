@@ -169,8 +169,8 @@ button.die-label:hover { border-color: var(--ink); }
 .step-hero { min-height: 100vh; min-height: 100svh; }
 .step-body { width: min(100%, 27.5rem); pointer-events: auto; opacity: 0.25; transition: opacity 0.4s; }
 .step.current .step-body { opacity: 1; }
-.step-count { font-size: 13px; color: var(--dim); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
-.step-count::before { content: ''; width: 22px; height: 2px; background: var(--blk); box-shadow: 0 0 12px var(--blk); }
+.step-count { font-size: clamp(15px, 1.2vw, 18px); font-weight: 600; color: var(--blk); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+.step-count::before { content: ''; width: 28px; height: 3px; background: var(--blk); box-shadow: 0 0 12px var(--blk); }
 .step h2 { font-size: clamp(30px, 3.5vw, 54px); line-height: 1.02; letter-spacing: -0.03em; font-weight: 680; font-stretch: 118%; text-wrap: balance; margin-bottom: 18px; }
 .step p { font-size: clamp(16px, 1.2vw, 18px); line-height: 1.58; }
 .facts { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 6px; font-size: 13.5px; color: var(--ink); }
